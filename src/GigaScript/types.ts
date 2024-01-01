@@ -1,3 +1,5 @@
+// [ LEXER ]
+
 // Contains the tokens that are parser understands
 export enum TokenType {
     // Literal Types (USER_DEFINED)
