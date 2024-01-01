@@ -1,0 +1,15 @@
+{
+  "name": "gigascript",
+  "version": "1.0.0",
+  "description": "A simple programming language based on TypeScript and Gen-Z slang.",
+  "main": "./src/index.ts",
+  "scripts": {
+    "test": "ts-node ./src/index.ts"
+  },
+  "author": "Bardia Shafaee (aName2050)",
+  "license": "MIT",
+  "dependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
