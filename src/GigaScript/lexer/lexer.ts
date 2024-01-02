@@ -20,7 +20,8 @@ export function tokenize(source: string): Token[] {
             src[0] == '+' ||
             src[0] == '-' ||
             src[0] == '*' ||
-            src[0] == '/'
+            src[0] == '/' ||
+            src[0] == '%'
         ) {
             // Binary Operations (left side and right side operations)
             tokens.push(token(src.shift(), TokenType.BinOp));
@@ -61,16 +62,16 @@ export function tokenize(source: string): Token[] {
             // Handle unknown characters
             else {
                 console.error(
-                    new SyntaxError(
-                        `Unknown character: charCode: ${src[0].charCodeAt(
-                            0
-                        )} char: ${src[0]}`
-                    )
+                    `LexerError: Unknown character: UNICODE-${src[0].charCodeAt(
+                        0
+                    )} ${src[0]}`
                 );
                 process.exit(1);
             }
         }
     }
+
+    tokens.push({ value: 'EndOfFile', type: TokenType.EOF });
 
     return tokens;
 }

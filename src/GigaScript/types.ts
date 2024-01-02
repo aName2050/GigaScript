@@ -14,6 +14,9 @@ export enum TokenType {
     Equals,
     OpenParan, // (
     CloseParen, // )
+
+    // Special
+    EOF, // End Of File
 }
 
 // Represents a single token in the language
