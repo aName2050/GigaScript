@@ -5,6 +5,7 @@ import {
     NumericLiteral,
     Program,
     Stmt,
+    NullLiteral,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -139,6 +140,10 @@ export default class Parser {
                     symbol: this.eat().value,
                 } as Identifier;
 
+            case TokenType.Null:
+                this.eat(); // advance to next token
+                return { kind: 'NullLiteral', value: 'null' } as NullLiteral;
+
             // Constants and numeric constants
             case TokenType.Number:
                 return {
@@ -158,10 +163,7 @@ export default class Parser {
             }
 
             default:
-                console.error(
-                    `ParseError: SyntaxError: Unexpected token: `,
-                    this.at()
-                );
+                console.error(`ParseError: Unexpected token: `, this.at());
                 process.exit(1);
         }
     }

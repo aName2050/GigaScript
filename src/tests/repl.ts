@@ -1,4 +1,6 @@
 import Parser from '../GigaScript/parser/parser';
+import { evaluate } from '../GigaScript/runtime/interpreter';
+
 import repl from 'repl';
 
 const v = 'v1';
@@ -15,5 +17,6 @@ function handle(
 
     // Produce AST
     const program = parser.generateAST(uInput);
-    callback(null, program);
+    const result = evaluate(program);
+    callback(null, result);
 }

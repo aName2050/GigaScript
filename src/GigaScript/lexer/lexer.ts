@@ -3,6 +3,7 @@ import { Token, TokenType } from '../types';
 
 const KEYWORDS: Record<string, TokenType> = {
     let: TokenType.Let,
+    null: TokenType.Null,
 };
 
 export function tokenize(source: string): Token[] {
@@ -49,7 +50,7 @@ export function tokenize(source: string): Token[] {
 
                 // Check for reserved keywords
                 const reserved = KEYWORDS[ident];
-                if (reserved) {
+                if (typeof reserved == 'number') {
                     tokens.push(token(ident, reserved));
                 } else {
                     // Unknown name is most likely user defined symbol
