@@ -24,8 +24,8 @@ export function isInt(str: string): boolean {
 }
 
 /**
- * Returns if the character is a skippable whitespace character [\s, \n, \t]
+ * Returns if the character is a skippable whitespace character [\s, \n, \t, \r]
  */
 export function isSkippable(str: string): boolean {
-    return str == ' ' || str == '\n' || str == '\t' || str == ';';
+    return str == ' ' || str == '\n' || str == '\t' || str == '\r';
 }
