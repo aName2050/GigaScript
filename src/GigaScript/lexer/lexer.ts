@@ -1,9 +1,11 @@
 import { isAlpha, isInt, isSkippable, token } from './lexerUtil';
 import { Token, TokenType } from '../types';
 
+/**
+ * Reserved keywords for GigaScript
+ */
 const KEYWORDS: Record<string, TokenType> = {
     let: TokenType.Let,
-    null: TokenType.Null,
 };
 
 export function tokenize(source: string): Token[] {

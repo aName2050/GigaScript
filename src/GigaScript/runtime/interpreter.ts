@@ -1,10 +1,17 @@
-import { NullVal, NumberVal, RuntimeVal } from './values';
-import { BinaryExpr, NumericLiteral, Program, Stmt } from '../ast/ast';
+import { MK_NULL, MK_NUMBER, NumberVal, RuntimeVal } from './values';
+import {
+    BinaryExpr,
+    Identifier,
+    NumericLiteral,
+    Program,
+    Stmt,
+} from '../ast/ast';
+import Environment from './environment';
 
-function eval_program(program: Program): RuntimeVal {
-    let lastEvaluated: RuntimeVal = { type: 'null', value: 'null' } as NullVal;
+function eval_program(program: Program, env: Environment): RuntimeVal {
+    let lastEvaluated: RuntimeVal = MK_NULL();
     for (const statement of program.body) {
-        lastEvaluated = evaluate(statement);
+        lastEvaluated = evaluate(statement, env);
     }
     return lastEvaluated;
 }
@@ -31,9 +38,9 @@ function eval_numeric_binary_expr(
 /**
  * Evaluates expressions based on the binary operation type
  */
-function eval_binary_expr(binop: BinaryExpr): RuntimeVal {
-    const lhs = evaluate(binop.left);
-    const rhs = evaluate(binop.right);
+function eval_binary_expr(binop: BinaryExpr, env: Environment): RuntimeVal {
+    const lhs = evaluate(binop.left, env);
+    const rhs = evaluate(binop.right, env);
 
     // Numeric operations are only supported currently
     if (lhs.type == 'number' && rhs.type == 'number') {
@@ -45,10 +52,15 @@ function eval_binary_expr(binop: BinaryExpr): RuntimeVal {
     }
 
     // A null value is in the binary expression
-    return { type: 'null', value: 'null' } as NullVal;
+    return MK_NULL();
 }
 
-export function evaluate(node: Stmt): RuntimeVal {
+function eval_identifier(ident: Identifier, env: Environment): RuntimeVal {
+    const val = env.lookupVar(ident.symbol);
+    return val;
+}
+
+export function evaluate(node: Stmt, env: Environment): RuntimeVal {
     switch (node.kind) {
         case 'NumericLiteral':
             return {
@@ -56,14 +68,14 @@ export function evaluate(node: Stmt): RuntimeVal {
                 type: 'number',
             } as NumberVal;
 
-        case 'NullLiteral':
-            return { value: 'null', type: 'null' } as NullVal;
+        case 'Identifier':
+            return eval_identifier(node as Identifier, env);
 
         case 'BinaryExpr':
-            return eval_binary_expr(node as BinaryExpr);
+            return eval_binary_expr(node as BinaryExpr, env);
 
         case 'Program':
-            return eval_program(node as Program);
+            return eval_program(node as Program, env);
 
         // Handle types not implemented
         default:

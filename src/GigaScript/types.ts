@@ -3,7 +3,6 @@
 // Contains the tokens that are parser understands
 export enum TokenType {
     // Literal Types (USER_DEFINED)
-    Null,
     Number,
     Identifier, // Variable names, function names, etc.
 

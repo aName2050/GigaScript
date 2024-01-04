@@ -5,7 +5,6 @@ import {
     NumericLiteral,
     Program,
     Stmt,
-    NullLiteral,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -139,10 +138,6 @@ export default class Parser {
                     kind: 'Identifier',
                     symbol: this.eat().value,
                 } as Identifier;
-
-            case TokenType.Null:
-                this.eat(); // advance to next token
-                return { kind: 'NullLiteral', value: 'null' } as NullLiteral;
 
             // Constants and numeric constants
             case TokenType.Number:
