@@ -1,7 +1,10 @@
-let x = 32;
+const foo = 32;
 
-func myFunc(arg) {
-    return arg * 2
-}
-
-myFunc(x);
+const obj = {
+    x: 100,
+    y: 50,
+    foo,
+    complex: {
+        bar: true,
+    },
+};

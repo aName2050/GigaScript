@@ -3,17 +3,23 @@
 // Contains the tokens that are parser understands
 export enum TokenType {
     // Literal Types (USER_DEFINED)
-    Number,
+    Number, // 0-9
     Identifier, // Variable names, function names, etc.
 
-    // Keywords (RESERVED)
-    Let,
+    // Keywords
+    Let, // Mutable variable declaration
+    Const, // Constant variable declaration
 
     // Grouping + Operators
     BinOp, // Binary operator
-    Equals,
+    Equals, // =
+    Comma, // ,
+    Colon, // :
+    Semicolon, // ;
     OpenParan, // (
     CloseParen, // )
+    OpenBrace, // {
+    CloseBrace, // }
 
     // Special
     EOF, // End Of File

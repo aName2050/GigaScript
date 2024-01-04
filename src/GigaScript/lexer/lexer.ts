@@ -6,6 +6,7 @@ import { Token, TokenType } from '../types';
  */
 const KEYWORDS: Record<string, TokenType> = {
     let: TokenType.Let,
+    const: TokenType.Const,
 };
 
 export function tokenize(source: string): Token[] {
@@ -19,6 +20,10 @@ export function tokenize(source: string): Token[] {
             tokens.push(token(src.shift(), TokenType.OpenParan));
         } else if (src[0] == ')') {
             tokens.push(token(src.shift(), TokenType.CloseParen));
+        } else if (src[0] == '{') {
+            tokens.push(token(src.shift(), TokenType.OpenBrace));
+        } else if (src[0] == '}') {
+            tokens.push(token(src.shift(), TokenType.CloseBrace));
         } else if (
             src[0] == '+' ||
             src[0] == '-' ||
@@ -28,9 +33,17 @@ export function tokenize(source: string): Token[] {
         ) {
             // Binary Operations (left side and right side operations)
             tokens.push(token(src.shift(), TokenType.BinOp));
-        } else if (src[0] == '=') {
+        }
+        // Handle conditionals and assignments
+        else if (src[0] == '=') {
             // Handle conditionals and assignments
             tokens.push(token(src.shift(), TokenType.Equals));
+        } else if (src[0] == ';') {
+            tokens.push(token(src.shift(), TokenType.Semicolon));
+        } else if (src[0] == ':') {
+            tokens.push(token(src.shift(), TokenType.Colon));
+        } else if (src[0] == ',') {
+            tokens.push(token(src.shift(), TokenType.Comma));
         } else {
             // Handle multicharacter tokens
             // Handle numeric literals

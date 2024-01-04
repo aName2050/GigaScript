@@ -28,4 +28,5 @@ export function isInt(str: string): boolean {
  */
 export function isSkippable(str: string): boolean {
     return str == ' ' || str == '\n' || str == '\t' || str == '\r';
+    // TODO: remove \r from here when adding EOL (End Of Line) handling in parser
 }

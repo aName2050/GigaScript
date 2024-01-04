@@ -5,6 +5,10 @@ import {
     NumericLiteral,
     Program,
     Stmt,
+    VarDeclaration,
+    AssignmentExpr,
+    Property,
+    ObjectLiteral,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -20,6 +24,14 @@ export default class Parser {
      */
     private not_eof(): boolean {
         return this.tokens[0].type != TokenType.EOF;
+    }
+
+    /**
+     * Determine if parsing the current line is complete by reaching the CR and/or LF tokens
+     */
+    private not_eol(): boolean {
+        // TODO:
+        throw new Error('Method not implemented');
     }
 
     /**
@@ -44,7 +56,12 @@ export default class Parser {
     private expect(type: TokenType, err: any): Token {
         const prev = this.tokens.shift() as Token;
         if (!prev || prev.type != type) {
-            console.error(`ParseError:\n${err} ${prev} - Expecting: ${type}`);
+            console.error(
+                `ParseError: ${err}`,
+                prev,
+                `- Expecting: type`,
+                type
+            );
             process.exit(1);
         }
 
@@ -70,15 +87,136 @@ export default class Parser {
      * Handle complex statements
      */
     private parse_stmt(): Stmt {
-        // skip to parse_expr
-        return this.parse_expr();
+        switch (this.at().type) {
+            case TokenType.Let:
+            case TokenType.Const:
+                return this.parse_var_declaration();
+
+            default:
+                return this.parse_expr();
+        }
+    }
+
+    /**
+     * Handle variable declarations
+     *
+     * LET IDENT;
+     * (LET | CONST) IDENT = EXPR;
+     *
+     * Semicolons (;) are required for variable declarations
+     */
+    private parse_var_declaration(): Stmt {
+        const isConstant = this.eat().type == TokenType.Const;
+        const identifier = this.expect(
+            TokenType.Identifier,
+            'Expected identifier following variable declaration keywords.'
+        ).value;
+
+        if (this.at().type == TokenType.Semicolon) {
+            this.eat(); // eat semicolon
+            if (isConstant) {
+                throw 'ParseError: Constant values must be declared with a value.';
+            }
+
+            return {
+                kind: 'VarDeclaration',
+                constant: false,
+                identifier,
+            } as VarDeclaration;
+        }
+
+        this.expect(
+            TokenType.Equals,
+            'Unexpected token. Expected "=" following identifier for variable declaration.'
+        );
+
+        const declaration = {
+            kind: 'VarDeclaration',
+            value: this.parse_expr(),
+            identifier,
+            constant: isConstant,
+        } as VarDeclaration;
+
+        this.expect(
+            TokenType.Semicolon,
+            'Variable declaration statements must end with a semicolon.'
+        );
+
+        return declaration;
     }
 
     /**
      * Handle expressions
      */
     private parse_expr(): Expr {
-        return this.parse_additive_expr();
+        return this.parse_assignment_expr();
+    }
+
+    /**
+     * Handle variable reassignments
+     */
+    private parse_assignment_expr(): Expr {
+        const left = this.parse_object_expr();
+
+        if (this.at().type == TokenType.Equals) {
+            this.eat(); // advance past equals token
+            const value = this.parse_assignment_expr();
+            return {
+                value,
+                assigne: left,
+                kind: 'AssignmentExpr',
+            } as AssignmentExpr;
+        }
+
+        return left;
+    }
+
+    private parse_object_expr(): Expr {
+        // { Prop[] }
+        if (this.at().type !== TokenType.OpenBrace) {
+            return this.parse_additive_expr();
+        }
+
+        this.eat(); // advance past the open brace
+        const properties = new Array<Property>();
+
+        while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
+            const key = this.expect(
+                TokenType.Identifier,
+                'Expected key for key: value pair declaration.'
+            ).value;
+
+            // Allows object key: value shortcut
+            // { key, }
+            if (this.at().type == TokenType.Comma) {
+                this.eat(); // advance past the comma
+                properties.push({ key, kind: 'Property' } as Property);
+                continue;
+            }
+            // { key }
+            else if (this.at().type == TokenType.CloseBrace) {
+                properties.push({ key, kind: 'Property' } as Property);
+                continue;
+            }
+
+            // { key: value }
+            this.expect(TokenType.Colon, 'Expected colon after identifier');
+            const value = this.parse_expr();
+
+            properties.push({ kind: 'Property', value, key });
+            if (this.at().type != TokenType.CloseBrace) {
+                this.expect(
+                    TokenType.Comma,
+                    'Expected comma or closing brace following property declaration.'
+                );
+            }
+        }
+
+        this.expect(
+            TokenType.CloseBrace,
+            'Expected closing brace when defined an object'
+        );
+        return { kind: 'ObjectLiteral', properties } as ObjectLiteral;
     }
 
     /**

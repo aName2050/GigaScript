@@ -1,5 +1,12 @@
 export type NodeType =
+    // STATEMENTS
     | 'Program'
+    | 'VarDeclaration'
+    // EXPRESSIONS
+    | 'AssignmentExpr'
+    // LITERALS
+    | 'Property'
+    | 'ObjectLiteral'
     | 'NumericLiteral'
     | 'Identifier'
     | 'BinaryExpr';
@@ -21,10 +28,26 @@ export interface Program extends Stmt {
     body: Stmt[];
 }
 
+export interface VarDeclaration extends Stmt {
+    kind: 'VarDeclaration';
+    constant: boolean;
+    identifier: string;
+    value?: Expr;
+}
+
 /**
  * Expressions will result in a value at runtime
  */
 export interface Expr extends Stmt {}
+
+/**
+ * An expression reassigning a variable to another value
+ */
+export interface AssignmentExpr extends Expr {
+    kind: 'AssignmentExpr';
+    assigne: Expr;
+    value: Expr;
+}
 
 /**
  * An operation with two sides seperated by an operator.
@@ -60,4 +83,23 @@ export interface Identifier extends Expr {
 export interface NumericLiteral extends Expr {
     kind: 'NumericLiteral';
     value: number;
+}
+
+/**
+ * A key: value property for objects
+ */
+export interface Property extends Expr {
+    kind: 'Property';
+    key: string;
+    value?: Expr;
+}
+
+/**
+ * Object literal structure.
+ *
+ * Contains many key: value pairs.
+ */
+export interface ObjectLiteral extends Expr {
+    kind: 'ObjectLiteral';
+    properties: Property[];
 }
