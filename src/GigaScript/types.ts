@@ -14,12 +14,15 @@ export enum TokenType {
     BinOp, // Binary operator
     Equals, // =
     Comma, // ,
+    Dot, // .
     Colon, // :
     Semicolon, // ;
     OpenParan, // (
     CloseParen, // )
     OpenBrace, // {
     CloseBrace, // }
+    OpenBracket, // [
+    CloseBracket, // ]
 
     // Special
     EOF, // End Of File

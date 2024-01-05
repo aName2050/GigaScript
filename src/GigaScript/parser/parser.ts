@@ -9,6 +9,8 @@ import {
     AssignmentExpr,
     Property,
     ObjectLiteral,
+    MemberExpr,
+    CallExpr,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -260,6 +262,98 @@ export default class Parser {
         }
 
         return left;
+    }
+
+    // foo.bar()()
+    private parse_call_member_expr(): Expr {
+        const member = this.parse_call_member_expr();
+
+        if (this.at().type == TokenType.OpenParan) {
+            return this.parse_call_expr(member);
+        }
+
+        return member;
+    }
+
+    private parse_call_expr(caller: Expr): Expr {
+        let call_expr: Expr = {
+            kind: 'CallExpr',
+            caller,
+            args: this.parse_args(),
+        } as CallExpr;
+
+        if (this.at().type == TokenType.OpenParan) {
+            call_expr = this.parse_call_expr(call_expr);
+        }
+
+        return call_expr;
+    }
+
+    private parse_args(): Expr[] {
+        this.expect(
+            TokenType.OpenParan,
+            'Expected "(" after function identifier.'
+        );
+        const args =
+            this.at().type == TokenType.CloseParen
+                ? []
+                : this.parse_arguments_list();
+
+        this.expect(
+            TokenType.CloseParen,
+            'Expected ")" after function parameters'
+        );
+        return args;
+    }
+
+    private parse_arguments_list(): Expr[] {
+        const args = [this.parse_assignment_expr()];
+
+        while (this.at().type == TokenType.Comma && this.eat()) {
+            args.push(this.parse_assignment_expr());
+        }
+
+        return args;
+    }
+
+    private parse_member_expr(): Expr {
+        let object = this.parse_primary_expr();
+
+        while (
+            this.at().type == TokenType.Dot ||
+            this.at().type == TokenType.OpenBracket
+        ) {
+            const operator = this.eat();
+            let property: Expr;
+            let computed: boolean;
+
+            // non-computed values, like foo.bar
+            if (operator.type == TokenType.Dot) {
+                computed = false;
+                // get ident
+                property = this.parse_primary_expr();
+                if (property.kind != 'Identifier') {
+                    throw 'Cannot use dot operator without valid identifier.';
+                }
+            } else {
+                // adds suport for foo[bar]
+                computed = true;
+                property = this.parse_expr();
+                this.expect(
+                    TokenType.CloseBracket,
+                    'Expected "]" at end of object member expression'
+                );
+            }
+
+            object = {
+                kind: 'MemberExpr',
+                object,
+                property,
+                computed,
+            } as MemberExpr;
+        }
+
+        return object;
     }
 
     /**
