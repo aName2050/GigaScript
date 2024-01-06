@@ -1,6 +1,9 @@
 import { MK_BOOL, MK_NULL, RuntimeVal } from './values';
 
-export function createGlobalScope() {
+/**
+ * Create the default global environment
+ */
+export function createGlobalScope(): Environment {
     const env = new Environment();
     // Global Variables
     env.delcareVar('true', MK_BOOL(true), true);

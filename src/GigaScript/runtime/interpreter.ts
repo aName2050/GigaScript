@@ -18,8 +18,6 @@ import {
 } from './eval/expr';
 import { eval_program, eval_var_declaration } from './eval/stmt';
 
-// TODO: ep. 9
-
 export function evaluate(node: Stmt, env: Environment): RuntimeVal {
     switch (node.kind) {
         case 'NumericLiteral':
