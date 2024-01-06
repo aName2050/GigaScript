@@ -1,12 +1,19 @@
 import {
     AssignmentExpr,
     BinaryExpr,
+    CallExpr,
     Identifier,
     ObjectLiteral,
 } from '../../ast/ast';
 import Environment from '../environment';
 import { evaluate } from '../interpreter';
-import { NumberVal, RuntimeVal, MK_NULL, ObjectVal } from '../values';
+import {
+    NumberVal,
+    RuntimeVal,
+    MK_NULL,
+    ObjectVal,
+    NativeFunctionVal,
+} from '../values';
 
 /**
  * Evaluate numeric operations with binary operators
@@ -85,4 +92,19 @@ export function eval_object_expr(
     }
 
     return object;
+}
+
+export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeVal {
+    const args = expr.args.map(arg => evaluate(arg, env));
+    const fn = evaluate(expr.caller, env);
+
+    if (fn.type !== 'nativeFunction') {
+        throw (
+            'Unable to call a value that is not a function: ' +
+            JSON.stringify(fn)
+        );
+    }
+
+    const result = (fn as NativeFunctionVal).call(args, env);
+    return result;
 }

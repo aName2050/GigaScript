@@ -2,6 +2,7 @@ import { MK_NULL, MK_NUMBER, NumberVal, RuntimeVal } from './values';
 import {
     AssignmentExpr,
     BinaryExpr,
+    CallExpr,
     Identifier,
     NumericLiteral,
     ObjectLiteral,
@@ -15,6 +16,7 @@ import {
     eval_binary_expr,
     eval_assignment,
     eval_object_expr,
+    eval_call_expr,
 } from './eval/expr';
 import { eval_program, eval_var_declaration } from './eval/stmt';
 
@@ -26,11 +28,17 @@ export function evaluate(node: Stmt, env: Environment): RuntimeVal {
                 type: 'number',
             } as NumberVal;
 
+        case 'Identifier':
+            return eval_identifier(node as Identifier, env);
+
         case 'ObjectLiteral':
             return eval_object_expr(node as ObjectLiteral, env);
 
-        case 'Identifier':
-            return eval_identifier(node as Identifier, env);
+        case 'CallExpr':
+            return eval_call_expr(node as CallExpr, env);
+
+        case 'AssignmentExpr':
+            return eval_assignment(node as AssignmentExpr, env);
 
         case 'BinaryExpr':
             return eval_binary_expr(node as BinaryExpr, env);
@@ -40,9 +48,6 @@ export function evaluate(node: Stmt, env: Environment): RuntimeVal {
 
         case 'VarDeclaration':
             return eval_var_declaration(node as VarDeclaration, env);
-
-        case 'AssignmentExpr':
-            return eval_assignment(node as AssignmentExpr, env);
 
         // Handle types not implemented
         default:

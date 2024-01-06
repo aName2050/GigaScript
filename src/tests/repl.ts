@@ -1,7 +1,7 @@
 import repl from 'repl';
 
 import Parser from '../GigaScript/parser/parser';
-import Environment from '../GigaScript/runtime/environment';
+import { createGlobalScope } from '../GigaScript/runtime/environment';
 import { evaluate } from '../GigaScript/runtime/interpreter';
 
 import { MK_NULL, MK_NUMBER, MK_BOOL } from '../GigaScript/runtime/values';
@@ -11,7 +11,7 @@ console.log(`REPL ${v}\n`);
 const r = repl.start({ prompt: `> `, eval: handle });
 
 const parser = new Parser();
-const env = new Environment();
+const env = createGlobalScope();
 
 function handle(
     uInput: string,

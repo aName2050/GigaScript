@@ -1,14 +1,39 @@
-import { MK_BOOL, MK_NULL, RuntimeVal } from './values';
+import {
+    MK_BOOL,
+    MK_NATIVE_FUNCTION,
+    MK_NULL,
+    MK_NUMBER,
+    RuntimeVal,
+} from './values';
 
 /**
  * Create the default global environment
  */
 export function createGlobalScope(): Environment {
     const env = new Environment();
+
     // Global Variables
     env.delcareVar('true', MK_BOOL(true), true);
     env.delcareVar('false', MK_BOOL(false), true);
     env.delcareVar('null', MK_NULL(), true);
+
+    // Native functions
+    env.delcareVar(
+        'print',
+        MK_NATIVE_FUNCTION((args, scope) => {
+            console.log(...args);
+            return MK_NULL();
+        }),
+        true
+    );
+
+    env.delcareVar(
+        'timestamp',
+        MK_NATIVE_FUNCTION((_args, _env) => {
+            return MK_NUMBER(Date.now());
+        }),
+        true
+    );
 
     return env;
 }

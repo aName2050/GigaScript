@@ -244,7 +244,7 @@ export default class Parser {
      * Handle multiplication (*), division (/), and modulo (%) operations
      */
     private parse_multiplicitave_expr(): Expr {
-        let left = this.parse_primary_expr();
+        let left = this.parse_call_member_expr();
 
         while (
             this.at().value == '/' ||
@@ -252,7 +252,7 @@ export default class Parser {
             this.at().value == '%'
         ) {
             const operator = this.eat().value;
-            const right = this.parse_primary_expr();
+            const right = this.parse_call_member_expr();
             left = {
                 kind: 'BinaryExpr',
                 left,
@@ -266,7 +266,7 @@ export default class Parser {
 
     // foo.bar()()
     private parse_call_member_expr(): Expr {
-        const member = this.parse_call_member_expr();
+        const member = this.parse_member_expr();
 
         if (this.at().type == TokenType.OpenParan) {
             return this.parse_call_expr(member);
