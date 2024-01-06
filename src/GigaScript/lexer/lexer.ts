@@ -7,6 +7,7 @@ import { Token, TokenType } from '../types';
 const KEYWORDS: Record<string, TokenType> = {
     let: TokenType.Let,
     const: TokenType.Const,
+    func: TokenType.Func,
 };
 
 export function tokenize(source: string): Token[] {

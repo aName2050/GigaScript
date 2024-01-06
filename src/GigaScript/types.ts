@@ -9,6 +9,7 @@ export enum TokenType {
     // Keywords
     Let, // Mutable variable declaration
     Const, // Constant variable declaration
+    Func, // Function declaration
 
     // Grouping + Operators
     BinOp, // Binary operator

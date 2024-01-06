@@ -20,8 +20,9 @@ function handle(
     callback: any
 ) {
     const program = parser.generateAST(uInput);
-    const result = evaluate(program, env);
-    callback(null, result);
+    evaluate(program, env);
+
+    callback();
 }
 
 export default r;

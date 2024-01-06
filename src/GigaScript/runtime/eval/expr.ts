@@ -13,6 +13,7 @@ import {
     MK_NULL,
     ObjectVal,
     NativeFunctionVal,
+    FunctionVal,
 } from '../values';
 
 /**
@@ -98,13 +99,33 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeVal {
     const args = expr.args.map(arg => evaluate(arg, env));
     const fn = evaluate(expr.caller, env);
 
-    if (fn.type !== 'nativeFunction') {
-        throw (
-            'Unable to call a value that is not a function: ' +
-            JSON.stringify(fn)
-        );
+    if (fn.type == 'nativeFunction') {
+        const result = (fn as NativeFunctionVal).call(args, env);
+        return result;
     }
 
-    const result = (fn as NativeFunctionVal).call(args, env);
-    return result;
+    if (fn.type == 'function') {
+        const func = fn as FunctionVal;
+        const scope = new Environment(func.declarationEnv);
+
+        // Create parameters as variables for new scope
+        for (let i = 0; i < func.parameters.length; i++) {
+            // TODO: check parameter bounds
+            //       verify arity of function
+
+            const varName = func.parameters[i];
+            scope.delcareVar(varName, args[i], false);
+        }
+
+        let result: RuntimeVal = MK_NULL();
+
+        // evaluate the function body line by line
+        for (const stmt of func.body) {
+            result = evaluate(stmt, scope);
+        }
+
+        return result;
+    }
+
+    throw 'Cannot call a value that is not a function: ' + JSON.stringify(fn);
 }

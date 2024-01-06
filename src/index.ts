@@ -17,8 +17,7 @@ const env = createGlobalScope();
 
 // GIGASCRIPT INTERPRETER
 const program = parser.generateAST(g);
-const result = evaluate(program, env);
-console.log(result);
+evaluate(program, env);
 
 // GIGASCRIPT COMPILER
 // TODO: make this

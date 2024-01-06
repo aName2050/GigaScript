@@ -9,6 +9,7 @@ import {
     Program,
     Stmt,
     VarDeclaration,
+    FunctionDeclaration,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -18,7 +19,11 @@ import {
     eval_object_expr,
     eval_call_expr,
 } from './eval/expr';
-import { eval_program, eval_var_declaration } from './eval/stmt';
+import {
+    eval_func_declaration,
+    eval_program,
+    eval_var_declaration,
+} from './eval/stmt';
 
 export function evaluate(node: Stmt, env: Environment): RuntimeVal {
     switch (node.kind) {
@@ -48,6 +53,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeVal {
 
         case 'VarDeclaration':
             return eval_var_declaration(node as VarDeclaration, env);
+
+        case 'FunctionDeclaration':
+            return eval_func_declaration(node as FunctionDeclaration, env);
 
         // Handle types not implemented
         default:

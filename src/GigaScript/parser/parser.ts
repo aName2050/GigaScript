@@ -11,6 +11,7 @@ import {
     ObjectLiteral,
     MemberExpr,
     CallExpr,
+    FunctionDeclaration,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -93,6 +94,8 @@ export default class Parser {
             case TokenType.Let:
             case TokenType.Const:
                 return this.parse_var_declaration();
+            case TokenType.Func:
+                return this.parse_func_declaration();
 
             default:
                 return this.parse_expr();
@@ -100,10 +103,63 @@ export default class Parser {
     }
 
     /**
+     * Handle function declarations
+     *
+     * func IDENT (...args) {
+     *    ...code
+     * }
+     */
+    private parse_func_declaration(): Stmt {
+        this.eat(); // advance past func keyword
+        const name = this.expect(
+            TokenType.Identifier,
+            'Expected identifier following func keyword.'
+        ).value;
+
+        const args = this.parse_args();
+        const params: string[] = [];
+        for (const arg of args) {
+            if (arg.kind !== 'Identifier') {
+                console.log(arg);
+                throw 'Expected paramters to of type string.';
+            }
+
+            params.push((arg as Identifier).symbol);
+        }
+
+        this.expect(
+            TokenType.OpenBrace,
+            'Expected "{" following function declaration.'
+        );
+        const body: Stmt[] = [];
+
+        while (
+            this.at().type !== TokenType.EOF &&
+            this.at().type !== TokenType.CloseBrace
+        ) {
+            body.push(this.parse_stmt());
+        }
+
+        this.expect(
+            TokenType.CloseBrace,
+            'Expected "}" after function declaration.'
+        );
+
+        const func = {
+            body,
+            name,
+            parameters: params,
+            kind: 'FunctionDeclaration',
+        } as FunctionDeclaration;
+
+        return func;
+    }
+
+    /**
      * Handle variable declarations
      *
-     * LET IDENT;
-     * (LET | CONST) IDENT = EXPR;
+     * let IDENT;
+     * (let | const) IDENT = EXPR;
      *
      * Semicolons (;) are required for variable declarations
      */

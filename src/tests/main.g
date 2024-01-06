@@ -1,6 +1,12 @@
-let x = 32;
-const obj = { x, y: 100 };
+func makeAdder (offset) {
 
-print(obj.y)
+    func add (x, y) {
+        x + y + offset
+    }
 
-print(timestamp())
+    add
+}
+
+const adder = makeAdder(1);
+
+print(adder(10, 5))

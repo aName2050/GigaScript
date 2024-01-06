@@ -1,7 +1,7 @@
-import { Program, VarDeclaration } from '../../ast/ast';
+import { FunctionDeclaration, Program, VarDeclaration } from '../../ast/ast';
 import Environment from '../environment';
 import { evaluate } from '../interpreter';
-import { RuntimeVal, MK_NULL } from '../values';
+import { RuntimeVal, MK_NULL, FunctionVal } from '../values';
 
 export function eval_program(program: Program, env: Environment): RuntimeVal {
     let lastEvaluated: RuntimeVal = MK_NULL();
@@ -20,4 +20,19 @@ export function eval_var_declaration(
         : MK_NULL();
 
     return env.delcareVar(declaration.identifier, value, declaration.constant);
+}
+
+export function eval_func_declaration(
+    declaration: FunctionDeclaration,
+    env: Environment
+): RuntimeVal {
+    const func = {
+        type: 'function',
+        name: declaration.name,
+        parameters: declaration.parameters,
+        declarationEnv: env,
+        body: declaration.body,
+    } as FunctionVal;
+
+    return env.delcareVar(declaration.name, func, true);
 }

@@ -1,10 +1,13 @@
+import { Stmt } from '../ast/ast';
 import Environment from './environment';
+
 export type ValueType =
     | 'null'
     | 'number'
     | 'boolean'
     | 'object'
-    | 'nativeFunction';
+    | 'nativeFunction'
+    | 'function';
 
 export interface RuntimeVal {
     type: ValueType;
@@ -66,4 +69,12 @@ export interface NativeFunctionVal extends RuntimeVal {
 
 export function MK_NATIVE_FUNCTION(call: FunctionCall) {
     return { type: 'nativeFunction', call } as NativeFunctionVal;
+}
+
+export interface FunctionVal extends RuntimeVal {
+    type: 'function';
+    name: string;
+    parameters: string[];
+    declarationEnv: Environment;
+    body: Stmt[];
 }
