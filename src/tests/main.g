@@ -1,13 +1,6 @@
-const foo = 50 / 2;
+let x = 32;
+const obj = { x, y: 100 };
 
-const obj = {
-    x: 100,
-    y: 32,
-    foo,
-    complex: {
-        bar: true,
-    },
-};
+print(obj.y)
 
-let f = obj.complex.bar;
-foo = obj.foo + 5;
+print(timestamp())
