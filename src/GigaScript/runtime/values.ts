@@ -9,69 +9,76 @@ export type ValueType =
     | 'nativeFunction'
     | 'function';
 
-export interface RuntimeVal {
+export interface RuntimeValue {
     type: ValueType;
 }
 
 /**
  * A value of no meaning
  */
-export interface NullVal extends RuntimeVal {
+export interface NullValue extends RuntimeValue {
     type: 'null';
     value: null;
 }
 
-export function MK_NULL() {
-    return { type: 'null', value: null } as NullVal;
+export function NULL() {
+    return { type: 'null', value: null } as NullValue;
 }
 
 /**
  * Runtime value with direct access to the raw JavaScript boolean
  */
-export interface BooleanVal extends RuntimeVal {
+export interface BooleanValue extends RuntimeValue {
     type: 'boolean';
     value: boolean;
 }
 
-export function MK_BOOL(b = true) {
-    return { type: 'boolean', value: b } as BooleanVal;
+export function BOOL(b = true) {
+    return { type: 'boolean', value: b } as BooleanValue;
 }
 
 /**
  * Runtime value with direct access to the raw JavaScript number
  */
-export interface NumberVal extends RuntimeVal {
+export interface NumberValue extends RuntimeValue {
     type: 'number';
     value: number;
 }
 
-export function MK_NUMBER(n = 0) {
-    return { type: 'number', value: n } as NumberVal;
+export function NUMBER(n = 0) {
+    return { type: 'number', value: n } as NumberValue;
 }
 
-export interface ObjectVal extends RuntimeVal {
+export interface ObjectValue extends RuntimeValue {
     type: 'object';
-    properties: Map<string, RuntimeVal>;
+    properties: Map<string, RuntimeValue>;
+}
+
+export function OBJECT(obj: Map<string, RuntimeValue>) {
+    return { type: 'object', properties: obj } as ObjectValue;
 }
 
 /**
  * Runtime value for function calls
  */
-export type FunctionCall = (args: RuntimeVal[], env: Environment) => RuntimeVal;
+export type FunctionCall = (
+    args: RuntimeValue[],
+    env: Environment
+) => RuntimeValue;
 
 /**
  * Runtime value for native functions
  */
-export interface NativeFunctionVal extends RuntimeVal {
+export interface NativeFunctionValue extends RuntimeValue {
     type: 'nativeFunction';
     call: FunctionCall;
 }
 
-export function MK_NATIVE_FUNCTION(call: FunctionCall) {
-    return { type: 'nativeFunction', call } as NativeFunctionVal;
+export function NATIVE_FUNCTION(call: FunctionCall) {
+    return { type: 'nativeFunction', call } as NativeFunctionValue;
 }
 
-export interface FunctionVal extends RuntimeVal {
+export interface FunctionValue extends RuntimeValue {
     type: 'function';
     name: string;
     parameters: string[];

@@ -1,10 +1,5 @@
-import {
-    MK_BOOL,
-    MK_NATIVE_FUNCTION,
-    MK_NULL,
-    MK_NUMBER,
-    RuntimeVal,
-} from './values';
+import { BOOL, NATIVE_FUNCTION, NULL, NUMBER, RuntimeValue } from './values';
+import * as NativeFunctions from '../native/functions';
 
 /**
  * Create the default global environment
@@ -13,34 +8,21 @@ export function createGlobalScope(): Environment {
     const env = new Environment();
 
     // Global Variables
-    env.delcareVar('true', MK_BOOL(true), true);
-    env.delcareVar('false', MK_BOOL(false), true);
-    env.delcareVar('null', MK_NULL(), true);
+    env.delcareVar('true', BOOL(true), true);
+    env.delcareVar('false', BOOL(false), true);
+    env.delcareVar('null', NULL(), true);
 
     // Native functions
-    env.delcareVar(
-        'print',
-        MK_NATIVE_FUNCTION((args, scope) => {
-            console.log(...args);
-            return MK_NULL();
-        }),
-        true
-    );
-
-    env.delcareVar(
-        'timestamp',
-        MK_NATIVE_FUNCTION((_args, _env) => {
-            return MK_NUMBER(Date.now());
-        }),
-        true
-    );
+    env.delcareVar('print', NativeFunctions.print, true);
+    env.delcareVar('timestamp', NativeFunctions.timestamp, true);
+    env.delcareVar('math', NativeFunctions.math, true);
 
     return env;
 }
 
 export default class Environment {
     private parent?: Environment;
-    private variables: Map<string, RuntimeVal>;
+    private variables: Map<string, RuntimeValue>;
     private constants: Set<string>;
 
     constructor(parentEnv?: Environment) {
@@ -51,9 +33,9 @@ export default class Environment {
 
     public delcareVar(
         varName: string,
-        value: RuntimeVal,
+        value: RuntimeValue,
         constant: boolean
-    ): RuntimeVal {
+    ): RuntimeValue {
         if (this.variables.has(varName))
             throw `Cannot redeclare variable "${varName}".`;
 
@@ -64,7 +46,7 @@ export default class Environment {
         return value;
     }
 
-    public assignVar(varName: string, value: RuntimeVal): RuntimeVal {
+    public assignVar(varName: string, value: RuntimeValue): RuntimeValue {
         const env = this.resolve(varName);
 
         if (env.constants.has(varName)) {
@@ -75,9 +57,9 @@ export default class Environment {
         return value;
     }
 
-    public lookupVar(varName: string): RuntimeVal {
+    public lookupVar(varName: string): RuntimeValue {
         const env = this.resolve(varName);
-        return env.variables.get(varName) as RuntimeVal;
+        return env.variables.get(varName) as RuntimeValue;
     }
 
     public resolve(varName: string): Environment {

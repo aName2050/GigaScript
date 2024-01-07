@@ -30,14 +30,6 @@ export default class Parser {
     }
 
     /**
-     * Determine if parsing the current line is complete by reaching the CR and/or LF tokens
-     */
-    private not_eol(): boolean {
-        // TODO:
-        throw new Error('Method not implemented');
-    }
-
-    /**
      * Returns current token
      */
     private at(): Token {

@@ -1,12 +1,5 @@
-func makeAdder (offset) {
+const x = { foo: 7, complex: { bar: 69 } };
 
-    func add (x, y) {
-        x + y + offset
-    }
+let c = x.complex.bar;
 
-    add
-}
-
-const adder = makeAdder(1);
-
-print(adder(10, 5))
+print(c)

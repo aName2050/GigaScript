@@ -1,4 +1,4 @@
-import { MK_NULL, MK_NUMBER, NumberVal, RuntimeVal } from './values';
+import { NumberValue, RuntimeValue } from './values';
 import {
     AssignmentExpr,
     BinaryExpr,
@@ -10,6 +10,7 @@ import {
     Stmt,
     VarDeclaration,
     FunctionDeclaration,
+    MemberExpr,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -18,6 +19,7 @@ import {
     eval_assignment,
     eval_object_expr,
     eval_call_expr,
+    eval_member_expr,
 } from './eval/expr';
 import {
     eval_func_declaration,
@@ -25,13 +27,14 @@ import {
     eval_var_declaration,
 } from './eval/stmt';
 
-export function evaluate(node: Stmt, env: Environment): RuntimeVal {
+export function evaluate(node: Stmt, env: Environment): RuntimeValue {
     switch (node.kind) {
+        // Handle literals
         case 'NumericLiteral':
             return {
                 value: (node as NumericLiteral).value,
                 type: 'number',
-            } as NumberVal;
+            } as NumberValue;
 
         case 'Identifier':
             return eval_identifier(node as Identifier, env);
@@ -39,6 +42,7 @@ export function evaluate(node: Stmt, env: Environment): RuntimeVal {
         case 'ObjectLiteral':
             return eval_object_expr(node as ObjectLiteral, env);
 
+        // Handle expressions
         case 'CallExpr':
             return eval_call_expr(node as CallExpr, env);
 
@@ -48,9 +52,14 @@ export function evaluate(node: Stmt, env: Environment): RuntimeVal {
         case 'BinaryExpr':
             return eval_binary_expr(node as BinaryExpr, env);
 
+        case 'MemberExpr':
+            return eval_member_expr(node as MemberExpr, env);
+
+        // Handle program evaluate
         case 'Program':
             return eval_program(node as Program, env);
 
+        // Handle statements
         case 'VarDeclaration':
             return eval_var_declaration(node as VarDeclaration, env);
 
