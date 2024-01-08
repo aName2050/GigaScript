@@ -52,9 +52,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 		case "BinaryExpr":
 			return eval_binary_expr(node as BinaryExpr, env);
 
-		case "MemberExpr":
-			// console.log(node);
-			return eval_member_expr(node, env);
+		// case "MemberExpr":
+		// 	// console.log(node);
+		// 	return eval_member_expr(node, env);
 
 		// Handle program evaluate
 		case "Program":
