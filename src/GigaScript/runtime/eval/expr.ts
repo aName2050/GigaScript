@@ -135,15 +135,44 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeValue {
 	);
 }
 
-export function eval_member_expr(expr: any, env: Environment): RuntimeValue {
-	console.log("expr: ", expr);
-	const objVal = evaluate(expr.object, env);
-
-	if (objVal.type == "object") {
-		// TODO: finish implementation of object member access
-		const props = (objVal as ObjectValue).properties;
-		// console.log(props);
+export function eval_member_expr(expr: MemberExpr, env: Environment): RuntimeValue {
+	/*
+	{
+		kind: 'MemberExpr',
+		object: {
+			kind: 'MemberExpr',
+			object: { kind: 'Identifier', symbol: 'obj' },
+			property: { kind: 'Identifier', symbol: 'complex' },
+			computed: false
+		},
+		property: { kind: 'Identifier', symbol: 'bar' },
+		computed: false
 	}
+	*/
+	const obj = undefined;
+	/*
+	Environment {
+		parent: undefined,
+		variables: Map(7) {
+			'true' => { type: 'boolean', value: true },
+			'false' => { type: 'boolean', value: false },
+			'null' => { type: 'null', value: null },
+			'print' => { type: 'nativeFunction', call: [Function (anonymous)] },
+			'timestamp' => { type: 'nativeFunction', call: [Function (anonymous)] },
+			'math' => { type: 'object', properties: [Map] },
+			'obj' => { type: 'object', properties: [Map] }
+		},
+		constants: Set(7) {
+			'true',
+			'false',
+			'null',
+			'print',
+			'timestamp',
+			'math',
+			'obj'
+		}
+	}
+	*/
 
 	throw `EvalError: Cannot not access the properties of a value that is not an object`;
 }
