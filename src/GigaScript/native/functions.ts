@@ -29,18 +29,11 @@ export const timestamp = NATIVE_FUNCTION((args, scope) => {
 });
 
 export const math = OBJECT(
-    new Map()
-        .set(
-            'pi',
-            NATIVE_FUNCTION((_args, _scope) => {
-                return NUMBER(Math.PI);
-            })
-        )
-        .set(
-            'sqrt',
-            NATIVE_FUNCTION((args, _scope) => {
-                const num = (args[0] as NumberValue).value;
-                return NUMBER(Math.sqrt(num));
-            })
-        )
+    new Map().set('pi', NUMBER(Math.PI)).set(
+        'sqrt',
+        NATIVE_FUNCTION((args, _scope) => {
+            const num = (args[0] as NumberValue).value;
+            return NUMBER(Math.sqrt(num));
+        })
+    )
 );

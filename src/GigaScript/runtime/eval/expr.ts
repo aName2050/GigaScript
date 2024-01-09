@@ -71,14 +71,20 @@ export function eval_assignment(
     node: AssignmentExpr,
     env: Environment
 ): RuntimeValue {
-    if (node.assigne.kind !== 'Identifier') {
+    // allows for expressions like -> x = ~newValue~
+    if (node.assigne.kind == 'Identifier') {
+        const varName = (node.assigne as Identifier).symbol;
+        return env.assignVar(varName, evaluate(node.value, env));
+    }
+    // allows for expressions like -> obj.x = ~newValue~
+    else if (node.assigne.kind == 'MemberExpr') {
+        const value = evaluate(node.value, env);
+        return env.lookupOrModifyObj(node.assigne as MemberExpr, value);
+    } else {
         throw `EvalError: Invalid LHS inside assignment expression ${JSON.stringify(
             node.assigne
         )}`;
     }
-
-    const varName = (node.assigne as Identifier).symbol;
-    return env.assignVar(varName, evaluate(node.value, env));
 }
 
 export function eval_object_expr(
@@ -141,8 +147,8 @@ export function eval_member_expr(
     expr?: MemberExpr | null
 ): RuntimeValue {
     if (expr) {
-        const VAR = env.lookupOrModifyObj(expr);
         // find and return value of property accessed through member expression
+        const VAR = env.lookupOrModifyObj(expr);
         return VAR;
     } else if (node) {
         // handle assignments into member objects, including adding new properties through -> obj.newProp = newValue
@@ -150,6 +156,7 @@ export function eval_member_expr(
             node.assigne as MemberExpr,
             evaluate(node.value, env)
         );
+
         return VAR;
     } else {
         throw 'EvalError: A member expression cannot be evaluated with a member or assignment expression.';

@@ -93,7 +93,7 @@ export interface CallExpr extends Expr {
 export interface MemberExpr extends Expr {
     kind: 'MemberExpr';
     object: Expr;
-    property: Expr;
+    property: Identifier;
     computed: boolean;
 }
 
