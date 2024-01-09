@@ -1,4 +1,4 @@
-import { NumberValue, RuntimeValue } from './values';
+import { NULL, NumberValue, RuntimeValue } from './values';
 import {
     AssignmentExpr,
     BinaryExpr,

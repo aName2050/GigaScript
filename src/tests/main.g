@@ -1,5 +1,5 @@
-const x = { foo: 7, complex: { bar: 69 } };
+const obj = { foo: 32, complex: { bar: 2 } };
 
-let c = x.complex.bar;
+let x = obj.complex.bar;
 
-print(c)
+print(x)

@@ -72,7 +72,7 @@ export function eval_assignment(
     env: Environment
 ): RuntimeValue {
     if (node.assigne.kind !== 'Identifier') {
-        throw `Invalid LHS inside assignment expression ${JSON.stringify(
+        throw `EvalError: Invalid LHS inside assignment expression ${JSON.stringify(
             node.assigne
         )}`;
     }
@@ -113,7 +113,7 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeValue {
         // Create parameters as variables for new scope
         for (let i = 0; i < func.parameters.length; i++) {
             if (func.parameters.length != args.length)
-                throw 'Parameters and arguments lengths do not match.';
+                throw 'EvalError: Parameters and arguments lengths do not match.';
 
             const varName = func.parameters[i];
             scope.delcareVar(varName, args[i], false);
@@ -129,7 +129,10 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeValue {
         return result;
     }
 
-    throw 'Cannot call a value that is not a function: ' + JSON.stringify(fn);
+    throw (
+        'EvalError: Cannot call a value that is not a function: ' +
+        JSON.stringify(fn)
+    );
 }
 
 export function eval_member_expr(
