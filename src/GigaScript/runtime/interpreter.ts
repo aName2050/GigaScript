@@ -53,7 +53,7 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
             return eval_binary_expr(node as BinaryExpr, env);
 
         case 'MemberExpr':
-            return eval_member_expr(node as MemberExpr, env);
+            return eval_member_expr(env, null, node as MemberExpr);
 
         // Handle program evaluate
         case 'Program':

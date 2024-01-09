@@ -1,5 +1,13 @@
-import { BOOL, NATIVE_FUNCTION, NULL, NUMBER, RuntimeValue } from './values';
+import {
+    BOOL,
+    NATIVE_FUNCTION,
+    NULL,
+    NUMBER,
+    ObjectValue,
+    RuntimeValue,
+} from './values';
 import * as NativeFunctions from '../native/functions';
+import { Identifier, MemberExpr } from '../ast/ast';
 
 /**
  * Create the default global environment
@@ -55,6 +63,37 @@ export default class Environment {
 
         env.variables.set(varName, value);
         return value;
+    }
+
+    public lookupOrModifyObj(
+        expr: MemberExpr,
+        value?: RuntimeValue,
+        property?: Identifier
+    ): RuntimeValue {
+        if (expr.object.kind === 'MemberExpr')
+            return this.lookupOrModifyObj(
+                expr.object as MemberExpr,
+                value,
+                expr.property as Identifier
+            );
+
+        const varName = (expr.object as Identifier).symbol;
+        const env = this.resolve(varName);
+
+        let oldVal = env.variables.get(varName) as ObjectValue;
+
+        const prop = property
+            ? property.symbol
+            : (expr.property as Identifier).symbol;
+        const currProp = (expr.property as Identifier).symbol;
+
+        // if a value is provided, the object is most likely being modified by adding a new property
+        if (value) oldVal.properties.set(prop, value);
+
+        // if currProp is not undefined, then it exists and its value should be returned
+        if (currProp) oldVal = oldVal.properties.get(currProp) as ObjectValue;
+
+        return oldVal;
     }
 
     public lookupVar(varName: string): RuntimeValue {

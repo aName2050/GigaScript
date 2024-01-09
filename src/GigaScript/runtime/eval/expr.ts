@@ -133,14 +133,22 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeValue {
 }
 
 export function eval_member_expr(
-    expr: MemberExpr,
-    env: Environment
+    env: Environment,
+    node?: AssignmentExpr | null,
+    expr?: MemberExpr | null
 ): RuntimeValue {
-    const objVal = evaluate(expr.object, env);
-
-    if (objVal.type == 'object') {
-        // TODO: finish implementation of object member access
+    if (expr) {
+        const VAR = env.lookupOrModifyObj(expr);
+        // find and return value of property accessed through member expression
+        return VAR;
+    } else if (node) {
+        // handle assignments into member objects, including adding new properties through -> obj.newProp = newValue
+        const VAR = env.lookupOrModifyObj(
+            node.assigne as MemberExpr,
+            evaluate(node.value, env)
+        );
+        return VAR;
+    } else {
+        throw 'EvalError: A member expression cannot be evaluated with a member or assignment expression.';
     }
-
-    throw `Cannot not access the properties of a value that is not an object`;
 }
