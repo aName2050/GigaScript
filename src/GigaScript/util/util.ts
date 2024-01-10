@@ -5,18 +5,27 @@ import {
     NullValue,
     ObjectValue,
     FunctionValue,
+    UndefinedValue,
+    NaNValue,
+    StringValue,
 } from '../runtime/values';
 
 export function getValue(
     runtimeVal: RuntimeValue
-): number | boolean | null | object {
+): number | boolean | null | undefined | string | object {
     switch (runtimeVal.type) {
         case 'number':
             return (runtimeVal as NumberValue).value;
+        case 'string':
+            return (runtimeVal as StringValue).value;
         case 'boolean':
             return (runtimeVal as BooleanValue).value;
         case 'null':
             return (runtimeVal as NullValue).value;
+        case 'undefined':
+            return (runtimeVal as UndefinedValue).value;
+        case 'NaN':
+            return (runtimeVal as NaNValue).value;
         case 'object':
             let obj: { [key: string]: any } = {};
             const aObj = runtimeVal as ObjectValue;

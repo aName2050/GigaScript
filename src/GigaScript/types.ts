@@ -4,6 +4,8 @@
 export enum TokenType {
     // Literal Types (USER_DEFINED)
     Number, // 0-9
+    String, // " anything "
+
     Identifier, // Variable names, function names, etc.
 
     // Keywords
@@ -12,18 +14,26 @@ export enum TokenType {
     Func, // Function declaration
 
     // Grouping + Operators
-    BinOp, // Binary operator
+    BinOp, // Binary operator (+ - * / %)
     Equals, // =
+
     Comma, // ,
     Dot, // .
+
     Colon, // :
     Semicolon, // ;
+
     OpenParan, // (
     CloseParen, // )
+
     OpenBrace, // {
     CloseBrace, // }
+
     OpenBracket, // [
     CloseBracket, // ]
+
+    DoubleQuote, // "
+    SignleQuote, // '
 
     // Special
     EOF, // End Of File
