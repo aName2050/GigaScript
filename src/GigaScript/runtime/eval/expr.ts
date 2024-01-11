@@ -71,20 +71,13 @@ export function eval_assignment(
     node: AssignmentExpr,
     env: Environment
 ): RuntimeValue {
-    // allows for expressions like -> x = ~newValue~
-    if (node.assigne.kind == 'Identifier') {
-        const varName = (node.assigne as Identifier).symbol;
-        return env.assignVar(varName, evaluate(node.value, env));
-    }
-    // allows for expressions like -> obj.x = ~newValue~
-    else if (node.assigne.kind == 'MemberExpr') {
-        const value = evaluate(node.value, env);
-        return env.lookupOrModifyObj(node.assigne as MemberExpr, value);
-    } else {
-        throw `EvalError: Invalid LHS inside assignment expression ${JSON.stringify(
-            node.assigne
-        )}`;
-    }
+    if (node.assigne.kind === 'MemberExpr') return eval_member_expr(env, node);
+    if (node.assigne.kind !== 'Identifier')
+        throw `Invalid LHS expression: ${JSON.stringify(node.assigne)}`;
+
+    const varName = (node.assigne as Identifier).symbol;
+
+    return env.assignVar(varName, evaluate(node.value, env));
 }
 
 export function eval_object_expr(
