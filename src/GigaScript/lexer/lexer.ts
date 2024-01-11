@@ -1,123 +1,127 @@
-import { isAlpha, isInt, isSkippable, token } from './lexerUtil';
-import { Token, TokenType } from '../types';
+import { isAlpha, isInt, isSkippable, token } from "./lexerUtil";
+import { Token, TokenType } from "../types";
 
 /**
  * Reserved keywords for GigaScript
  */
 const KEYWORDS: Record<string, TokenType> = {
-    let: TokenType.Let,
-    const: TokenType.Const,
-    func: TokenType.Func,
+	let: TokenType.Let,
+	const: TokenType.Const,
+
+	func: TokenType.Func,
+
+	if: TokenType.If,
+	else: TokenType.Else,
 };
 
 /**
  * Token lookup (does not include special tokens)
  */
 const TOKENS: Record<string, TokenType> = {
-    '(': TokenType.OpenParen,
-    ')': TokenType.CloseParen,
+	"(": TokenType.OpenParen,
+	")": TokenType.CloseParen,
 
-    '{': TokenType.OpenBrace,
-    '}': TokenType.CloseBrace,
+	"{": TokenType.OpenBrace,
+	"}": TokenType.CloseBrace,
 
-    '[': TokenType.OpenBracket,
-    ']': TokenType.CloseBracket,
+	"[": TokenType.OpenBracket,
+	"]": TokenType.CloseBracket,
 
-    '+': TokenType.BinOp,
-    '-': TokenType.BinOp,
-    '*': TokenType.BinOp,
-    '/': TokenType.BinOp,
-    '%': TokenType.BinOp,
+	"+": TokenType.BinOp,
+	"-": TokenType.BinOp,
+	"*": TokenType.BinOp,
+	"/": TokenType.BinOp,
+	"%": TokenType.BinOp,
 
-    '=': TokenType.Equals,
+	"=": TokenType.Equals,
 
-    ';': TokenType.Semicolon,
-    ':': TokenType.Colon,
-    ',': TokenType.Comma,
-    '.': TokenType.Dot,
+	";": TokenType.Semicolon,
+	":": TokenType.Colon,
+	",": TokenType.Comma,
+	".": TokenType.Dot,
 };
 
 export function tokenize(source: string): Token[] {
-    const tokens = new Array<Token>();
-    const src = source.split('');
+	const tokens = new Array<Token>();
+	const src = source.split("");
 
-    // Make tokens till EOF
-    while (src.length > 0) {
-        const curr = src[0];
-        const TOKEN = TOKENS[curr];
+	// Make tokens till EOF
+	while (src.length > 0) {
+		const curr = src[0];
+		const TOKEN = TOKENS[curr];
 
-        // allow for both positive and negative numbers
-        if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
-            let num: string = src.shift() || ''; // move past first digit or negative sign
-            let decimalPointFound = false; // if number has digits in the decimal place
-            while (src.length > 0) {
-                if (src[0] == '.' && !decimalPointFound) {
-                    // only allow a single decimal point
-                    decimalPointFound = true;
-                    num += src.shift();
-                } else if (isInt(src[0])) {
-                    num += src.shift();
-                } else break;
-            }
+		// allow for both positive and negative numbers
+		if (isInt(curr) || (curr == "-" && isInt(src[1]))) {
+			let num: string = src.shift() || ""; // move past first digit or negative sign
+			let decimalPointFound = false; // if number has digits in the decimal place
+			while (src.length > 0) {
+				if (src[0] == "." && !decimalPointFound) {
+					// only allow a single decimal point
+					decimalPointFound = true;
+					num += src.shift();
+				} else if (isInt(src[0])) {
+					num += src.shift();
+				} else break;
+			}
 
-            tokens.push(token(num, TokenType.Number));
-        } else if (typeof TOKEN == 'number') {
-            // Matches a single character token in TOKENS
-            tokens.push(token(src.shift(), TOKEN));
-        } else {
-            // handle multicharacter tokens and special tokens
-            switch (curr) {
-                case '"': // string support
-                    let str = '';
-                    src.shift(); // move past opening doubleQuotes, indicating beginning of string
+			tokens.push(token(num, TokenType.Number));
+		} else if (typeof TOKEN == "number") {
+			// Matches a single character token in TOKENS
+			tokens.push(token(src.shift(), TOKEN));
+		} else {
+			// handle multicharacter tokens and special tokens
+			switch (curr) {
+				case '"': // string support
+					let str = "";
+					src.shift(); // move past opening doubleQuotes, indicating beginning of string
 
-                    while (src.length > 0 && src[0] !== '"') {
-                        str += src.shift();
-                    }
+					while (src.length > 0 && src[0] !== '"') {
+						str += src.shift();
+					}
 
-                    src.shift(); // advance past closing doubleQuotes, indicating end of string
+					src.shift(); // advance past closing doubleQuotes, indicating end of string
 
-                    tokens.push(token(str, TokenType.String));
-                    break;
+					tokens.push(token(str, TokenType.String));
+					break;
 
-                default:
-                    if (isAlpha(curr, false)) {
-                        // The first character of an identifier can be alphabetic or an underscore
-                        let ident = '';
-                        ident += src.shift();
+				default:
+					if (isAlpha(curr, false)) {
+						// The first character of an identifier can be alphabetic or an underscore
+						let ident = "";
+						ident += src.shift();
 
-                        while (src.length > 0 && isAlpha(src[0])) {
-                            // Identifier can consist of alphanumeric or underscores after first character
-                            ident += src.shift();
-                        }
+						while (src.length > 0 && isAlpha(src[0])) {
+							// Identifier can consist of alphanumeric or underscores after first character
+							ident += src.shift();
+						}
 
-                        // check for reserved keywords
-                        const RESERVED = KEYWORDS[ident];
-                        if (typeof RESERVED == 'number') {
-                            tokens.push(token(ident, RESERVED));
-                        } else {
-                            // Unknown identifier most likely means user defined symbol
-                            tokens.push(token(ident, TokenType.Identifier));
-                        }
-                    } else if (isSkippable(src[0])) {
-                        // ignore whitespace characters
-                        src.shift();
-                    } else {
-                        // handle unknown characters
-                        // TODO: implement error handling and recovery
+						// check for reserved keywords
+						const RESERVED = KEYWORDS[ident];
+						if (typeof RESERVED == "number") {
+							tokens.push(token(ident, RESERVED));
+						} else {
+							// Unknown identifier most likely means user defined symbol
+							tokens.push(token(ident, TokenType.Identifier));
+						}
+					} else if (isSkippable(src[0])) {
+						// ignore whitespace characters
+						src.shift();
+					} else {
+						// handle unknown characters
+						// TODO: implement error handling and recovery
 
-                        console.error(
-                            `LexerError: Unknown character: UNICODE-${src[0].charCodeAt(
-                                0
-                            )} ${src[0]}`
-                        );
-                        process.exit(1);
-                    }
-            }
-        }
-    }
+						console.error(
+							`LexerError: Unknown character: UNICODE-${src[0].charCodeAt(
+								0
+							)} ${src[0]}`
+						);
+						process.exit(1);
+					}
+			}
+		}
+	}
 
-    tokens.push({ value: 'EOF', type: TokenType.EOF });
+	tokens.push({ value: "EOF", type: TokenType.EOF });
 
-    return tokens;
+	return tokens;
 }
