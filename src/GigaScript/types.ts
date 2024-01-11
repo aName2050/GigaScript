@@ -13,16 +13,24 @@ export enum TokenType {
     Const, // Constant variable declaration
     Func, // Function declaration
 
-    // Grouping + Operators
-    BinOp, // Binary operator (+ - * / %)
-    Equals, // =
+    // Comparison Operators
+    GreaterThan, // >
+    LessThan, // <
 
+    // Punctuation
     Comma, // ,
     Dot, // .
-
     Colon, // :
+
     Semicolon, // ;
 
+    // Mathematical Operations
+    BinOp, // Binary operator (+ - * / %)
+
+    // Assignment Operators
+    Equals, // =
+
+    // Grouping
     OpenParen, // (
     CloseParen, // )
 
