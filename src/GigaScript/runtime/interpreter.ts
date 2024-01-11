@@ -1,4 +1,4 @@
-import { NULL, NumberValue, RuntimeValue } from './values';
+import { NULL, NumberValue, RuntimeValue, StringValue } from './values';
 import {
     AssignmentExpr,
     BinaryExpr,
@@ -11,6 +11,7 @@ import {
     VarDeclaration,
     FunctionDeclaration,
     MemberExpr,
+    StringLiteral,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -35,6 +36,11 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
                 value: (node as NumericLiteral).value,
                 type: 'number',
             } as NumberValue;
+        case 'StringLiteral':
+            return {
+                type: 'string',
+                value: (node as StringLiteral).value,
+            } as StringValue;
 
         case 'Identifier':
             return eval_identifier(node as Identifier, env);
@@ -68,7 +74,7 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 
         // Handle types not implemented
         default:
-            console.error('RuntimeError: AST Node not implemented. ', node);
+            console.error('RuntimeError: AST Node not implemented.', node);
             process.exit(1);
     }
 }

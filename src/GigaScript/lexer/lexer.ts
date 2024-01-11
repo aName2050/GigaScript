@@ -11,7 +11,7 @@ const KEYWORDS: Record<string, TokenType> = {
 };
 
 /**
- * Token lookup
+ * Token lookup (does not include special tokens)
  */
 const TOKENS: Record<string, TokenType> = {
     '(': TokenType.OpenParen,
@@ -35,8 +35,6 @@ const TOKENS: Record<string, TokenType> = {
     ':': TokenType.Colon,
     ',': TokenType.Comma,
     '.': TokenType.Dot,
-
-    '"': TokenType.DoubleQuote,
 };
 
 export function tokenize(source: string): Token[] {
@@ -46,6 +44,7 @@ export function tokenize(source: string): Token[] {
     // Make tokens till EOF
     while (src.length > 0) {
         const curr = src[0];
+        const TOKEN = TOKENS[curr];
 
         // allow for both positive and negative numbers
         if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
@@ -62,9 +61,9 @@ export function tokenize(source: string): Token[] {
             }
 
             tokens.push(token(num, TokenType.Number));
-        } else if (typeof TOKENS[curr] == 'number') {
+        } else if (typeof TOKEN == 'number') {
             // Matches a single character token in TOKENS
-            tokens.push(token(src.shift(), TOKENS[curr]));
+            tokens.push(token(src.shift(), TOKEN));
         } else {
             // handle multicharacter tokens and special tokens
             switch (curr) {

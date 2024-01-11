@@ -12,6 +12,7 @@ import {
     MemberExpr,
     CallExpr,
     FunctionDeclaration,
+    StringLiteral,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -424,12 +425,17 @@ export default class Parser {
                     symbol: this.eat().value,
                 } as Identifier;
 
-            // Constants and numeric constants
             case TokenType.Number:
                 return {
                     kind: 'NumericLiteral',
                     value: parseFloat(this.eat().value),
                 } as NumericLiteral;
+
+            case TokenType.String:
+                return {
+                    kind: 'StringLiteral',
+                    value: this.eat().value,
+                } as StringLiteral;
 
             case TokenType.OpenParen: {
                 this.eat(); // eat the opening paren
