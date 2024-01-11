@@ -23,7 +23,7 @@ export enum TokenType {
     Colon, // :
     Semicolon, // ;
 
-    OpenParan, // (
+    OpenParen, // (
     CloseParen, // )
 
     OpenBrace, // {
@@ -33,7 +33,6 @@ export enum TokenType {
     CloseBracket, // ]
 
     DoubleQuote, // "
-    SignleQuote, // '
 
     // Special
     EOF, // End Of File

@@ -10,8 +10,9 @@ export function token(value = '', type: TokenType): Token {
 /**
  * Returns whether the character passed is alphabetic [a-z] [A-Z]
  */
-export function isAlpha(str: string): boolean {
-    return str.toUpperCase() != str.toLowerCase();
+export function isAlpha(str: string, allowAlphanumeric = true): boolean {
+    if (allowAlphanumeric) return /^[A-Za-z_]+$/.test(str);
+    return /^[A-Za-z0-9_]+$/.test(str);
 }
 
 /**
@@ -28,5 +29,4 @@ export function isInt(str: string): boolean {
  */
 export function isSkippable(str: string): boolean {
     return str == ' ' || str == '\n' || str == '\t' || str == '\r';
-    // TODO: remove \r from here when adding EOL (End Of Line) handling in parser
 }
