@@ -20,6 +20,15 @@ export enum TokenType {
 	// Comparison Operators
 	GreaterThan, // >
 	LessThan, // <
+	IsEqual, // ==
+	NotEquals, // !=
+	Exclamation, // ! (NOT operator)
+	And, // &&
+	Or, // ||
+
+	// Symbols
+	Bar, // |
+	Ampersand, // &
 
 	// Punctuation
 	Comma, // ,

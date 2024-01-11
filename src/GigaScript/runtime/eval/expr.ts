@@ -15,25 +15,140 @@ import {
 	ObjectValue,
 	NativeFunctionValue,
 	FunctionValue,
+	BOOL,
+	BooleanValue,
+	StringValue,
+	UndefinedValue,
+	NullValue,
+	NUMBER,
 } from "../values";
 
 /**
  * Evaluate numeric operations with binary operators
  */
 export function eval_numeric_binary_expr(
-	lhs: NumberValue,
-	rhs: NumberValue,
+	lhs: RuntimeValue,
+	rhs: RuntimeValue,
 	operator: string
-): NumberValue {
-	let result: number;
-	if (operator == "+") result = lhs.value + rhs.value;
-	else if (operator == "-") result = lhs.value - rhs.value;
-	else if (operator == "*") result = lhs.value * rhs.value;
-	else if (operator == "/")
-		result = lhs.value / rhs.value; // TODO: add division by zero checks
-	else result = lhs.value % rhs.value;
+): RuntimeValue {
+	const op = operator;
 
-	return { value: result, type: "number" } as NumberValue;
+	console.log(`${lhs} ${op} ${rhs}`);
+
+	if (op === "!=") {
+		return equals(lhs, rhs, false);
+	} else if (op === "==") {
+		return equals(lhs, rhs, true);
+	} else if (op === "&&") {
+		return equals(lhs, rhs, true);
+	} else if (op === "||") {
+		const blhs = lhs as BooleanValue;
+		const brhs = rhs as BooleanValue;
+
+		return BOOL(blhs.value || brhs.value);
+	} else if (lhs.type === "number" && rhs.type === "number") {
+		const nlhs = lhs as NumberValue;
+		const nrhs = rhs as NumberValue;
+
+		switch (op) {
+			case "+":
+				return NUMBER(nlhs.value + nrhs.value);
+
+			case "-":
+				return NUMBER(nlhs.value - nrhs.value);
+
+			case "*":
+				return NUMBER(nlhs.value * nrhs.value);
+
+			case "/":
+				return NUMBER(nlhs.value / nrhs.value);
+
+			case "%":
+				return NUMBER(nlhs.value % nrhs.value);
+
+			case "<":
+				return BOOL(nlhs.value < nrhs.value);
+
+			case ">":
+				return BOOL(nlhs.value > nrhs.value);
+
+			default:
+				throw `RuntimeError: unknown operator "${op}" in operation ${lhs} ${op} ${rhs}`;
+		}
+	} else {
+		return NULL();
+	}
+}
+
+function equals(
+	lhs: RuntimeValue,
+	rhs: RuntimeValue,
+	strict: boolean
+): RuntimeValue {
+	const compare = strict
+		? (a: any, b: any) => a === b
+		: (a: any, b: any) => a !== b;
+
+	switch (lhs.type) {
+		case "boolean":
+			return BOOL(
+				compare(
+					(lhs as BooleanValue).value,
+					(rhs as BooleanValue).value
+				)
+			);
+
+		case "number":
+			return BOOL(
+				compare((lhs as NumberValue).value, (rhs as NumberValue).value)
+			);
+
+		case "string":
+			return BOOL(
+				compare((lhs as StringValue).value, (rhs as StringValue).value)
+			);
+
+		case "undefined":
+			return BOOL(
+				compare(
+					(lhs as UndefinedValue).value,
+					(rhs as UndefinedValue).value
+				)
+			);
+
+		case "null":
+			return BOOL(
+				compare((lhs as NullValue).value, (rhs as NullValue).value)
+			);
+
+		case "object":
+			return BOOL(
+				compare(
+					(lhs as ObjectValue).properties,
+					(rhs as ObjectValue).properties
+				)
+			);
+
+		case "function":
+			return BOOL(
+				compare(
+					(lhs as FunctionValue).body,
+					(rhs as FunctionValue).body
+				)
+			);
+
+		case "nativeFunction":
+			return BOOL(
+				compare(
+					(lhs as NativeFunctionValue).call,
+					(rhs as NativeFunctionValue).call
+				)
+			);
+
+		// Unknown type catch-all
+		default:
+			throw `RuntimeError: Unknown type in comparison: ${lhs}, ${rhs}`;
+	}
 }
 
 /**
@@ -46,17 +161,11 @@ export function eval_binary_expr(
 	const lhs = evaluate(binop.left, env);
 	const rhs = evaluate(binop.right, env);
 
-	// Numeric operations are only supported currently
-	if (lhs.type == "number" && rhs.type == "number") {
-		return eval_numeric_binary_expr(
-			lhs as NumberValue,
-			rhs as NumberValue,
-			binop.operator
-		);
-	}
-
-	// A null value is in the binary expression
-	return NULL();
+	return eval_numeric_binary_expr(
+		lhs as RuntimeValue,
+		rhs as RuntimeValue,
+		binop.operator
+	);
 }
 
 export function eval_identifier(

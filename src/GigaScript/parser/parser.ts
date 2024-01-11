@@ -35,6 +35,7 @@ export default class Parser {
 	 * Returns current token
 	 */
 	private at(): Token {
+		console.log("at:", this.tokens[0] as Token);
 		return this.tokens[0] as Token;
 	}
 
@@ -43,6 +44,7 @@ export default class Parser {
 	 */
 	private eat(): Token {
 		const prev = this.tokens.shift() as Token;
+		console.log("ate:", prev);
 		return prev;
 	}
 
@@ -320,7 +322,7 @@ export default class Parser {
 	 */
 	private parse_additive_expr(): Expr {
 		let left = this.parse_multiplicitave_expr();
-		while (this.at().value == "+" || this.at().value == "-") {
+		while (["+", "-", "==", "!=", "<", ">"].includes(this.at().value)) {
 			const operator = this.eat().value;
 			const right = this.parse_multiplicitave_expr();
 			left = {
@@ -340,11 +342,7 @@ export default class Parser {
 	private parse_multiplicitave_expr(): Expr {
 		let left = this.parse_call_member_expr();
 
-		while (
-			this.at().value == "/" ||
-			this.at().value == "*" ||
-			this.at().value == "%"
-		) {
+		while (["/", "*", "%"].includes(this.at().value)) {
 			const operator = this.eat().value;
 			const right = this.parse_call_member_expr();
 			left = {

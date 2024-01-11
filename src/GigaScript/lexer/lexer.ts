@@ -33,12 +33,15 @@ const TOKENS: Record<string, TokenType> = {
 	"/": TokenType.BinOp,
 	"%": TokenType.BinOp,
 
-	"=": TokenType.Equals,
-
 	";": TokenType.Semicolon,
 	":": TokenType.Colon,
 	",": TokenType.Comma,
 	".": TokenType.Dot,
+
+	"<": TokenType.LessThan,
+	">": TokenType.GreaterThan,
+
+	"|": TokenType.Bar,
 };
 
 export function tokenize(source: string): Token[] {
@@ -71,6 +74,44 @@ export function tokenize(source: string): Token[] {
 		} else {
 			// handle multicharacter tokens and special tokens
 			switch (curr) {
+				// handle tokens that can be in a single character or multicharacter form
+				case "=":
+					src.shift(); // go past first equals to check if there is another
+					if (src[0] == "=") {
+						src.shift(); // ISEQUAL comparison found
+						tokens.push(token("==", TokenType.IsEqual));
+					} else {
+						tokens.push(token("=", TokenType.Equals));
+					}
+					break;
+
+				case "&":
+					src.shift(); // go past first & and check for second one
+					if (src[0] == "&") {
+						src.shift(); // AND comparison found
+						tokens.push(token("&&", TokenType.And));
+					} else {
+						tokens.push(token("&", TokenType.Ampersand));
+					}
+
+				case "|":
+					src.shift(); // go past first | and check for second one
+					if (src[0] == "|") {
+						src.shift(); // OR comparison found
+						tokens.push(token("||", TokenType.Or));
+					} else {
+						tokens.push(token("|", TokenType.Bar));
+					}
+
+				case "!":
+					src.shift(); // go past ! to check for equals sign
+					if (src[0] == "=") {
+						src.shift(); // NOTEQUAL comparison found
+						tokens.push(token("!=", TokenType.NotEquals));
+					} else {
+						tokens.push(token("!", TokenType.Exclamation));
+					}
+
 				case '"': // string support
 					let str = "";
 					src.shift(); // move past opening doubleQuotes, indicating beginning of string
