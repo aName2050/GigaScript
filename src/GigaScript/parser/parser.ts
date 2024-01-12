@@ -126,7 +126,7 @@ export default class Parser {
             'Expected "(" following if statement.'
         );
 
-        const test = this.parse_expr();
+        const test = this.parse_logical_expr(this.parse_expr());
 
         this.expect(
             TokenType.CloseParen,
@@ -320,7 +320,7 @@ export default class Parser {
      */
     private parse_additive_expr(): Expr {
         let left = this.parse_multiplicitave_expr();
-        while (['+', '-', '==', '!=', '<', '>'].includes(this.at().value)) {
+        while (['+', '-'].includes(this.at().value)) {
             const operator = this.eat().value;
             const right = this.parse_multiplicitave_expr();
             left = {
@@ -329,6 +329,23 @@ export default class Parser {
                 right,
                 operator,
             } as BinaryExpr;
+        }
+
+        return this.parse_logical_expr(left);
+    }
+
+    private parse_logical_expr(left: Expr): Expr {
+        if (['&&', '||', '==', '!='].includes(this.at().value)) {
+            const operator = this.eat().value;
+            const right = this.parse_expr();
+            left = {
+                kind: 'BinaryExpr',
+                left,
+                right,
+                operator,
+            } as BinaryExpr;
+
+            return this.parse_logical_expr(left);
         }
 
         return left;
