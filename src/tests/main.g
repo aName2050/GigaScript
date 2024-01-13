@@ -1,6 +1,6 @@
-let x = true;
-let y = false;
+let x = 20;
+let y = 200;
 
-if(x || y) {
-    print("x or y is true!")
+if(x != y) {
+    print("x != y")
 }

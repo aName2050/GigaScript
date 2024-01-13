@@ -33,8 +33,6 @@ export function eval_numeric_binary_expr(
 ): RuntimeValue {
     const op = operator;
 
-    console.log(`${lhs} ${op} ${rhs}`);
-
     if (op === '!=') {
         return equals(lhs, rhs, false);
     } else if (op === '==') {

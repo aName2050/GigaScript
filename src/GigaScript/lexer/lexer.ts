@@ -40,22 +40,16 @@ const TOKENS: Record<string, TokenType> = {
 
     '<': TokenType.LessThan,
     '>': TokenType.GreaterThan,
-
-    '|': TokenType.Bar,
 };
 
 export function tokenize(source: string): Token[] {
     const tokens = new Array<Token>();
     const src = source.split('');
 
-    console.log('tokenizing:', source);
-
     // Make tokens till EOF
     while (src.length > 0) {
         const curr = src[0];
         const TOKEN = TOKENS[curr];
-
-        console.log('curr:', curr);
 
         // allow for both positive and negative numbers
         if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
@@ -100,9 +94,7 @@ export function tokenize(source: string): Token[] {
                     break;
 
                 case '|':
-                    console.log('| found! val before .shift():', src[0]);
                     src.shift(); // go past first | and check for second one
-                    console.log('val after .shift():', src[0]);
                     if (src[0] == '|') {
                         src.shift(); // OR comparison found
                         tokens.push(token('||', TokenType.Or));
@@ -167,13 +159,14 @@ export function tokenize(source: string): Token[] {
                         );
                         process.exit(1);
                     }
+                    break;
             }
         }
     }
 
     tokens.push({ value: 'EOF', type: TokenType.EOF });
 
-    console.log(tokens);
+    // console.log(tokens);
 
     return tokens;
 }

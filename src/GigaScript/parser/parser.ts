@@ -126,7 +126,7 @@ export default class Parser {
             'Expected "(" following if statement.'
         );
 
-        const test = this.parse_logical_expr(this.parse_expr());
+        const test = this.parse_expr();
 
         this.expect(
             TokenType.CloseParen,
@@ -270,7 +270,7 @@ export default class Parser {
     private parse_object_expr(): Expr {
         // { Prop[] }
         if (this.at().type !== TokenType.OpenBrace) {
-            return this.parse_additive_expr();
+            return this.parse_multiplicitave_expr();
         }
 
         this.eat(); // advance past the open brace
@@ -316,48 +316,100 @@ export default class Parser {
     }
 
     /**
-     * Handle addition (+) and subtraction (-) operations
+     * Handle multiplication (*), division (/), and modulo (%) operations
      */
-    private parse_additive_expr(): Expr {
-        let left = this.parse_multiplicitave_expr();
-        while (['+', '-'].includes(this.at().value)) {
+    private parse_multiplicitave_expr(): Expr {
+        let left = this.parse_additive_expr();
+
+        while (['/', '*', '%'].includes(this.at().value)) {
             const operator = this.eat().value;
-            const right = this.parse_multiplicitave_expr();
+            const right = this.parse_additive_expr();
             left = {
                 kind: 'BinaryExpr',
                 left,
                 right,
                 operator,
             } as BinaryExpr;
-        }
-
-        return this.parse_logical_expr(left);
-    }
-
-    private parse_logical_expr(left: Expr): Expr {
-        if (['&&', '||', '==', '!='].includes(this.at().value)) {
-            const operator = this.eat().value;
-            const right = this.parse_expr();
-            left = {
-                kind: 'BinaryExpr',
-                left,
-                right,
-                operator,
-            } as BinaryExpr;
-
-            return this.parse_logical_expr(left);
         }
 
         return left;
     }
 
     /**
-     * Handle multiplication (*), division (/), and modulo (%) operations
+     * Handle addition (+) and subtraction (-) operations
      */
-    private parse_multiplicitave_expr(): Expr {
+    private parse_additive_expr(): Expr {
+        let left = this.parse_comparison_expr();
+
+        while (['+', '-'].includes(this.at().value)) {
+            const operator = this.eat().value;
+            const right = this.parse_comparison_expr();
+            left = {
+                kind: 'BinaryExpr',
+                left,
+                right,
+                operator,
+            } as BinaryExpr;
+        }
+
+        return left;
+    }
+
+    private parse_comparison_expr(): Expr {
+        let left = this.parse_equality_expr();
+
+        while (['<', '>'].includes(this.at().value)) {
+            const operator = this.eat().value;
+            const right = this.parse_equality_expr();
+            left = {
+                kind: 'BinaryExpr',
+                left,
+                right,
+                operator,
+            } as BinaryExpr;
+        }
+
+        return left;
+    }
+
+    private parse_equality_expr(): Expr {
+        let left = this.parse_and_expr();
+
+        while (['!=', '=='].includes(this.at().value)) {
+            const operator = this.eat().value;
+            const right = this.parse_equality_expr();
+            left = {
+                kind: 'BinaryExpr',
+                left,
+                right,
+                operator,
+            } as BinaryExpr;
+        }
+
+        return left;
+    }
+
+    private parse_and_expr(): Expr {
+        let left = this.parse_or_expr();
+
+        while (['&&'].includes(this.at().value)) {
+            const operator = this.eat().value;
+            const right = this.parse_or_expr();
+            left = {
+                kind: 'BinaryExpr',
+                left,
+                right,
+                operator,
+            } as BinaryExpr;
+        }
+
+        return left;
+    }
+
+    private parse_or_expr(): Expr {
         let left = this.parse_call_member_expr();
 
-        while (['/', '*', '%'].includes(this.at().value)) {
+        while (['||'].includes(this.at().value)) {
             const operator = this.eat().value;
             const right = this.parse_call_member_expr();
             left = {
@@ -462,6 +514,22 @@ export default class Parser {
 
         return object;
     }
+
+    /**
+     * Order of Precedence
+     *
+     * Assignment Operators =
+     * Object
+     * Multiplication * / %
+     * Addition/Subtraction + -
+     * Comparison Operators < >
+     * Equality Operators == !=
+     * Logical AND &&
+     * Logical OR ||
+     * Call
+     * Member
+     * PrimaryExpr
+     */
 
     /**
      * Parse literal values and grouping expressions
