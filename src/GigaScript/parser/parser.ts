@@ -14,6 +14,7 @@ import {
     FunctionDeclaration,
     StringLiteral,
     IfStatement,
+    TryCatchStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -270,7 +271,7 @@ export default class Parser {
     private parse_object_expr(): Expr {
         // { Prop[] }
         if (this.at().type !== TokenType.OpenBrace) {
-            return this.parse_multiplicitave_expr();
+            return this.parse_try_catch_expr(); // check for Try-Catch statement
         }
 
         this.eat(); // advance past the open brace
@@ -423,6 +424,27 @@ export default class Parser {
         return left;
     }
 
+    private parse_try_catch_expr(): Expr {
+        if (this.at().value !== 'try') return this.parse_multiplicitave_expr();
+
+        this.eat(); // advance past try keyword
+
+        const body = this.parse_block_statement();
+
+        if (this.at().value !== 'catch')
+            throw '"Try-Catch" statements must have a "catch" statement after "try" statement.';
+
+        this.eat(); // advance past catch keyword
+
+        const alt = this.parse_block_statement();
+
+        return {
+            kind: 'TryCatchStatement',
+            body,
+            alt,
+        } as TryCatchStatement;
+    }
+
     // foo.bar()()
     private parse_call_member_expr(): Expr {
         const member = this.parse_member_expr();
@@ -520,6 +542,7 @@ export default class Parser {
      *
      * Assignment Operators =
      * Object
+     * Try Catch Expr
      * Multiplication * / %
      * Addition/Subtraction + -
      * Comparison Operators < >

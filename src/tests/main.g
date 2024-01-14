@@ -1,6 +1,8 @@
-let x = 20;
-let y = 200;
+let x = 32;
 
-if(x != y) {
-    print("x != y")
+try {
+    x = y + 1
+    print(x)
+} catch {
+    print(error)
 }
