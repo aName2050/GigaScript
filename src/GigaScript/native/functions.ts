@@ -9,6 +9,8 @@ import {
     OBJECT,
     ObjectValue,
     RuntimeValue,
+    STRING,
+    StringValue,
 } from '../runtime/values';
 import { getValue } from '../util/util';
 
@@ -37,3 +39,19 @@ export const math = OBJECT(
         })
     )
 );
+
+export const format = NATIVE_FUNCTION((args, scope) => {
+    const str = args.shift() as StringValue;
+
+    let res = '';
+
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i] as StringValue;
+
+        res = str.value.replace(/\${}/, arg.value);
+    }
+
+    if (!args[0]) throw '"format" expected 2 arguments, but got 1.';
+
+    return STRING(res);
+});

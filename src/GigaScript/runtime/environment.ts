@@ -27,6 +27,7 @@ export function createGlobalScope(): Environment {
     env.delcareVar('print', NativeFunctions.print, true);
     env.delcareVar('timestamp', NativeFunctions.timestamp, true);
     env.delcareVar('math', NativeFunctions.math, true);
+    env.delcareVar('format', NativeFunctions.format, true);
 
     return env;
 }

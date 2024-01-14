@@ -1,4 +1,5 @@
 import {
+    ForStatement,
     FunctionDeclaration,
     IfStatement,
     Program,
@@ -15,6 +16,7 @@ import {
     BooleanValue,
     STRING,
 } from '../values';
+import { eval_assignment } from './expr';
 
 export function eval_program(program: Program, env: Environment): RuntimeValue {
     let lastEvaluated: RuntimeValue = NULL();
@@ -100,4 +102,29 @@ export function eval_try_catch_statement(
         env.assignVar('error', STRING(String(e)));
         return eval_body(declaration?.alt!, catch_env, false);
     }
+}
+
+export function eval_for_statement(
+    declaration: ForStatement,
+    env: Environment
+): RuntimeValue {
+    env = new Environment(env);
+
+    eval_var_declaration(declaration.init, env);
+
+    const body = declaration.body;
+    const update = declaration.update;
+
+    let test = evaluate(declaration.test, env);
+
+    if ((test as BooleanValue).value !== true) return NULL(); // test expression failed
+
+    do {
+        eval_assignment(update, env);
+        eval_body(body, new Environment(env), false);
+
+        test = evaluate(declaration.test, env);
+    } while ((test as BooleanValue).value);
+
+    return NULL();
 }

@@ -14,6 +14,7 @@ import {
     StringLiteral,
     IfStatement,
     TryCatchStatement,
+    ForStatement,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -30,6 +31,7 @@ import {
     eval_program,
     eval_var_declaration,
     eval_try_catch_statement,
+    eval_for_statement,
 } from './eval/stmt';
 
 export function evaluate(node: Stmt, env: Environment): RuntimeValue {
@@ -81,6 +83,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 
         case 'TryCatchStatement':
             return eval_try_catch_statement(env, node as TryCatchStatement);
+
+        case 'ForStatement':
+            return eval_for_statement(node as ForStatement, env);
 
         // Handle types not implemented
         default:

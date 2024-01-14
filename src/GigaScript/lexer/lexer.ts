@@ -12,6 +12,8 @@ const KEYWORDS: Record<string, TokenType> = {
 
     if: TokenType.If,
     else: TokenType.Else,
+
+    for: TokenType.For,
 };
 
 /**

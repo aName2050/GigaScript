@@ -5,6 +5,7 @@ export type NodeType =
     | 'FunctionDeclaration'
     | 'IfStatement'
     | 'TryCatchStatement'
+    | 'ForStatement'
     // EXPRESSIONS
     | 'AssignmentExpr'
     | 'MemberExpr'
@@ -59,6 +60,14 @@ export interface TryCatchStatement extends Stmt {
     kind: 'TryCatchStatement';
     body: Stmt[];
     alt: Stmt[];
+}
+
+export interface ForStatement extends Stmt {
+    kind: 'ForStatement';
+    init: VarDeclaration;
+    test: Expr;
+    update: AssignmentExpr;
+    body: Stmt[];
 }
 
 /**

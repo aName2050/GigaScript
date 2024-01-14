@@ -15,6 +15,7 @@ import {
     StringLiteral,
     IfStatement,
     TryCatchStatement,
+    ForStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -93,6 +94,8 @@ export default class Parser {
                 return this.parse_func_declaration();
             case TokenType.If:
                 return this.parse_if_statement();
+            case TokenType.For:
+                return this.parse_for_statement();
 
             default:
                 return this.parse_expr();
@@ -118,6 +121,40 @@ export default class Parser {
         this.expect(TokenType.CloseBrace, `Expected "}" at end of code block.`);
 
         return body;
+    }
+
+    private parse_for_statement(): Stmt {
+        this.eat(); // advance past for keyword
+
+        this.expect(
+            TokenType.OpenParen,
+            'Expected "(" following "for" keyword'
+        );
+
+        const init = this.parse_var_declaration();
+        const test = this.parse_expr();
+
+        this.expect(
+            TokenType.Semicolon,
+            'Expected ";" following test expression in "for" statement'
+        );
+
+        const update = this.parse_assignment_expr();
+
+        this.expect(
+            TokenType.CloseParen,
+            'Expected ")" following update expression in "for" statement'
+        );
+
+        const body = this.parse_block_statement();
+
+        return {
+            kind: 'ForStatement',
+            init,
+            test,
+            update,
+            body,
+        } as ForStatement;
     }
 
     private parse_if_statement(): Stmt {
