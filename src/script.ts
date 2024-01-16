@@ -7,6 +7,11 @@ import { createGlobalScope } from "./GigaScript/runtime/environment";
 
 const file = process.argv[2];
 
+const REPL = {
+	parser: new Parser(),
+	env: createGlobalScope(),
+};
+
 if (file) {
 	// run file
 	run(file);
@@ -47,11 +52,7 @@ function handle(
 	_filename: unknown,
 	callback: any
 ): void {
-	const parser = new Parser();
-	const env = createGlobalScope();
-
-	const program = parser.generateAST(uInput);
-	evaluate(program, env);
-
+	const program = REPL.parser.generateAST(uInput);
+	evaluate(program, REPL.env);
 	callback();
 }
