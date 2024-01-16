@@ -1,8 +1,12 @@
-let start = timestamp();
-for(let i=0;i<1000;i=i+1){
-    for(let j=0;j<1000;j=j+1){
-        let z = i + j;
-        print(z)
-    }
+let x = 100;
+let y = 50;
+
+let z = x + y;
+
+if(z == 200) {
+    print("z is 200!")
+} else {
+    print("z is a number but isnt 200!")
 }
-print("took", timestamp() - start, "ms")
+
+print("z is", z)
