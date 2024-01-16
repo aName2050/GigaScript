@@ -29,13 +29,13 @@ function run(filename: string) {
 
 	let file = fs.readFileSync(filename, "utf-8");
 
-	if (file.endsWith(".g")) {
+	if (filename.endsWith(".g")) {
 		// handle standard GigaScript files
 		const program = parser.generateAST(file);
 		const res = evaluate(program, env);
 
 		return res;
-	} else if (file.endsWith(".gsx")) {
+	} else if (filename.endsWith(".gsx")) {
 		// handle gen-z GigaScript files
 		console.log(".gsx files are not yet supported");
 		process.exit(1);

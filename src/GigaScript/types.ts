@@ -26,7 +26,7 @@ export enum TokenType {
     LessThan, // <
     IsEqual, // ==
     NotEquals, // !=
-    Exclamation, // ! (NOT operator)
+    Exclamation, // ! 
     And, // &&
     Or, // ||
 
