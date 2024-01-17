@@ -4,11 +4,13 @@ A programming language written in TypeScript, with two forms of syntax, one base
 
 There are two forms of this language, ***.g** and ***.gsx**. ***.g** files use traditional syntax similar to JavaScript/TypeScript. ***.gsx** files use the Gen Z slang syntax. GigaChads use ***.gsx** :).
 
-## .g
+## .g <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript.png" />
 
-This is syntax is actively being worked on!
+The boring version of GigaScript...
 
-## .gsx
+## .gsx <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript-X.png" />
+
+The cool version of GigaScript!
 
 This syntax is currently unavailable. I'm still working on it!
 
