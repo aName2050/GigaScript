@@ -1,3 +1,4 @@
+print("======== begin *main.g* ========")
 let x = 100;
 let y = 50;
 
@@ -10,3 +11,6 @@ if(z == 200) {
 }
 
 print("z is", z)
+
+const test = undefined;
+print(test)
