@@ -6,6 +6,7 @@ import {
     ObjectValue,
     RuntimeValue,
     STRING,
+    UNDEFINED,
 } from './values';
 import * as NativeFunctions from '../native/functions';
 import { Identifier, MemberExpr } from '../ast/ast';
@@ -20,6 +21,7 @@ export function createGlobalScope(): Environment {
     env.delcareVar('true', BOOL(true), true);
     env.delcareVar('false', BOOL(false), true);
     env.delcareVar('null', NULL(), true);
+    env.delcareVar('undefined', UNDEFINED(), true);
 
     env.delcareVar('error', NULL(), false);
 
