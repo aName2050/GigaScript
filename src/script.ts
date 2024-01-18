@@ -12,7 +12,7 @@ const REPL = {
     env: createGlobalScope(),
 };
 
-import { parseGSX } from './GigaScript/util/gsx';
+import { readGSX } from './GigaScript/util/gsx';
 
 if (file) {
     // run file
@@ -39,7 +39,9 @@ function run(filename: string) {
         return res;
     } else if (filename.endsWith('.gsx')) {
         // handle gen-z GigaScript files
-        const program = parseGSX(file);
+        const translation = readGSX(file);
+        console.log(translation);
+        const program = parser.generateAST(translation);
 
         const res = evaluate(program, env);
         return res;

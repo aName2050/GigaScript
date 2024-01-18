@@ -1,7 +1,3 @@
-import { Program } from '../ast/ast';
-import Parser from '../parser/parser';
-import { Token } from '../types';
-
 const CHARS: Record<string, string> = {
     // TOKENS
     lit: 'let',
@@ -43,18 +39,37 @@ const CHARS: Record<string, string> = {
     nerd: 'math',
 };
 
-export function parseGSX(source: string): Program {
-    const src = source.split('\n'); // handle line by line
-    const tokensFound = new Array<Token>();
-
-    // Tokenize code
-    while (src.length > 0) {
-        // TODO: implement
+// typescript stuff :(
+declare global {
+    interface String {
+        replaceGSX(target: string, replacement: string): string;
     }
+}
 
-    // Parse translated code
-    const parser = new Parser();
-    const program = parser.generateGSXAST(tokensFound);
+// replace gsx from source
+String.prototype.replaceGSX = function (
+    target: string,
+    replacement: string
+): string {
+    const regex = new RegExp('("[^"]*")|(\b' + target + '\b)', 'g');
+    return this.replace(regex, replacement);
+};
 
-    return program;
+// TODO: finish implementation
+
+export function readGSX(source: string): string {
+    return source
+        .replaceGSX('lit', 'let')
+        .replaceGSX('bro', 'const')
+        .replaceGSX('be', '=')
+        .replaceGSX('rn', ';')
+        .replaceGSX('sus', 'if')
+        .replaceGSX('imposter', 'else')
+        .replaceGSX('waffle', 'print')
+        .replaceGSX('frfr', '==')
+        .replaceGSX('with', '+')
+        .replaceGSX('without', '-')
+        .replaceGSX('by', '*')
+        .replaceGSX('some', '/')
+        .replaceGSX('left', '%');
 }

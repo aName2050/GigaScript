@@ -55,7 +55,7 @@ export function tokenize(source: string): Token[] {
 
         // allow for both positive and negative numbers
         if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
-            let num: string = src.shift() || ''; // move past first digit or negative sign
+            let num: string = src.shift()!; // move past first digit or negative sign
             let decimalPointFound = false; // if number has digits in the decimal place
             while (src.length > 0) {
                 if (src[0] == '.' && !decimalPointFound) {

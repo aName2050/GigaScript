@@ -82,20 +82,6 @@ export default class Parser {
         return program;
     }
 
-    public generateGSXAST(tokens: Token[]): Program {
-        this.tokens = tokens;
-        const program: Program = {
-            kind: 'Program',
-            body: [],
-        };
-
-        while (this.not_eof()) {
-            program.body.push(this.parse_stmt());
-        }
-
-        return program;
-    }
-
     /**
      * Handle complex statements
      */
