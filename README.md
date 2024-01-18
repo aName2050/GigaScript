@@ -12,7 +12,18 @@ The boring version of GigaScript...
 
 The cool version of GigaScript!
 
-This syntax is currently unavailable. I'm still working on it!
+## How to run
+### Start a REPL
+
+```
+npm run gigascript
+```
+
+### Run a file
+
+```
+npm run gigascript [file_location]
+```
 
 # Credits
 
