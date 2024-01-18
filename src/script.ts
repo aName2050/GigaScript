@@ -8,57 +8,56 @@ import { createGlobalScope } from './GigaScript/runtime/environment';
 const file = process.argv[2];
 
 const REPL = {
-    parser: new Parser(),
-    env: createGlobalScope(),
+	parser: new Parser(),
+	env: createGlobalScope(),
 };
 
 import { readGSX } from './GigaScript/util/gsx';
 
 if (file) {
-    // run file
-    run(file);
+	// run file
+	run(file);
 } else {
-    // start repl
-    const v = 'v1';
-    console.log(`GigaScript REPL ${v}\n`);
+	// start repl
+	const v = 'v1';
+	console.log(`GigaScript REPL ${v}\n`);
 
-    repl.start({ prompt: '> ', eval: handle });
+	repl.start({ prompt: '> ', eval: handle });
 }
 
 function run(filename: string) {
-    const parser = new Parser();
-    const env = createGlobalScope();
+	const parser = new Parser();
+	const env = createGlobalScope();
 
-    let file = fs.readFileSync(filename, 'utf-8');
+	let file = fs.readFileSync(filename, 'utf-8');
 
-    if (filename.endsWith('.g')) {
-        // handle standard GigaScript files
-        const program = parser.generateAST(file);
-        const res = evaluate(program, env);
+	if (filename.endsWith('.g')) {
+		// handle standard GigaScript files
+		const program = parser.generateAST(file);
+		const res = evaluate(program, env);
 
-        return res;
-    } else if (filename.endsWith('.gsx')) {
-        // handle gen-z GigaScript files
-        const translation = readGSX(file);
-        console.log(translation);
-        const program = parser.generateAST(translation);
+		return res;
+	} else if (filename.endsWith('.gsx')) {
+		// handle gen-z GigaScript files
+		const translation = readGSX(file);
+		const program = parser.generateAST(translation);
 
-        const res = evaluate(program, env);
-        return res;
-    } else {
-        throw `File does not end with ".g" or ".gsx". ${
-            file.split('.')[1]
-        } is not a supported file type.`;
-    }
+		const res = evaluate(program, env);
+		return res;
+	} else {
+		throw `File does not end with ".g" or ".gsx". ${
+			file.split('.')[1]
+		} is not a supported file type.`;
+	}
 }
 
 function handle(
-    uInput: string,
-    _context: unknown,
-    _filename: unknown,
-    callback: any
+	uInput: string,
+	_context: unknown,
+	_filename: unknown,
+	callback: any
 ): void {
-    const program = REPL.parser.generateAST(uInput);
-    evaluate(program, REPL.env);
-    callback();
+	const program = REPL.parser.generateAST(uInput);
+	evaluate(program, REPL.env);
+	callback();
 }
