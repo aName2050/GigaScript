@@ -26,7 +26,7 @@ const CHARS: Record<string, string> = {
 	be: '=',
 
 	rn: ';',
-	dawg: ':',
+	is: ':',
 
 	// SPECIAL
 	nocap: 'true',
@@ -83,7 +83,7 @@ export function readGSX(source: string): string {
 
 			// Special symbols
 			.replaceGSX('rn') // ;
-			.replaceGSX('dawg') // :
+			.replaceGSX('is') // :
 
 			// Bin Op
 			.replaceGSX('with') // +

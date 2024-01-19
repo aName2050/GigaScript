@@ -1,11 +1,5 @@
 bro obj be {
-    key dawg "hello"
+    word is "hello"
 };
 
-waffle(obj.key)
-
-messAround {
-    waffle(x)
-} findOut {
-    waffle(error)
-}
+waffle(obj.word)
