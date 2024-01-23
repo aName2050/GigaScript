@@ -19,7 +19,19 @@ const varName = value;
 ```
 
 > [!NOTE]
-> All variable **declarations, not assignments**, must end in a semicolon (;)
+> All variable **declarations** must end in a semicolon (;)
+
+Reassigning a mutable variable
+
+```
+varName = newValue
+```
+
+> [!NOTE]
+> Variable **assignments or reassignments** do not need to end in a semicolon (;)
+
+> [!WARNING]
+> Semicolons (;) should **only** be used when **declaring variables**! Using semicolons (;) anywhere else will result in an error.
 
 ### Functions
 
@@ -180,7 +192,19 @@ bro varName be value rn
 ```
 
 > [!NOTE]
-> All variable **declarations, not assignments**, must end with the `rn` keyword.
+> All variable **declarations** must end with the `rn` keyword.
+
+Reassigning a mutable variable
+
+```
+varName be newValue
+```
+
+> [!NOTE]
+> Variable **assignments or reassignments** do not need to end with the `rn` keyword.
+
+> [!WARNING]
+> `rn` keywords should **only** be used when **declaring variables**! Using the `rn` keyword anywhere else will result in an error.
 
 ### Functions
 
