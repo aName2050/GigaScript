@@ -16,6 +16,7 @@ import {
 	IfStatement,
 	TryCatchStatement,
 	ForStatement,
+	ImportStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -96,6 +97,8 @@ export default class Parser {
 				return this.parse_if_statement();
 			case TokenType.For:
 				return this.parse_for_statement();
+			case TokenType.Import:
+				return this.parse_import_statement();
 
 			default:
 				return this.parse_expr();
@@ -192,6 +195,20 @@ export default class Parser {
 			body,
 			alt,
 		} as IfStatement;
+	}
+
+	private parse_import_statement(): Stmt {
+		this.eat(); // advance past import keyword
+
+		const file = this.expect(
+			TokenType.String,
+			'Expected string to file location in import statement.'
+		).value;
+
+		return {
+			kind: 'ImportStatement',
+			file,
+		} as ImportStatement;
 	}
 
 	/**

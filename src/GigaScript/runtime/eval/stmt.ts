@@ -1,130 +1,148 @@
 import {
-    ForStatement,
-    FunctionDeclaration,
-    IfStatement,
-    Program,
-    Stmt,
-    TryCatchStatement,
-    VarDeclaration,
+	ForStatement,
+	FunctionDeclaration,
+	IfStatement,
+	ImportStatement,
+	Program,
+	Stmt,
+	TryCatchStatement,
+	VarDeclaration,
 } from '../../ast/ast';
 import Environment from '../environment';
 import { evaluate } from '../interpreter';
 import {
-    RuntimeValue,
-    NULL,
-    FunctionValue,
-    BooleanValue,
-    STRING,
+	RuntimeValue,
+	NULL,
+	FunctionValue,
+	BooleanValue,
+	STRING,
 } from '../values';
 import { eval_assignment } from './expr';
+import * as fs from 'node:fs';
 
 export function eval_program(program: Program, env: Environment): RuntimeValue {
-    let lastEvaluated: RuntimeValue = NULL();
-    for (const statement of program.body) {
-        lastEvaluated = evaluate(statement, env);
-    }
-    return lastEvaluated;
+	let lastEvaluated: RuntimeValue = NULL();
+	for (const statement of program.body) {
+		lastEvaluated = evaluate(statement, env);
+	}
+	return lastEvaluated;
 }
 
 export function eval_var_declaration(
-    declaration: VarDeclaration,
-    env: Environment
+	declaration: VarDeclaration,
+	env: Environment
 ): RuntimeValue {
-    const value = declaration.value ? evaluate(declaration.value, env) : NULL();
+	const value = declaration.value ? evaluate(declaration.value, env) : NULL();
 
-    return env.delcareVar(declaration.identifier, value, declaration.constant);
+	return env.delcareVar(declaration.identifier, value, declaration.constant);
 }
 
 export function eval_func_declaration(
-    declaration: FunctionDeclaration,
-    env: Environment
+	declaration: FunctionDeclaration,
+	env: Environment
 ): RuntimeValue {
-    const func = {
-        type: 'function',
-        name: declaration.name,
-        parameters: declaration.parameters,
-        declarationEnv: env,
-        body: declaration.body,
-    } as FunctionValue;
+	const func = {
+		type: 'function',
+		name: declaration.name,
+		parameters: declaration.parameters,
+		declarationEnv: env,
+		body: declaration.body,
+	} as FunctionValue;
 
-    return env.delcareVar(declaration.name, func, true);
+	return env.delcareVar(declaration.name, func, true);
 }
 
 export function eval_if_statement(
-    declaration: IfStatement,
-    env: Environment
+	declaration: IfStatement,
+	env: Environment
 ): RuntimeValue {
-    const test = evaluate(declaration.test, env);
+	const test = evaluate(declaration.test, env);
 
-    if ((test as BooleanValue).value === true) {
-        return eval_body(declaration.body, env);
-    } else if (declaration.alt) {
-        return eval_body(declaration.alt, env);
-    } else {
-        return NULL();
-    }
+	if ((test as BooleanValue).value === true) {
+		return eval_body(declaration.body, env);
+	} else if (declaration.alt) {
+		return eval_body(declaration.alt, env);
+	} else {
+		return NULL();
+	}
 }
 
 export function eval_body(
-    body: Stmt[],
-    env: Environment,
-    newEnv = true
+	body: Stmt[],
+	env: Environment,
+	newEnv = true
 ): RuntimeValue {
-    let scope: Environment;
+	let scope: Environment;
 
-    if (newEnv) {
-        scope = new Environment(env);
-    } else {
-        scope = env;
-    }
+	if (newEnv) {
+		scope = new Environment(env.cwd, env);
+	} else {
+		scope = env;
+	}
 
-    let result: RuntimeValue = NULL();
+	let result: RuntimeValue = NULL();
 
-    // evaluate each line of the body
-    for (const stmt of body) {
-        // TODO: implement continue and break keywords
-        result = evaluate(stmt, scope);
-    }
+	// evaluate each line of the body
+	for (const stmt of body) {
+		// TODO: implement continue and break keywords
+		result = evaluate(stmt, scope);
+	}
 
-    return result;
+	return result;
 }
 
 export function eval_try_catch_statement(
-    env: Environment,
-    declaration?: TryCatchStatement
+	env: Environment,
+	declaration?: TryCatchStatement
 ): RuntimeValue {
-    const try_env = new Environment(env);
-    const catch_env = new Environment(env);
+	const try_env = new Environment(env.cwd, env);
+	const catch_env = new Environment(env.cwd, env);
 
-    try {
-        return eval_body(declaration?.body!, try_env, false);
-    } catch (e) {
-        env.assignVar('error', STRING(String(e)));
-        return eval_body(declaration?.alt!, catch_env, false);
-    }
+	try {
+		return eval_body(declaration?.body!, try_env, false);
+	} catch (e) {
+		env.assignVar('error', STRING(String(e)));
+		return eval_body(declaration?.alt!, catch_env, false);
+	}
 }
 
 export function eval_for_statement(
-    declaration: ForStatement,
-    env: Environment
+	declaration: ForStatement,
+	env: Environment
 ): RuntimeValue {
-    env = new Environment(env);
+	env = new Environment(env.cwd, env);
 
-    eval_var_declaration(declaration.init, env);
+	eval_var_declaration(declaration.init, env);
 
-    const body = declaration.body;
-    const update = declaration.update;
+	const body = declaration.body;
+	const update = declaration.update;
 
-    let test = evaluate(declaration.test, env);
+	let test = evaluate(declaration.test, env);
 
-    if ((test as BooleanValue).value !== true) return NULL(); // test expression failed
+	if ((test as BooleanValue).value !== true) return NULL(); // test expression failed
 
-    do {
-        eval_assignment(update, env);
-        eval_body(body, new Environment(env), false);
+	do {
+		eval_assignment(update, env);
+		eval_body(body, new Environment(env.cwd, env), false);
 
-        test = evaluate(declaration.test, env);
-    } while ((test as BooleanValue).value);
+		test = evaluate(declaration.test, env);
+	} while ((test as BooleanValue).value);
 
-    return NULL();
+	return NULL();
+}
+
+export function eval_import_statement(
+	declaration: ImportStatement,
+	env: Environment
+): RuntimeValue {
+	const fileContents = fs.readFileSync(
+		`${process.cwd()}\\${declaration.file}`,
+		{
+			encoding: 'utf-8',
+		}
+	);
+
+	console.log(fileContents);
+
+	return NULL();
 }

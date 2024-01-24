@@ -2,69 +2,71 @@
 
 // Contains the tokens that are parser understands
 export enum TokenType {
-    // Literal Types (USER_DEFINED)
-    Number, // 0-9
-    String, // " anything "
+	// Literal Types (USER_DEFINED)
+	Number, // 0-9
+	String, // " anything "
 
-    Identifier, // Variable names, function names, etc.
+	Identifier, // Variable names, function names, etc.
 
-    // Keywords
-    Let, // Mutable variable declaration
-    Const, // Constant variable declaration
+	// Keywords
+	Let, // Mutable variable declaration
+	Const, // Constant variable declaration
 
-    Func, // Function declaration
+	Func, // Function declaration
 
-    If, // If statement
-    Else, // If statement alternate path
+	If, // If statement
+	Else, // If statement alternate path
 
-    For, // For loop statement
-    // Continue, // For Loop continue statement
-    // Break, // For loop break statement
+	For, // For loop statement
+	// Continue, // For Loop continue statement
+	// Break, // For loop break statement
 
-    // Comparison Operators
-    GreaterThan, // >
-    LessThan, // <
-    IsEqual, // ==
-    NotEquals, // !=
-    Exclamation, // ! 
-    And, // &&
-    Or, // ||
+	Import, // Import GigaScript code from another file
 
-    // Symbols
-    Bar, // |
-    Ampersand, // &
+	// Comparison Operators
+	GreaterThan, // >
+	LessThan, // <
+	IsEqual, // ==
+	NotEquals, // !=
+	Exclamation, // !
+	And, // &&
+	Or, // ||
 
-    // Punctuation
-    Comma, // ,
-    Dot, // .
-    Colon, // :
+	// Symbols
+	Bar, // |
+	Ampersand, // &
 
-    Semicolon, // ;
+	// Punctuation
+	Comma, // ,
+	Dot, // .
+	Colon, // :
 
-    // Mathematical Operations
-    BinOp, // Binary operator (+ - * / %)
+	Semicolon, // ;
 
-    // Assignment Operators
-    Equals, // =
+	// Mathematical Operations
+	BinOp, // Binary operator (+ - * / %)
 
-    // Grouping
-    OpenParen, // (
-    CloseParen, // )
+	// Assignment Operators
+	Equals, // =
 
-    OpenBrace, // {
-    CloseBrace, // }
+	// Grouping
+	OpenParen, // (
+	CloseParen, // )
 
-    OpenBracket, // [
-    CloseBracket, // ]
+	OpenBrace, // {
+	CloseBrace, // }
 
-    DoubleQuote, // "
+	OpenBracket, // [
+	CloseBracket, // ]
 
-    // Special
-    EOF, // End Of File
+	DoubleQuote, // "
+
+	// Special
+	EOF, // End Of File
 }
 
 // Represents a single token in the language
 export interface Token {
-    value: string; // the raw value as seen in the language
-    type: TokenType; // token structure
+	value: string; // the raw value as seen in the language
+	type: TokenType; // token structure
 }
