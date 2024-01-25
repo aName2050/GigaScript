@@ -137,9 +137,13 @@ export function eval_import_statement(
 	declaration: ImportStatement,
 	env: Environment
 ): RuntimeValue {
+	// DOESN'T RETURN ANYTHING!!!
+
 	const fileLocation = `${env.cwd}/${declaration.file}`;
-	console.log(fileLocation);
+
 	// Run external file
+	// Run Function from script.ts but modified for this use
+	// TypeScript doesn't like the imported copy :(
 	const parser = new Parser();
 	const extEnv = createGlobalScope(fileLocation);
 
@@ -148,22 +152,19 @@ export function eval_import_statement(
 	if (file.endsWith('.g')) {
 		// handle standard GigaScript files
 		const program = parser.generateAST(file);
-		const res = evaluate(program, extEnv);
+		evaluate(program, extEnv);
 
-		return res;
+		return NULL();
 	} else if (fileLocation.endsWith('.gsx')) {
 		// handle gen-z GigaScript files
 		const translation = readGSX(file);
 		const program = parser.generateAST(translation);
 
-		const res = evaluate(program, env);
-		return res;
+		evaluate(program, env);
+		return NULL();
 	} else {
 		throw `File does not end with ".g" or ".gsx". ${
 			file.split('.')[1]
 		} is not a supported file type.`;
 	}
-
-	// Doesn't return anything
-	return NULL();
 }
