@@ -217,7 +217,7 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeValue {
 
     if (fn.type == 'function') {
         const func = fn as FunctionValue;
-        const scope = new Environment(func.declarationEnv);
+        const scope = new Environment(env.cwd, func.declarationEnv);
 
         // Create parameters as variables for new scope
         for (let i = 0; i < func.parameters.length; i++) {
