@@ -175,6 +175,18 @@ try {
 > [!WARNING]
 > `catch` doesn't return anything. `error` is global variable, which is assigned a value when `catch` catches an error in the `try` block.
 
+### Import Statement
+
+```
+import "path/to/file.ext"
+```
+
+> [!IMPORTANT]
+> The `import` file path must be relative. Do not write out the full file path like **"C:/path/to/file.ext"**, you must use the relative path like **"file.ext"** or **"to/file.ext"**.
+
+> [!CAUTION]
+> When using relative file paths, do **not** start with a "." (dot). This will cause errors.
+
 ## GigaScript-X (.gsx) <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript-X.png" />
 
 ### Variables
@@ -347,3 +359,15 @@ messAround {
 
 > [!WARNING]
 > `findOut` doesn't return anything. `error` is global variable, which is assigned a value when `findOut` catches an error in the `messAround` block.
+
+### Import Statement
+
+```
+yoink "path/to/file.ext"
+```
+
+> [!IMPORTANT]
+> The `yoink` file path must be relative. Do not write out the full file path like **"C:/path/to/file.ext"**, you must use the relative path like **"file.ext"** or **"to/file.ext"**.
+
+> [!CAUTION]
+> When using relative file paths, do **not** start with a "." (dot). This will cause errors.
