@@ -49,9 +49,10 @@ declare global {
 	}
 }
 
+// test: ("(.*?)")
 // replace gsx from source
 String.prototype.replaceGSX = function (target: string): string {
-	const regex = new RegExp('(?<![\'"`])\\b' + target + '\\b(?!["\'`])', 'g');
+	const regex = new RegExp('(?<!["s])\\b' + target + '\\b(?!["])', 'g');
 	return this.replace(regex, CHARS[target]);
 };
 
