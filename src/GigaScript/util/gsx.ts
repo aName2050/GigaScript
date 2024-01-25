@@ -10,6 +10,8 @@ const CHARS: Record<string, string> = {
 
 	yall: 'for',
 
+	yoink: 'import',
+
 	big: '>',
 	lil: '<',
 	frfr: '==',
@@ -69,6 +71,9 @@ export function readGSX(source: string): string {
 
 			// Loops
 			.replaceGSX('yall') // for
+
+			// Special Statements
+			.replaceGSX('yoink') // import
 
 			// Comparisons
 			.replaceGSX('frfr') // ==
