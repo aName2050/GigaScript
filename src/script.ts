@@ -9,8 +9,6 @@ import { createGlobalScope } from './GigaScript/runtime/environment';
 const file = process.argv[2];
 let fileLocation = path.parse(file).dir;
 
-console.log(fileLocation);
-
 const REPL = {
 	parser: new Parser(),
 	env: createGlobalScope(file),
