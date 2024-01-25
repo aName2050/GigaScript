@@ -3,3 +3,7 @@ bro obj be {
 };
 
 waffle(obj.word)
+
+yoink "testImport.gsx"
+
+waffle("inside main.gsx")

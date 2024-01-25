@@ -9,6 +9,7 @@ import {
 	VarDeclaration,
 } from '../../ast/ast';
 import Parser from '../../parser/parser';
+import { readGSX } from '../../util/gsx';
 import Environment, { createGlobalScope } from '../environment';
 import { evaluate } from '../interpreter';
 import {
@@ -136,18 +137,33 @@ export function eval_import_statement(
 	declaration: ImportStatement,
 	env: Environment
 ): RuntimeValue {
-	const fileContents = fs.readFileSync(`${env.cwd}/${declaration.file}`, {
-		encoding: 'utf-8',
-	});
-
-	// Parse imported file and run file
+	const fileLocation = `${env.cwd}/${declaration.file}`;
+	console.log(fileLocation);
+	// Run external file
 	const parser = new Parser();
-	const externalProgram = parser.generateAST(fileContents);
+	const extEnv = createGlobalScope(fileLocation);
 
-	// Evaluate and run external file
-	const externalEnv = createGlobalScope(env.cwd);
-	evaluate(externalProgram, externalEnv);
+	let file = fs.readFileSync(fileLocation, { encoding: 'utf-8' });
 
-	// return nothing
+	if (file.endsWith('.g')) {
+		// handle standard GigaScript files
+		const program = parser.generateAST(file);
+		const res = evaluate(program, extEnv);
+
+		return res;
+	} else if (fileLocation.endsWith('.gsx')) {
+		// handle gen-z GigaScript files
+		const translation = readGSX(file);
+		const program = parser.generateAST(translation);
+
+		const res = evaluate(program, env);
+		return res;
+	} else {
+		throw `File does not end with ".g" or ".gsx". ${
+			file.split('.')[1]
+		} is not a supported file type.`;
+	}
+
+	// Doesn't return anything
 	return NULL();
 }

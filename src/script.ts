@@ -31,7 +31,7 @@ function run(filename: string) {
 	const parser = new Parser();
 	const env = createGlobalScope(fileLocation);
 
-	let file = fs.readFileSync(filename, 'utf-8');
+	let file = fs.readFileSync(filename, { encoding: 'utf-8' });
 
 	if (filename.endsWith('.g')) {
 		// handle standard GigaScript files
