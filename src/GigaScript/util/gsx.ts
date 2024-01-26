@@ -123,7 +123,9 @@ export function readGSX(source: string): Token[] {
 				// look for "||" ("carenot")
 				case 'c':
 					src.shift(); // advance past first character
-					// if(src[0] == 'a')
+					if(src[0] == 'a' && src[1] == 'r' && src[2])  {
+						
+					}
 					// TODO: finish
 					break;
 
