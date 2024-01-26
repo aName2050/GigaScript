@@ -94,12 +94,17 @@ export function readGSX(source: string): Token[] {
 		} else {
 			// multicharacter tokens + special tokens
 			switch (curr) {
-				// look for "=" ("be")
+				// look for "=" "&&" ("be" "btw")
 				case 'b':
 					src.shift(); // advance past first character
 					if (src[0] == 'e') {
 						src.shift(); // "be" assignment token
 						tokens.push(token('=', TokenType.Equals));
+					} else if (src[0] == 't') {
+						// "btw" ("&&") comparison found, advance past remainding characters
+						src.shift();
+						src.shift();
+						tokens.push(token('&&', TokenType.And));
 					}
 					break;
 
@@ -114,18 +119,19 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('==', TokenType.IsEqual));
 					}
 					break;
+
+				// look for "||" ("carenot")
+				case 'c':
+					src.shift(); // advance past first character
+					// if(src[0] == 'a')
+					// TODO: finish
+					break;
+
+				default:
+					src.shift();
+					break;
 			}
 		}
-		// 		case '&':
-		// 			src.shift(); // go past first & and check for second one
-		// 			if (src[0] == '&') {
-		// 				src.shift(); // AND comparison found
-		// 				tokens.push(token('&&', TokenType.And));
-		// 			} else {
-		// 				tokens.push(token('&', TokenType.Ampersand));
-		// 			}
-		// 			break;
-
 		// 		case '|':
 		// 			src.shift(); // go past first | and check for second one
 		// 			if (src[0] == '|') {
