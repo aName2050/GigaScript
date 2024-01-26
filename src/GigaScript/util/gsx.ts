@@ -2,19 +2,7 @@ import { isAlpha, isInt, isSkippable, token } from '../lexer/lexerUtil';
 import { Token, TokenType } from '../types';
 
 const CHARS: Record<string, string> = {
-	// TOKENS
-	lit: 'let',
-	bro: 'const',
-
-	bruh: 'func',
-
-	sus: 'if',
-	impostor: 'else',
-
-	yall: 'for',
-
-	yoink: 'import',
-
+	// Comparisons
 	big: '>',
 	lil: '<',
 	frfr: '==',
@@ -22,18 +10,21 @@ const CHARS: Record<string, string> = {
 	btw: '&&',
 	carenot: '||',
 
+	// BinOp
 	with: '+',
 	without: '-',
 	by: '*',
 	some: '/',
 	left: '%',
 
+	// Assignments
 	be: '=',
 
+	// Special Tokens
 	rn: ';',
 	is: ':',
 
-	// SPECIAL
+	// Native
 	nocap: 'true',
 	cap: 'false',
 	fake: 'null',
@@ -69,36 +60,9 @@ const TOKENS: Record<string, TokenType> = {
 	'[': TokenType.OpenBracket,
 	']': TokenType.CloseBracket,
 
-	with: TokenType.BinOp,
-	without: TokenType.BinOp,
-	by: TokenType.BinOp,
-	some: TokenType.BinOp,
-	left: TokenType.BinOp,
-
-	rn: TokenType.Semicolon,
-	is: TokenType.Colon,
 	',': TokenType.Comma,
 	'.': TokenType.Dot,
-
-	lil: TokenType.LessThan,
-	big: TokenType.GreaterThan,
 };
-
-// typescript stuff :(
-declare global {
-	interface String {
-		replaceGSX(target: string): string;
-	}
-}
-
-// test: ("(.*?)")
-// replace gsx from source
-// String.prototype.replaceGSX = function (target: string): string {
-// 	const regex = new RegExp('(?<!["s])\\b' + target + '\\b(?!["])', 'g');
-// 	console.log(target, CHARS[target]);
-
-// 	return this.replace(regex, CHARS[target]);
-// };
 
 export function readGSX(source: string): Token[] {
 	const tokens = new Array<Token>();
@@ -128,26 +92,30 @@ export function readGSX(source: string): Token[] {
 		} else if (typeof TOKEN == 'number') {
 			tokens.push(token(src.shift(), TOKEN));
 		} else {
-			src.shift();
+			// multicharacter tokens + special tokens
+			switch (curr) {
+				// look for "=" ("be")
+				case 'b':
+					src.shift(); // advance past first character
+					if (src[0] == 'e') {
+						src.shift(); // "be" assignment token
+						tokens.push(token('=', TokenType.Equals));
+					}
+					break;
+
+				// look for "==" ("frfr")
+				case 'f':
+					src.shift(); // advance past first character
+					if (src[0] == 'r' && src[1] == 'f' && src[2] == 'r') {
+						// "frfr" comparison token found, advance past "rfr" token remainder
+						src.shift();
+						src.shift();
+						src.shift();
+						tokens.push(token('==', TokenType.IsEqual));
+					}
+					break;
+			}
 		}
-
-		// } else if (typeof TOKEN == 'number') {
-		// 	// Matches a single character token in TOKENS
-		// 	tokens.push(token(src.shift(), TOKEN));
-		// } else {
-		// 	// handle multicharacter tokens and special tokens
-		// 	switch (curr) {
-		// 		// handle tokens that can be in a single character or multicharacter form
-		// 		case '=':
-		// 			src.shift(); // go past first equals to check if there is another
-		// 			if (src[0] == '=') {
-		// 				src.shift(); // ISEQUAL comparison found
-		// 				tokens.push(token('==', TokenType.IsEqual));
-		// 			} else {
-		// 				tokens.push(token('=', TokenType.Equals));
-		// 			}
-		// 			break;
-
 		// 		case '&':
 		// 			src.shift(); // go past first & and check for second one
 		// 			if (src[0] == '&') {
