@@ -2,6 +2,8 @@ bro obj be {
     word is "hello"
 };
 
+lit x be 100 rn
+
 waffle(obj.word)
 
 yoink "testImport.gsx"

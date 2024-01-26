@@ -158,7 +158,7 @@ export function eval_import_statement(
 	} else if (fileLocation.endsWith('.gsx')) {
 		// handle gen-z GigaScript files
 		const translation = readGSX(file);
-		const program = parser.generateAST(translation);
+		const program = parser.generateGSXAST(translation);
 
 		evaluate(program, env);
 		return NULL();

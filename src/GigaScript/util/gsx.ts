@@ -1,3 +1,6 @@
+import { isAlpha, isInt, isSkippable, token } from '../lexer/lexerUtil';
+import { Token, TokenType } from '../types';
+
 const CHARS: Record<string, string> = {
 	// TOKENS
 	lit: 'let',
@@ -42,6 +45,45 @@ const CHARS: Record<string, string> = {
 	nerd: 'math',
 };
 
+const KEYWORDS: Record<string, TokenType> = {
+	lit: TokenType.Let,
+	bro: TokenType.Const,
+
+	bruh: TokenType.Func,
+
+	sus: TokenType.If,
+	imposter: TokenType.Else,
+
+	yall: TokenType.For,
+
+	yoink: TokenType.Import,
+};
+
+const TOKENS: Record<string, TokenType> = {
+	'(': TokenType.OpenParen,
+	')': TokenType.CloseParen,
+
+	'{': TokenType.OpenBrace,
+	'}': TokenType.CloseBrace,
+
+	'[': TokenType.OpenBracket,
+	']': TokenType.CloseBracket,
+
+	with: TokenType.BinOp,
+	without: TokenType.BinOp,
+	by: TokenType.BinOp,
+	some: TokenType.BinOp,
+	left: TokenType.BinOp,
+
+	rn: TokenType.Semicolon,
+	is: TokenType.Colon,
+	',': TokenType.Comma,
+	'.': TokenType.Dot,
+
+	lil: TokenType.LessThan,
+	big: TokenType.GreaterThan,
+};
+
 // typescript stuff :(
 declare global {
 	interface String {
@@ -51,63 +93,145 @@ declare global {
 
 // test: ("(.*?)")
 // replace gsx from source
-String.prototype.replaceGSX = function (target: string): string {
-	const regex = new RegExp('(?<!["s])\\b' + target + '\\b(?!["])', 'g');
-	return this.replace(regex, CHARS[target]);
-};
+// String.prototype.replaceGSX = function (target: string): string {
+// 	const regex = new RegExp('(?<!["s])\\b' + target + '\\b(?!["])', 'g');
+// 	console.log(target, CHARS[target]);
 
-// TODO: finish implementation
+// 	return this.replace(regex, CHARS[target]);
+// };
 
-export function readGSX(source: string): string {
-	return (
-		source
-			// Declarations
-			.replaceGSX('lit') // let
-			.replaceGSX('bro') // const
-			.replaceGSX('bruh') // func
+export function readGSX(source: string): Token[] {
+	const tokens = new Array<Token>();
+	const src = source.split('');
 
-			// Conditional statements
-			.replaceGSX('sus') // if
-			.replaceGSX('impostor') // else
+	// Make tokens till EOF
+	while (src.length > 0) {
+		const curr = src[0];
+		const TOKEN = TOKENS[curr];
 
-			// Loops
-			.replaceGSX('yall') // for
+		console.log(curr);
 
-			// Special Statements
-			.replaceGSX('yoink') // import
+		if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
+			// handle numbers
+			let num: string = src.shift()!; // advance past first digit or negative sign
+			let decPointFound = false;
+			while (src.length > 0) {
+				if (src[0] == '.' && !decPointFound) {
+					decPointFound = true;
+					num += src.shift();
+				} else if (isInt(src[0])) {
+					num += src.shift();
+				} else break;
+			}
 
-			// Comparisons
-			.replaceGSX('frfr') // ==
-			.replaceGSX('big') // >
-			.replaceGSX('lil') // <
-			.replaceGSX('nah') // !=
-			.replaceGSX('btw') // &&
-			.replaceGSX('carenot') // ||
+			tokens.push(token(num, TokenType.Number));
+		} else if (typeof TOKEN == 'number') {
+			tokens.push(token(src.shift(), TOKEN));
+		} else {
+			src.shift();
+		}
 
-			// Assignments
-			.replaceGSX('be') // =
+		// } else if (typeof TOKEN == 'number') {
+		// 	// Matches a single character token in TOKENS
+		// 	tokens.push(token(src.shift(), TOKEN));
+		// } else {
+		// 	// handle multicharacter tokens and special tokens
+		// 	switch (curr) {
+		// 		// handle tokens that can be in a single character or multicharacter form
+		// 		case '=':
+		// 			src.shift(); // go past first equals to check if there is another
+		// 			if (src[0] == '=') {
+		// 				src.shift(); // ISEQUAL comparison found
+		// 				tokens.push(token('==', TokenType.IsEqual));
+		// 			} else {
+		// 				tokens.push(token('=', TokenType.Equals));
+		// 			}
+		// 			break;
 
-			// Special symbols
-			.replaceGSX('rn') // ;
-			.replaceGSX('is') // :
+		// 		case '&':
+		// 			src.shift(); // go past first & and check for second one
+		// 			if (src[0] == '&') {
+		// 				src.shift(); // AND comparison found
+		// 				tokens.push(token('&&', TokenType.And));
+		// 			} else {
+		// 				tokens.push(token('&', TokenType.Ampersand));
+		// 			}
+		// 			break;
 
-			// Bin Op
-			.replaceGSX('with') // +
-			.replaceGSX('without') // -
-			.replaceGSX('by') // *
-			.replaceGSX('some') // /
-			.replaceGSX('left') // %
+		// 		case '|':
+		// 			src.shift(); // go past first | and check for second one
+		// 			if (src[0] == '|') {
+		// 				src.shift(); // OR comparison found
+		// 				tokens.push(token('||', TokenType.Or));
+		// 			} else {
+		// 				tokens.push(token('|', TokenType.Bar));
+		// 			}
+		// 			break;
 
-			// Native Functions/Native Variables
-			.replaceGSX('waffle') // print
-			.replaceGSX('nerd') // math
+		// 		case '!':
+		// 			src.shift(); // go past ! to check for equals sign
+		// 			if (src[0] == '=') {
+		// 				src.shift(); // NOTEQUAL comparison found
+		// 				tokens.push(token('!=', TokenType.NotEquals));
+		// 			} else {
+		// 				tokens.push(token('!', TokenType.Exclamation));
+		// 			}
+		// 			break;
 
-			.replaceGSX('nocap') // true
-			.replaceGSX('cap') // false
-			.replaceGSX('fake') // null
+		// 		case '"': // string support
+		// 			let str = '';
+		// 			src.shift(); // move past opening doubleQuotes, indicating beginning of string
 
-			// Native Statements
-			.replaceGSX('messAround') // try
-			.replaceGSX('findOut') // catch
-	);
+		// 			while (src.length > 0 && src[0] !== '"') {
+		// 				str += src.shift();
+		// 			}
+
+		// 			src.shift(); // advance past closing doubleQuotes, indicating end of string
+
+		// 			tokens.push(token(str, TokenType.String));
+		// 			break;
+
+		// 		default:
+		// 			if (isAlpha(curr, false)) {
+		// 				// The first character of an identifier can be alphabetic or an underscore
+		// 				let ident = '';
+		// 				ident += src.shift();
+
+		// 				while (src.length > 0 && isAlpha(src[0])) {
+		// 					// Identifier can consist of alphanumeric or underscores after first character
+		// 					ident += src.shift();
+		// 				}
+
+		// 				// check for reserved keywords
+		// 				const RESERVED = KEYWORDS[ident];
+		// 				if (typeof RESERVED == 'number') {
+		// 					tokens.push(token(ident, RESERVED));
+		// 				} else {
+		// 					// Unknown identifier most likely means user defined symbol
+		// 					tokens.push(token(ident, TokenType.Identifier));
+		// 				}
+		// 			} else if (isSkippable(src[0])) {
+		// 				// ignore whitespace characters
+		// 				src.shift();
+		// 			} else {
+		// 				// handle unknown characters
+		// 				// TODO: implement error handling and recovery
+
+		// 				console.error(
+		// 					`LexerError: Unknown character: UNICODE-${src[0].charCodeAt(
+		// 						0
+		// 					)} ${src[0]}`
+		// 				);
+		// 				process.exit(1);
+		// 			}
+		// 			break;
+		// 	}
+		// }
+	}
+
+	tokens.push({ value: 'EOF', type: TokenType.EOF });
+
+	console.log(tokens);
+
+	return tokens;
 }
