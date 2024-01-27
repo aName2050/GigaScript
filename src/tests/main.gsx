@@ -1,6 +1,6 @@
 bro obj be {
     word is "hello"
-};
+} rn
 
 lit x be 100 rn
 
@@ -15,3 +15,9 @@ waffle("BEGIN TEST GSX REPLACEMENT..........................")
 waffle("lit bro bruh sus imposter yall yoink big lil frfr nah btw carenot with without by some left be rn is nocap cap fake messAround findOut waffle nerd")
 
 waffle("END TEST..........................")
+
+messAround {
+    waffle(thisVariableDoesntExist)
+} findOut {
+    waffle(error)
+}

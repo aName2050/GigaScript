@@ -1,41 +1,6 @@
 import { isAlpha, isInt, isSkippable, token } from '../lexer/lexerUtil';
 import { Token, TokenType } from '../types';
 
-const CHARS: Record<string, string> = {
-	// Comparisons
-	big: '>',
-	lil: '<',
-	frfr: '==',
-	nah: '!=',
-	btw: '&&',
-	carenot: '||',
-
-	// BinOp
-	with: '+',
-	without: '-',
-	by: '*',
-	some: '/',
-	left: '%',
-
-	// Assignments
-	be: '=',
-
-	// Special Tokens
-	rn: ';',
-	is: ':',
-
-	// Native
-	nocap: 'true',
-	cap: 'false',
-	fake: 'null',
-
-	messAround: 'try',
-	findOut: 'catch',
-
-	waffle: 'print',
-	nerd: 'math',
-};
-
 const KEYWORDS: Record<string, TokenType> = {
 	lit: TokenType.Let,
 	bro: TokenType.Const,
@@ -73,8 +38,6 @@ export function readGSX(source: string): Token[] {
 		const curr = src[0];
 		const TOKEN = TOKENS[curr];
 
-		console.log(curr);
-
 		if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
 			// handle numbers
 			let num: string = src.shift()!; // advance past first digit or negative sign
@@ -94,7 +57,6 @@ export function readGSX(source: string): Token[] {
 		} else {
 			// multicharacter tokens + special tokens
 			switch (curr) {
-				// look for "=" "&&" ("be" "btw")
 				case 'b':
 					src.shift(); // advance past first character
 					if (src[0] == 'e') {
@@ -105,10 +67,49 @@ export function readGSX(source: string): Token[] {
 						src.shift();
 						src.shift();
 						tokens.push(token('&&', TokenType.And));
+					} else if (src[0] == 'i' && src[1] == 'g') {
+						// "big" (">") comparison found
+						src.shift();
+						src.shift();
+
+						tokens.push(token('>', TokenType.GreaterThan));
+					} else if (src[0] == 'y') {
+						// "by" ("*") token found, advance past token
+						src.shift();
+
+						tokens.push(token('*', TokenType.BinOp));
 					}
 					break;
 
-				// look for "==" ("frfr")
+				case 'c':
+					src.shift(); // advance past first character
+					if (
+						src[0] == 'a' &&
+						src[1] == 'r' &&
+						src[2] == 'e' &&
+						src[3] == 'n' &&
+						src[4] == 'o' &&
+						src[5] == 't'
+					) {
+						// "carenot" comparison found, advance past "arenot" token remainder
+						src.shift();
+						src.shift();
+						src.shift();
+						src.shift();
+						src.shift();
+						src.shift();
+
+						tokens.push(token('||', TokenType.Or));
+					} else if (src[0] == 'a' && src[1] == 'p') {
+						// "cap" found (false), advance past
+						src.shift();
+						src.shift();
+
+						tokens.push(token('false', TokenType.Identifier));
+					}
+
+					break;
+
 				case 'f':
 					src.shift(); // advance past first character
 					if (src[0] == 'r' && src[1] == 'f' && src[2] == 'r') {
@@ -116,93 +117,196 @@ export function readGSX(source: string): Token[] {
 						src.shift();
 						src.shift();
 						src.shift();
+
 						tokens.push(token('==', TokenType.IsEqual));
 					}
+
+					// TODO: fake (null)
+					// TODO: findOut (catch)
+
 					break;
 
-				// look for "||" ("carenot")
-				case 'c':
+				case 'i':
 					src.shift(); // advance past first character
-					if(src[0] == 'a' && src[1] == 'r' && src[2])  {
-						
+					if (src[0] == 's') {
+						// "is" token found (:), advance past
+						src.shift();
+
+						tokens.push(token(':', TokenType.Colon));
 					}
-					// TODO: finish
+
+					break;
+
+				case 'l':
+					src.shift(); // advance past first token
+					if (src[0] == 'i' && src[1] == 'l') {
+						// "lil" token found, continue past
+						src.shift();
+						src.shift();
+
+						tokens.push(token('<', TokenType.LessThan));
+					} else if (
+						src[0] == 'e' &&
+						src[1] == 'f' &&
+						src[2] == 't'
+					) {
+						// "left" found (%), advance past
+						src.shift();
+						src.shift();
+						src.shift();
+
+						tokens.push(token('%', TokenType.BinOp));
+					}
+
+					break;
+
+				case 'm':
+					// TODO: messAround (try)
+					break;
+
+				case 'n':
+					src.shift(); // advance past first character
+					if (src[0] == 'a' && src[1] == 'h') {
+						// "nah" comparison token found, advance past "ah" token remainder
+						src.shift();
+						src.shift();
+
+						tokens.push(token('!=', TokenType.NotEquals));
+					} else if (
+						src[0] == 'o' &&
+						src[1] == 'c' &&
+						src[2] == 'a' &&
+						src[3] == 'p'
+					) {
+						// "nocap" (true) found, advance past
+						src.shift();
+						src.shift();
+						src.shift();
+						src.shift();
+
+						tokens.push(token('true', TokenType.Identifier));
+					}
+
+					// TODO: nerd (math)
+
+					break;
+
+				case 'r':
+					src.shift(); // advance past first character
+					if (src[0] == 'n') {
+						// "rn" token found, advance past
+						src.shift();
+
+						tokens.push(token(';', TokenType.Semicolon));
+					}
+
+					break;
+
+				case 's':
+					src.shift(); // advance past first character
+					if (src[0] == 'o' && src[1] == 'm' && src[2] == 'e') {
+						// "some" found (/), advance past
+						src.shift();
+						src.shift();
+						src.shift();
+
+						tokens.push(token('/', TokenType.BinOp));
+					}
+
+					break;
+
+				case 'w':
+					src.shift(); // advance past first character
+					if (src[0] == 'i' && src[1] == 't' && src[2] == 'h') {
+						// "with" found, check if "without"
+						if (src[3] == 'o' && src[4] == 'u' && src[5] == 't') {
+							// "without" token (-) advance past token
+							src.shift();
+							src.shift();
+							src.shift();
+
+							src.shift();
+							src.shift();
+							src.shift();
+
+							tokens.push(token('-', TokenType.BinOp));
+						} else {
+							// "with" token (+) advance past token
+							src.shift();
+							src.shift();
+							src.shift();
+
+							tokens.push(token('+', TokenType.BinOp));
+						}
+					} else if (
+						src[0] == 'a' &&
+						src[1] == 'f' &&
+						src[2] == 'f' &&
+						src[3] == 'l' &&
+						src[4] == 'e'
+					) {
+						// "waffle" function (print) found, advance past
+						src.shift();
+						src.shift();
+						src.shift();
+						src.shift();
+						src.shift();
+
+						tokens.push(token('print', TokenType.Identifier));
+					}
+
+					break;
+
+				// look for strings
+				case '"':
+					let str = '';
+					src.shift(); // advance past opening quotes (begin string)
+
+					while (src.length > 0 && src[0] !== '"') {
+						str += src.shift();
+					}
+
+					src.shift(); // advance past closing quotes (end string)
+
+					tokens.push(token(str, TokenType.String));
+
 					break;
 
 				default:
-					src.shift();
+					if (isAlpha(curr, false)) {
+						// first char of ident can be [a-zA-Z] or underscore
+						let ident = '';
+						ident += src.shift();
+
+						while (src.length > 0 && isAlpha(src[0])) {
+							ident += src.shift();
+						}
+
+						// check for reserved keywords that do not have a GSX version
+						const RESERVED = KEYWORDS[ident];
+						if (typeof RESERVED == 'number') {
+							tokens.push(token(ident, RESERVED));
+						} else {
+							// user defined or native symbol (handles any native symbol that doesn't have GSX version)
+							tokens.push(token(ident, TokenType.Identifier));
+						}
+					} else if (isSkippable(src[0])) {
+						// ignore whitespace
+						src.shift();
+					} else {
+						// handle unknown
+						// TODO: implement error handling and recovery
+						console.error(
+							`GSXError: LexerError: Unknown character: UNICODE-${src[0].charCodeAt(
+								0
+							)} ${src[0]}`
+						);
+						process.exit(1);
+					}
+
 					break;
 			}
 		}
-		// 		case '|':
-		// 			src.shift(); // go past first | and check for second one
-		// 			if (src[0] == '|') {
-		// 				src.shift(); // OR comparison found
-		// 				tokens.push(token('||', TokenType.Or));
-		// 			} else {
-		// 				tokens.push(token('|', TokenType.Bar));
-		// 			}
-		// 			break;
-
-		// 		case '!':
-		// 			src.shift(); // go past ! to check for equals sign
-		// 			if (src[0] == '=') {
-		// 				src.shift(); // NOTEQUAL comparison found
-		// 				tokens.push(token('!=', TokenType.NotEquals));
-		// 			} else {
-		// 				tokens.push(token('!', TokenType.Exclamation));
-		// 			}
-		// 			break;
-
-		// 		case '"': // string support
-		// 			let str = '';
-		// 			src.shift(); // move past opening doubleQuotes, indicating beginning of string
-
-		// 			while (src.length > 0 && src[0] !== '"') {
-		// 				str += src.shift();
-		// 			}
-
-		// 			src.shift(); // advance past closing doubleQuotes, indicating end of string
-
-		// 			tokens.push(token(str, TokenType.String));
-		// 			break;
-
-		// 		default:
-		// 			if (isAlpha(curr, false)) {
-		// 				// The first character of an identifier can be alphabetic or an underscore
-		// 				let ident = '';
-		// 				ident += src.shift();
-
-		// 				while (src.length > 0 && isAlpha(src[0])) {
-		// 					// Identifier can consist of alphanumeric or underscores after first character
-		// 					ident += src.shift();
-		// 				}
-
-		// 				// check for reserved keywords
-		// 				const RESERVED = KEYWORDS[ident];
-		// 				if (typeof RESERVED == 'number') {
-		// 					tokens.push(token(ident, RESERVED));
-		// 				} else {
-		// 					// Unknown identifier most likely means user defined symbol
-		// 					tokens.push(token(ident, TokenType.Identifier));
-		// 				}
-		// 			} else if (isSkippable(src[0])) {
-		// 				// ignore whitespace characters
-		// 				src.shift();
-		// 			} else {
-		// 				// handle unknown characters
-		// 				// TODO: implement error handling and recovery
-
-		// 				console.error(
-		// 					`LexerError: Unknown character: UNICODE-${src[0].charCodeAt(
-		// 						0
-		// 					)} ${src[0]}`
-		// 				);
-		// 				process.exit(1);
-		// 			}
-		// 			break;
-		// 	}
-		// }
 	}
 
 	tokens.push({ value: 'EOF', type: TokenType.EOF });
