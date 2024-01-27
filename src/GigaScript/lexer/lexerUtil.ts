@@ -8,7 +8,7 @@ export function token(value = '', type: TokenType): Token {
 }
 
 /**
- * Returns whether the character passed is alphabetic [a-z] [A-Z]
+ * Returns whether the character passed is alphabetic [a-z] [A-Z] or including [0-9]
  */
 export function isAlpha(str: string, disallowAlphanumeric = true): boolean {
 	if (disallowAlphanumeric) return /^[A-Za-z_]+$/.test(str);
