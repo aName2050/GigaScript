@@ -1,4 +1,4 @@
-import { isAlpha, isInt, isSkippable, token } from '../lexer/lexerUtil';
+import { isAlpha, isInt, isSkippable, token } from './lexerUtil';
 import { Token, TokenType } from '../types';
 
 const TOKENS: Record<string, TokenType> = {

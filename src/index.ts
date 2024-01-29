@@ -1,24 +1,65 @@
 import fs from 'fs';
+import repl from 'repl';
+import path from 'path';
 
 import Parser from './GigaScript/parser/parser';
 import { evaluate } from './GigaScript/runtime/interpreter';
 import { createGlobalScope } from './GigaScript/runtime/environment';
 
-const g = fs.readFileSync('./src/tests/main.g', { encoding: 'utf-8' }); // standard GigaScript file
-const gsx = fs.readFileSync('./src/tests/main.gsx', { encoding: 'utf-8' }); // gen-z slang version of GigaScript
+const file = process.argv[2];
+let fileLocation = path.parse(file).dir;
 
-/**
- * .g files can be interpreted or compiled
- * .gsx files can only be interpreted
- */
+const REPL = {
+	parser: new Parser(),
+	env: createGlobalScope(file),
+};
 
-const parser = new Parser();
-const env = createGlobalScope();
+import { readGSX } from './GigaScript/lexer/gsx';
 
-// GIGASCRIPT INTERPRETER
-const program = parser.generateAST(g);
-const result = evaluate(program, env);
-// console.log(result);
+if (file) {
+	// run file
+	run(file);
+} else {
+	// start repl
+	const v = 'v1';
+	console.log(`GigaScript REPL ${v}\n`);
 
-// GIGASCRIPT COMPILER
-// TODO: make this
+	repl.start({ prompt: '> ', eval: handle });
+}
+
+function run(filename: string) {
+	const parser = new Parser();
+	const env = createGlobalScope(fileLocation);
+
+	let file = fs.readFileSync(filename, { encoding: 'utf-8' });
+
+	if (filename.endsWith('.g')) {
+		// handle standard GigaScript files
+		const program = parser.generateAST(file);
+		const res = evaluate(program, env);
+
+		return res;
+	} else if (filename.endsWith('.gsx')) {
+		// handle gen-z GigaScript files
+		const translation = readGSX(file);
+		const program = parser.generateGSXAST(translation);
+
+		const res = evaluate(program, env);
+		return res;
+	} else {
+		throw `File does not end with ".g" or ".gsx". ${
+			file.split('.')[1]
+		} is not a supported file type.`;
+	}
+}
+
+function handle(
+	uInput: string,
+	_context: unknown,
+	_filename: unknown,
+	callback: any
+): void {
+	const program = REPL.parser.generateAST(uInput);
+	evaluate(program, REPL.env);
+	callback();
+}
