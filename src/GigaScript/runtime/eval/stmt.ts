@@ -9,7 +9,7 @@ import {
 	VarDeclaration,
 } from '../../ast/ast';
 import Parser from '../../parser/parser';
-import { readGSX } from '../../util/gsx';
+import { readGSX } from '../../lexer/gsx';
 import Environment, { createGlobalScope } from '../environment';
 import { evaluate } from '../interpreter';
 import {

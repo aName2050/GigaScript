@@ -7,7 +7,12 @@ import { evaluate } from './GigaScript/runtime/interpreter';
 import { createGlobalScope } from './GigaScript/runtime/environment';
 
 const file = process.argv[2];
-let fileLocation = path.parse(file).dir;
+
+let fileLocation: string;
+
+if (file) {
+	fileLocation = path.parse(file).dir;
+}
 
 const REPL = {
 	parser: new Parser(),
