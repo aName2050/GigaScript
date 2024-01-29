@@ -21,6 +21,7 @@ import {
 } from '../values';
 import { eval_assignment } from './expr';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 export function eval_program(program: Program, env: Environment): RuntimeValue {
 	let lastEvaluated: RuntimeValue = NULL();
@@ -149,7 +150,7 @@ export function eval_import_statement(
 
 	let file = fs.readFileSync(fileLocation, { encoding: 'utf-8' });
 
-	if (file.endsWith('.g')) {
+	if (fileLocation.endsWith('.g')) {
 		// handle standard GigaScript files
 		const program = parser.generateAST(file);
 		evaluate(program, extEnv);
@@ -163,8 +164,7 @@ export function eval_import_statement(
 		evaluate(program, env);
 		return NULL();
 	} else {
-		throw `File does not end with ".g" or ".gsx". ${
-			file.split('.')[1]
-		} is not a supported file type.`;
+		throw `RuntimeError: FileImportError: File does not end with ".g" or ".gsx".
+		"${path.extname(fileLocation)}" is not a supported file type.`;
 	}
 }
