@@ -16,15 +16,13 @@ const TOKENS: Record<string, TokenType> = {
 };
 
 export function readGSX(source: string): Token[] {
-	const tokens = new Array<Token>();
+	let tokens = new Array<Token>();
 	const src = source.split('');
 
 	// Make tokens till EOF
 	while (src.length > 0) {
 		const curr = src[0];
 		const TOKEN = TOKENS[curr];
-
-		console.log(`"${curr}"`, 'token?', TokenType[TOKEN]);
 
 		if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
 			// handle numbers
@@ -87,6 +85,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('func', TokenType.Func));
 					} else {
 						src.unshift(firstCharB);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -118,6 +117,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('false', TokenType.Identifier));
 					} else {
 						src.unshift(firstCharC);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -143,12 +143,12 @@ export function readGSX(source: string): Token[] {
 
 						tokens.push(token('null', TokenType.Identifier));
 					} else if (
-						src[1] == 'i' &&
-						src[2] == 'n' &&
-						src[3] == 'd' &&
-						src[4] == 'O' &&
-						src[5] == 'u' &&
-						src[6] == 't'
+						src[0] == 'i' &&
+						src[1] == 'n' &&
+						src[2] == 'd' &&
+						src[3] == 'O' &&
+						src[4] == 'u' &&
+						src[5] == 't'
 					) {
 						src.shift();
 						src.shift();
@@ -157,9 +157,12 @@ export function readGSX(source: string): Token[] {
 						src.shift();
 						src.shift();
 
+						console.log('findOut => catch');
+
 						tokens.push(token('catch', TokenType.Identifier));
 					} else {
 						src.unshift(firstCharF);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -192,6 +195,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('else', TokenType.Else));
 					} else {
 						src.unshift(firstCharI);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -223,6 +227,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('let', TokenType.Let));
 					} else {
 						src.unshift(firstCharL);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -230,15 +235,15 @@ export function readGSX(source: string): Token[] {
 				case 'm':
 					const firstCharM = src.shift()!;
 					if (
-						src[1] == 'e' &&
+						src[0] == 'e' &&
+						src[1] == 's' &&
 						src[2] == 's' &&
-						src[3] == 's' &&
-						src[4] == 'A' &&
-						src[5] == 'r' &&
-						src[6] == 'o' &&
-						src[7] == 'u' &&
-						src[8] == 'n' &&
-						src[9] == 'd'
+						src[3] == 'A' &&
+						src[4] == 'r' &&
+						src[5] == 'o' &&
+						src[6] == 'u' &&
+						src[7] == 'n' &&
+						src[8] == 'd'
 					) {
 						src.shift();
 						src.shift();
@@ -250,9 +255,12 @@ export function readGSX(source: string): Token[] {
 						src.shift();
 						src.shift();
 
+						console.log('messAround => try');
+
 						tokens.push(token('try', TokenType.Identifier));
 					} else {
 						src.unshift(firstCharM);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -279,9 +287,9 @@ export function readGSX(source: string): Token[] {
 
 						tokens.push(token('true', TokenType.Identifier));
 					} else if (
-						src[1] == 'e' &&
-						src[2] == 'r' &&
-						src[3] == 'd'
+						src[0] == 'e' &&
+						src[1] == 'r' &&
+						src[2] == 'd'
 					) {
 						src.shift();
 						src.shift();
@@ -290,6 +298,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('math', TokenType.Identifier));
 					} else {
 						src.unshift(firstCharN);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -303,6 +312,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token(';', TokenType.Semicolon));
 					} else {
 						src.unshift(firstCharR);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -324,6 +334,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('if', TokenType.If));
 					} else {
 						src.unshift(firstCharS);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -368,6 +379,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('print', TokenType.Identifier));
 					} else {
 						src.unshift(firstCharW);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -397,6 +409,7 @@ export function readGSX(source: string): Token[] {
 						tokens.push(token('import', TokenType.Import));
 					} else {
 						src.unshift(firstCharY);
+						tokens = handleSymbols(src, tokens);
 					}
 
 					break;
@@ -418,18 +431,7 @@ export function readGSX(source: string): Token[] {
 
 				default:
 					if (isAlpha(curr, false)) {
-						// first char of ident can be [a-zA-Z] or underscore
-						let ident = '';
-						ident += src.shift();
-
-						while (src.length > 0 && isAlpha(src[0], false)) {
-							ident += src.shift();
-						}
-
-						console.log(ident, ' => ', TokenType[TOKENS[ident]]);
-
-						// user/natively defined symbols should only be reaching this point
-						tokens.push(token(ident, TokenType.Identifier));
+						tokens = handleSymbols(src, tokens);
 					} else if (isSkippable(src[0])) {
 						// ignore whitespace
 						src.shift();
@@ -444,13 +446,27 @@ export function readGSX(source: string): Token[] {
 					break;
 			}
 		}
-
-		console.log('newToken', tokens[tokens.length - 1]);
 	}
 
 	tokens.push({ value: 'EOF', type: TokenType.EOF });
 
 	// console.log(tokens);
 
+	return tokens;
+}
+
+function handleSymbols(src: string[], tokens: Token[]): Token[] {
+	// first char of ident can be [a-zA-Z] or underscore
+	let ident = '';
+	ident += src.shift();
+
+	while (src.length > 0 && isAlpha(src[0], false)) {
+		ident += src.shift();
+	}
+
+	// user/natively defined symbols should only be reaching this point
+	tokens.push(token(ident, TokenType.Identifier));
+
+	// return new tokens array
 	return tokens;
 }
