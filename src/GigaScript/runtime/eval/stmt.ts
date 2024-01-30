@@ -162,17 +162,18 @@ export function eval_import_statement(
 		const translation = readGSX(file);
 		const program = parser.generateGSXAST(translation);
 
-		evaluate(program, env);
-		return NULL();
+		return evaluate(program, env);
 	} else {
 		throw `RuntimeError: FileImportError: File does not end with ".g" or ".gsx".
 		"${path.extname(fileLocation)}" is not a supported file type.`;
 	}
 }
 
-// export function eval_export_statement(
-// 	declaration: ExportStatement,
-// 	env: Environment
-// ): RuntimeValue {
+export function eval_export_statement(
+	declaration: ExportStatement,
+	env: Environment
+): RuntimeValue {
+	const exportedValue = evaluate(declaration.exportedValue, env);
 
-// }
+	return exportedValue;
+}

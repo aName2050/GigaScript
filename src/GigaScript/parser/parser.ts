@@ -17,6 +17,7 @@ import {
 	TryCatchStatement,
 	ForStatement,
 	ImportStatement,
+	ExportStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -113,8 +114,8 @@ export default class Parser {
 				return this.parse_for_statement();
 			case TokenType.Import:
 				return this.parse_import_statement();
-			// case TokenType.Export:
-			// 	return this.parse_export_statement();
+			case TokenType.Export:
+				return this.parse_export_statement();
 
 			default:
 				return this.parse_expr();
@@ -214,7 +215,15 @@ export default class Parser {
 	}
 
 	private parse_import_statement(): Stmt {
+		// TODO: convert to: import varName from "path/to/file"
 		this.eat(); // advance past import keyword
+
+		const variable = this.expect(
+			TokenType.Identifier,
+			'Expected identifier after import statement'
+		);
+
+		// this.expect()
 
 		const file = this.expect(
 			TokenType.String,
@@ -225,6 +234,15 @@ export default class Parser {
 			kind: 'ImportStatement',
 			file,
 		} as ImportStatement;
+	}
+
+	private parse_export_statement(): Stmt {
+		this.eat(); // advance past export keyword
+
+		return {
+			kind: 'ExportStatement',
+			exportedValue: this.parse_expr(),
+		} as ExportStatement;
 	}
 
 	/**

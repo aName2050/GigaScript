@@ -15,6 +15,12 @@ const TOKENS: Record<string, TokenType> = {
 	'.': TokenType.Dot,
 };
 
+// TODO:
+/**
+ * export - yeet
+ * from - from
+ */
+
 export function readGSX(source: string): Token[] {
 	let tokens = new Array<Token>();
 	const src = source.split('');

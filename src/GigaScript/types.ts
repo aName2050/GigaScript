@@ -23,6 +23,7 @@ export enum TokenType {
 
 	Import, // Import GigaScript code from another file
 	Export, // Export GigaScript code to another file (the file returns the last Export statements value)
+	From, // From sets the imported value to a symbol
 
 	// Comparison Operators
 	GreaterThan, // >
