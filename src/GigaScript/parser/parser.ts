@@ -113,6 +113,8 @@ export default class Parser {
 				return this.parse_for_statement();
 			case TokenType.Import:
 				return this.parse_import_statement();
+			// case TokenType.Export:
+			// 	return this.parse_export_statement();
 
 			default:
 				return this.parse_expr();

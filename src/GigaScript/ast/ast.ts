@@ -7,6 +7,7 @@ export type NodeType =
 	| 'TryCatchStatement'
 	| 'ForStatement'
 	| 'ImportStatement'
+	| 'ExportStatement'
 	// EXPRESSIONS
 	| 'AssignmentExpr'
 	| 'MemberExpr'
@@ -74,6 +75,11 @@ export interface ForStatement extends Stmt {
 export interface ImportStatement extends Stmt {
 	kind: 'ImportStatement';
 	file: string;
+}
+
+export interface ExportStatement extends Stmt {
+	kind: 'ExportStatement';
+	exportedValue: Expr;
 }
 
 /**

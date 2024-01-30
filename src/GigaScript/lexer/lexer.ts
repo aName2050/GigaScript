@@ -16,6 +16,7 @@ const KEYWORDS: Record<string, TokenType> = {
 	for: TokenType.For,
 
 	import: TokenType.Import,
+	export: TokenType.Export,
 };
 
 /**

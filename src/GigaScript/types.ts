@@ -22,6 +22,7 @@ export enum TokenType {
 	// Break, // For loop break statement
 
 	Import, // Import GigaScript code from another file
+	Export, // Export GigaScript code to another file (the file returns the last Export statements value)
 
 	// Comparison Operators
 	GreaterThan, // >

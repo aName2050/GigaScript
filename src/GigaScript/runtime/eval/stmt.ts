@@ -1,4 +1,5 @@
 import {
+	ExportStatement,
 	ForStatement,
 	FunctionDeclaration,
 	IfStatement,
@@ -168,3 +169,10 @@ export function eval_import_statement(
 		"${path.extname(fileLocation)}" is not a supported file type.`;
 	}
 }
+
+// export function eval_export_statement(
+// 	declaration: ExportStatement,
+// 	env: Environment
+// ): RuntimeValue {
+
+// }
