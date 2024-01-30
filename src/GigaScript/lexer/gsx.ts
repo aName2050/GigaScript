@@ -150,14 +150,13 @@ export function readGSX(source: string): Token[] {
 						src[4] == 'u' &&
 						src[5] == 't'
 					) {
+						// "findOut" (catch) found, advance past
 						src.shift();
 						src.shift();
 						src.shift();
 						src.shift();
 						src.shift();
 						src.shift();
-
-						console.log('findOut => catch');
 
 						tokens.push(token('catch', TokenType.Identifier));
 					} else {
@@ -245,6 +244,7 @@ export function readGSX(source: string): Token[] {
 						src[7] == 'n' &&
 						src[8] == 'd'
 					) {
+						// "messAround" (try) found, advance past
 						src.shift();
 						src.shift();
 						src.shift();
@@ -254,8 +254,6 @@ export function readGSX(source: string): Token[] {
 						src.shift();
 						src.shift();
 						src.shift();
-
-						console.log('messAround => try');
 
 						tokens.push(token('try', TokenType.Identifier));
 					} else {
@@ -291,6 +289,7 @@ export function readGSX(source: string): Token[] {
 						src[1] == 'r' &&
 						src[2] == 'd'
 					) {
+						// "nerd" (math) native function found, advance past
 						src.shift();
 						src.shift();
 						src.shift();
