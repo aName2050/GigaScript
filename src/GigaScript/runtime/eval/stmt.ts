@@ -186,10 +186,7 @@ export function eval_export_statement(
 ): RuntimeValue {
 	const exportedValue = evaluate(declaration.exportedValue, env);
 
-	console.log('exported', exportedValue);
-
 	env.setGlobalExportedValue(exportedValue);
-	// env.saveEnv(env);
 
 	return NULL();
 }
