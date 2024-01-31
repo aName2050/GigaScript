@@ -139,8 +139,7 @@ export function eval_import_statement(
 	declaration: ImportStatement,
 	env: Environment
 ): RuntimeValue {
-	// DOESN'T RETURN ANYTHING!!!
-
+	// Returns NULL
 	const fileLocation = `${env.cwd}/${declaration.file}`;
 
 	// Run external file
@@ -156,11 +155,23 @@ export function eval_import_statement(
 		const program = parser.generateAST(file);
 		evaluate(program, extEnv);
 
+		const exportedValue = extEnv.getGlobalExportedValue();
+
+		if (exportedValue) {
+			env.delcareVar(declaration.variable, exportedValue, true);
+		}
+
 		return NULL();
 	} else if (fileLocation.endsWith('.gsx')) {
 		// handle gen-z GigaScript files
 		const translation = readGSX(file);
 		const program = parser.generateGSXAST(translation);
+
+		const exportedValue = extEnv.getGlobalExportedValue();
+
+		if (exportedValue) {
+			env.delcareVar(declaration.variable, exportedValue, true);
+		}
 
 		return evaluate(program, env);
 	} else {
@@ -175,5 +186,10 @@ export function eval_export_statement(
 ): RuntimeValue {
 	const exportedValue = evaluate(declaration.exportedValue, env);
 
-	return exportedValue;
+	console.log('exported', exportedValue);
+
+	env.setGlobalExportedValue(exportedValue);
+	// env.saveEnv(env);
+
+	return NULL();
 }

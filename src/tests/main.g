@@ -1,9 +1,5 @@
-import "testImport.g"
+import test from "testImport.g"
 
 print("inside main.g!")
 
-try {
-    print("test")
-} catch {
-    print(error)
-}
+print(test)

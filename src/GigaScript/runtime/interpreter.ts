@@ -16,6 +16,7 @@ import {
 	TryCatchStatement,
 	ForStatement,
 	ImportStatement,
+	ExportStatement,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -34,6 +35,7 @@ import {
 	eval_try_catch_statement,
 	eval_for_statement,
 	eval_import_statement,
+	eval_export_statement,
 } from './eval/stmt';
 
 export function evaluate(node: Stmt, env: Environment): RuntimeValue {
@@ -91,6 +93,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 
 		case 'ImportStatement':
 			return eval_import_statement(node as ImportStatement, env);
+
+		case 'ExportStatement':
+			return eval_export_statement(node as ExportStatement, env);
 
 		// Handle types not implemented
 		default:

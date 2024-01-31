@@ -1,1 +1,3 @@
-print("inside testImport.g!")
+let x = 69420;
+
+export x;

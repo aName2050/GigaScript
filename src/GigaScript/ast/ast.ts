@@ -74,6 +74,7 @@ export interface ForStatement extends Stmt {
 
 export interface ImportStatement extends Stmt {
 	kind: 'ImportStatement';
+	variable: string;
 	file: string;
 }
 

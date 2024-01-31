@@ -220,10 +220,13 @@ export default class Parser {
 
 		const variable = this.expect(
 			TokenType.Identifier,
-			'Expected identifier after import statement'
-		);
+			'Expected identifier after import statement.'
+		).value;
 
-		// this.expect()
+		this.expect(
+			TokenType.From,
+			'Expected "from" keyword following identifier.'
+		);
 
 		const file = this.expect(
 			TokenType.String,
@@ -232,6 +235,7 @@ export default class Parser {
 
 		return {
 			kind: 'ImportStatement',
+			variable,
 			file,
 		} as ImportStatement;
 	}
@@ -239,9 +243,16 @@ export default class Parser {
 	private parse_export_statement(): Stmt {
 		this.eat(); // advance past export keyword
 
+		const exportedValue = this.parse_expr();
+
+		this.expect(
+			TokenType.Semicolon,
+			'Expected semicolon following export statement value'
+		);
+
 		return {
 			kind: 'ExportStatement',
-			exportedValue: this.parse_expr(),
+			exportedValue,
 		} as ExportStatement;
 	}
 
