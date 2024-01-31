@@ -135,6 +135,9 @@ export function eval_for_statement(
 	return NULL();
 }
 
+// TODO: add support for exporting multiple values
+// TODO: add support for importing multiple values as an object
+
 export function eval_import_statement(
 	declaration: ImportStatement,
 	env: Environment
