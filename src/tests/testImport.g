@@ -1,5 +1,5 @@
-let x = 69;
-let y = 420;
+let x = 32;
+let y = 64;
 
 export x;
 export y;
