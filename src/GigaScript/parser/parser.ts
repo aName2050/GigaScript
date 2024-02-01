@@ -215,7 +215,6 @@ export default class Parser {
 	}
 
 	private parse_import_statement(): Stmt {
-		// TODO: convert to: import varName from "path/to/file"
 		this.eat(); // advance past import keyword
 
 		const variable = this.expect(

@@ -184,6 +184,16 @@ import "path/to/file.ext"
 > [!IMPORTANT]
 > The `import` file path must be relative. Do not write out the full file path like **"C:/path/to/file.ext"**, you must use the relative path like **"file.ext"** or **"to/file.ext"**.
 
+> [!IMPORTANT]
+> The `import` statement can only import one thing at a time.
+> You **cannot** import multiple exports like: `import { x, y, z } from "path/to/file"`
+> You **can** import multiple exports like:
+> ```
+> import x from "path/to/file"
+> import y from "path/to/file"
+> import z from "path/to/file"
+> ```
+
 > [!CAUTION]
 > When using relative file paths, do **not** start with a "." (dot). This will cause errors.
 
