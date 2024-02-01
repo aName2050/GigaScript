@@ -39,23 +39,23 @@ export default class Environment {
 	private variables: Map<string, RuntimeValue>;
 	private constants: Set<string>;
 	public cwd: string;
-	public globalExportedValue: RuntimeValue;
+	public exports: Map<string, RuntimeValue>;
 
 	constructor(currDir: string, parentEnv?: Environment) {
 		this.parent = parentEnv;
 		this.cwd = currDir;
 		this.variables = new Map();
 		this.constants = new Set();
-		this.globalExportedValue = UNDEFINED();
+		this.exports = new Map();
 	}
 
-	public setGlobalExportedValue(value: RuntimeValue): void {
-		this.globalExportedValue = value;
+	public addExportedValue(identifier: string, value: RuntimeValue): void {
+		this.exports.set(identifier, value);
 		return;
 	}
 
-	public getGlobalExportedValue(): RuntimeValue {
-		return this.globalExportedValue;
+	public getExportedValues(): Map<string, RuntimeValue> {
+		return this.exports;
 	}
 
 	public delcareVar(

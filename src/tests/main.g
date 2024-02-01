@@ -1,5 +1,6 @@
-import test from "testImport.g"
+import x from "testImport.g"
+import y from "testImport.g"
 
 print("inside main.g!")
 
-print(test)
+print(x, y)

@@ -2,6 +2,7 @@ import {
 	ExportStatement,
 	ForStatement,
 	FunctionDeclaration,
+	Identifier,
 	IfStatement,
 	ImportStatement,
 	Program,
@@ -138,12 +139,16 @@ export function eval_for_statement(
 // TODO: add support for exporting multiple values
 // TODO: add support for importing multiple values as an object
 
+// TODO: finish
+
 export function eval_import_statement(
 	declaration: ImportStatement,
 	env: Environment
 ): RuntimeValue {
 	// Returns NULL
 	const fileLocation = `${env.cwd}/${declaration.file}`;
+
+	const variable = declaration.variable;
 
 	// Run external file
 	// Run Function from script.ts but modified for this use
@@ -158,23 +163,28 @@ export function eval_import_statement(
 		const program = parser.generateAST(file);
 		evaluate(program, extEnv);
 
-		const exportedValue = extEnv.getGlobalExportedValue();
+		const exportedValues = extEnv.getExportedValues();
 
-		if (exportedValue) {
-			env.delcareVar(declaration.variable, exportedValue, true);
-		}
+		let EARLY_BREAK = false;
+		exportedValues.forEach((val, ident) => {
+			console.log(variable, ident);
+			if (!EARLY_BREAK) {
+				if (variable != ident) {
+					throw `RuntimeError: FileImportError: ${variable} doesn't exist. Did you mean ${ident}?`;
+				} else if (variable == ident) {
+					env.delcareVar(variable, val, true);
+					EARLY_BREAK = true;
+				} else {
+					throw 'RuntimeError: FileImportError: unknown error';
+				}
+			}
+		});
 
 		return NULL();
 	} else if (fileLocation.endsWith('.gsx')) {
 		// handle gen-z GigaScript files
 		const translation = readGSX(file);
 		const program = parser.generateGSXAST(translation);
-
-		const exportedValue = extEnv.getGlobalExportedValue();
-
-		if (exportedValue) {
-			env.delcareVar(declaration.variable, exportedValue, true);
-		}
 
 		return evaluate(program, env);
 	} else {
@@ -189,7 +199,7 @@ export function eval_export_statement(
 ): RuntimeValue {
 	const exportedValue = evaluate(declaration.exportedValue, env);
 
-	env.setGlobalExportedValue(exportedValue);
+	env.addExportedValue(declaration.identifier, exportedValue);
 
 	return NULL();
 }

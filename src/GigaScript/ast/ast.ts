@@ -80,6 +80,7 @@ export interface ImportStatement extends Stmt {
 
 export interface ExportStatement extends Stmt {
 	kind: 'ExportStatement';
+	identifier: string;
 	exportedValue: Expr;
 }
 

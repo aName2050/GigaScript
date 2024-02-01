@@ -245,13 +245,18 @@ export default class Parser {
 
 		const exportedValue = this.parse_expr();
 
+		if (exportedValue.kind != 'Identifier') {
+			throw 'Export statements can only export identifiers (variables and functions).';
+		}
+
 		this.expect(
 			TokenType.Semicolon,
-			'Expected semicolon following export statement value'
+			'Expected semicolon (;) following export statement'
 		);
 
 		return {
 			kind: 'ExportStatement',
+			identifier: (exportedValue as Identifier).symbol,
 			exportedValue,
 		} as ExportStatement;
 	}
