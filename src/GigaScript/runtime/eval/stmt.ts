@@ -163,22 +163,14 @@ export function eval_import_statement(
 		const program = parser.generateAST(file);
 		evaluate(program, extEnv);
 
-		const exportedValues = extEnv.getExportedValues();
+		const exportedValues = Array.from(extEnv.getExportedValues());
 
-		let EARLY_BREAK = false;
-		exportedValues.forEach((val, ident) => {
-			console.log(variable, ident);
-			if (!EARLY_BREAK) {
-				if (variable != ident) {
-					throw `RuntimeError: FileImportError: ${variable} doesn't exist. Did you mean ${ident}?`;
-				} else if (variable == ident) {
-					env.delcareVar(variable, val, true);
-					EARLY_BREAK = true;
-				} else {
-					throw 'RuntimeError: FileImportError: unknown error';
-				}
-			}
-		});
+		for (let i = 0; i < exportedValues.length; i++) {
+			const val = exportedValues[i];
+			console.log(
+				`import ${variable} (${val[0]}) [i: ${i} length: ${exportedValues.length}]`
+			);
+		}
 
 		return NULL();
 	} else if (fileLocation.endsWith('.gsx')) {
