@@ -2,7 +2,6 @@ import {
 	ExportStatement,
 	ForStatement,
 	FunctionDeclaration,
-	Identifier,
 	IfStatement,
 	ImportStatement,
 	Program,
@@ -167,9 +166,10 @@ export function eval_import_statement(
 
 		for (let i = 0; i < exportedValues.length; i++) {
 			const val = exportedValues[i];
-			console.log(
-				`import ${variable} (${val[0]}) [i: ${i} length: ${exportedValues.length}]`
-			);
+			if (variable == val[0]) {
+				const value = (val[1] as RuntimeValue).value;
+				env.delcareVar(variable, value, true);
+			}
 		}
 
 		return NULL();
