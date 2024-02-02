@@ -135,11 +135,6 @@ export function eval_for_statement(
 	return NULL();
 }
 
-// TODO: add support for exporting multiple values
-// TODO: add support for importing multiple values as an object
-
-// TODO: finish
-
 export function eval_import_statement(
 	declaration: ImportStatement,
 	env: Environment
@@ -150,7 +145,7 @@ export function eval_import_statement(
 	const variable = declaration.variable;
 
 	// Run external file
-	// Run Function from script.ts but modified for this use
+	// Run Function from index.ts but modified for this use
 	// TypeScript doesn't like the imported copy :(
 	const parser = new Parser();
 	const extEnv = createGlobalScope(fileLocation);
@@ -177,8 +172,19 @@ export function eval_import_statement(
 		// handle gen-z GigaScript files
 		const translation = readGSX(file);
 		const program = parser.generateGSXAST(translation);
+		evaluate(program, extEnv);
 
-		return evaluate(program, env);
+		const exportedValues = Array.from(extEnv.getExportedValues());
+
+		for (let i = 0; i < exportedValues.length; i++) {
+			const val = exportedValues[i];
+			if (variable == val[0]) {
+				const value = (val[1] as RuntimeValue).value;
+				env.delcareVar(variable, value, true);
+			}
+		}
+
+		return NULL();
 	} else {
 		throw `RuntimeError: FileImportError: File does not end with ".g" or ".gsx".
 		"${path.extname(fileLocation)}" is not a supported file type.`;
