@@ -15,12 +15,6 @@ const TOKENS: Record<string, TokenType> = {
 	'.': TokenType.Dot,
 };
 
-// TODO:
-/**
- * export - yeet
- * from - from
- */
-
 export function readGSX(source: string): Token[] {
 	let tokens = new Array<Token>();
 	const src = source.split('');
@@ -165,6 +159,17 @@ export function readGSX(source: string): Token[] {
 						src.shift();
 
 						tokens.push(token('catch', TokenType.Identifier));
+					} else if (
+						src[0] == 'r' &&
+						src[1] == 'o' &&
+						src[2] == 'm'
+					) {
+						// "from"
+						src.shift();
+						src.shift();
+						src.shift();
+
+						tokens.push(token('from', TokenType.From));
 					} else {
 						src.unshift(firstCharF);
 						tokens = handleSymbols(src, tokens);
@@ -412,6 +417,17 @@ export function readGSX(source: string): Token[] {
 						src.shift();
 
 						tokens.push(token('import', TokenType.Import));
+					} else if (
+						src[0] == 'e' &&
+						src[1] == 'e' &&
+						src[2] == 't'
+					) {
+						// "yeet" (export) statement found, advance past
+						src.shift();
+						src.shift();
+						src.shift();
+
+						tokens.push(token('export', TokenType.Export));
 					} else {
 						src.unshift(firstCharY);
 						tokens = handleSymbols(src, tokens);
