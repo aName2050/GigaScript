@@ -1,5 +1,5 @@
-let x = 32;
-let y = 64;
+const x = 32;
+const y = 64;
 
 export x;
 export y;
