@@ -6,6 +6,7 @@ export type NodeType =
 	| 'IfStatement'
 	| 'TryCatchStatement'
 	| 'ForStatement'
+	| 'WhileStatement'
 	| 'ImportStatement'
 	| 'ExportStatement'
 	// EXPRESSIONS
@@ -69,6 +70,12 @@ export interface ForStatement extends Stmt {
 	init: VarDeclaration;
 	test: Expr;
 	update: AssignmentExpr;
+	body: Stmt[];
+}
+
+export interface WhileStatement extends Stmt {
+	kind: 'WhileStatement';
+	test: Expr;
 	body: Stmt[];
 }
 

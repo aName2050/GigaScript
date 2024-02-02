@@ -112,6 +112,8 @@ export default class Parser {
 				return this.parse_if_statement();
 			case TokenType.For:
 				return this.parse_for_statement();
+			// case TokenType.While:
+			// 	return this.parse_while_statement();
 			case TokenType.Import:
 				return this.parse_import_statement();
 			case TokenType.Export:
@@ -176,6 +178,11 @@ export default class Parser {
 			body,
 		} as ForStatement;
 	}
+
+	// private parse_while_statement(): Stmt {
+	// 	// TODO: finish
+
+	// }
 
 	private parse_if_statement(): Stmt {
 		this.eat(); // advance past if keyword
