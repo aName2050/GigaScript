@@ -1,4 +1,6 @@
-yoink x from "testImport.g"
-yoink y from "testImport.g"
+yoink x from "testImport.gsx"
+yoink y from "testImport.gsx"
+
+waffle("variables yoinked from testImport.gsx!")
 
 waffle(x, y)
