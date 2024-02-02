@@ -30,8 +30,8 @@ varName = newValue
 > [!NOTE]
 > Variable **assignments or reassignments** do not need to end in a semicolon (;)
 
-> [!WARNING]
-> Semicolons (;) should **only** be used when **declaring variables**! Using semicolons (;) anywhere else will result in an error.
+> [!CAUTION]
+> Semicolons (;) **must** be used when **declaring variables**! Not using semicolons (;) will result in an error!
 
 ### Functions
 
@@ -81,8 +81,8 @@ if (comparison) {
 }
 ```
 
-> [!NOTE]
-> You do not need to include an `else` statement at the end of every **Chained If-Else** statement. An `else` statement is a catch-all for if all the other comparisons return `false`.
+> [!TIP]
+> You do not need to include an `else` statement at the end of every **Chained If-Else** statement or **If-Else** statement. An `else` statement is a catch-all for if all the other comparisons return `false`.
 
 ### For Loops
 
@@ -178,11 +178,12 @@ try {
 ### Import Statement
 
 ```
-import "path/to/file.ext"
+import exportedVariable from "path/to/file.ext"
 ```
 
-> [!IMPORTANT]
+> [!CAUTION]
 > The `import` file path must be relative. Do not write out the full file path like **"C:/path/to/file.ext"**, you must use the relative path like **"file.ext"** or **"to/file.ext"**.
+> When using relative file paths, do **not** start with a "." (dot). This will cause errors.
 
 > [!IMPORTANT]
 > The `import` statement can only import one thing at a time.
@@ -194,8 +195,17 @@ import "path/to/file.ext"
 > import z from "path/to/file"
 > ```
 
+### Export Statement
+
+```
+export exportedVariable;
+```
+
+> [!IMPORTANT]
+> `export` statements **must** end with a semicolon (;).
+
 > [!CAUTION]
-> When using relative file paths, do **not** start with a "." (dot). This will cause errors.
+> `export` statements can only export variables or functions.
 
 ## GigaScript-X (.gsx) <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript-X.png" />
 
@@ -373,11 +383,31 @@ messAround {
 ### Import Statement
 
 ```
-yoink "path/to/file.ext"
+yoink exportedVariable from "path/to/file.ext"
+```
+
+> [!CAUTION]
+> The `yoink` file path must be relative. Do not write out the full file path like **"C:/path/to/file.ext"**, you must use the relative path like **"file.ext"** or **"to/file.ext"**.
+> When using relative file paths, do **not** start with a "." (dot). This will cause errors.
+
+> [!IMPORTANT]
+> The `yoink` statement can only import one thing at a time.
+> You **cannot** import multiple exports like: `yoink { x, y, z } from "path/to/file"`
+> You **can** import multiple exports like:
+> ```
+> yoink x from "path/to/file"
+> yoink y from "path/to/file"
+> yoink z from "path/to/file"
+> ```
+
+### Export Statement
+
+```
+yeet exportedVariable;
 ```
 
 > [!IMPORTANT]
-> The `yoink` file path must be relative. Do not write out the full file path like **"C:/path/to/file.ext"**, you must use the relative path like **"file.ext"** or **"to/file.ext"**.
+> `yeet` statements **must** end with the `rn` keyword.
 
 > [!CAUTION]
-> When using relative file paths, do **not** start with a "." (dot). This will cause errors.
+> `yeet` statements can only export variables or functions.
