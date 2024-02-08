@@ -19,6 +19,8 @@ import {
 	ImportStatement,
 	ExportStatement,
 	WhileStatement,
+	BreakStatement,
+	ContinueStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -115,6 +117,10 @@ export default class Parser {
 				return this.parse_for_statement();
 			case TokenType.While:
 				return this.parse_while_statement();
+			case TokenType.Break:
+				return this.parse_break_statement();
+			case TokenType.Continue:
+				return this.parse_continue_statement();
 			case TokenType.Import:
 				return this.parse_import_statement();
 			case TokenType.Export:
@@ -202,6 +208,22 @@ export default class Parser {
 			test,
 			body,
 		} as WhileStatement;
+	}
+
+	private parse_break_statement(): Stmt {
+		this.eat(); // advance past break keyword
+
+		return {
+			kind: 'BreakStatement',
+		} as BreakStatement;
+	}
+
+	private parse_continue_statement(): Stmt {
+		this.eat(); // advance past continue keyword
+
+		return {
+			kind: 'ContinueStatement',
+		} as ContinueStatement;
 	}
 
 	private parse_if_statement(): Stmt {

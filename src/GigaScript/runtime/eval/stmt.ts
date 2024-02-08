@@ -1,4 +1,6 @@
 import {
+	BreakStatement,
+	ContinueStatement,
 	ExportStatement,
 	ForStatement,
 	FunctionDeclaration,
@@ -128,7 +130,21 @@ export function eval_for_statement(
 
 	do {
 		eval_assignment(update, env);
-		eval_body(body, new Environment(env.cwd, env), false);
+
+		try {
+			eval_body(body, new Environment(env.cwd, env), false);
+		} catch (e) {
+			if (e == 'BREAK_LOOP') {
+				// break statement
+				break;
+			} else if (e == 'CONTINUE_LOOP') {
+				// continue statement
+				continue;
+			} else {
+				// unknown error code
+				throw e;
+			}
+		}
 
 		test = evaluate(declaration.test, env);
 	} while ((test as BooleanValue).value);
@@ -146,12 +162,39 @@ export function eval_while_statement(
 	const body = declaration.body;
 
 	do {
-		eval_body(body, new Environment(env.cwd, env), false);
+		try {
+			eval_body(body, new Environment(env.cwd, env), false);
+		} catch (e) {
+			if (e == 'BREAK_LOOP') {
+				// break statement
+				break;
+			} else if (e == 'CONTINUE_LOOP') {
+				// continue statement
+				continue;
+			} else {
+				// unknown error code
+				throw e;
+			}
+		}
 
 		test = evaluate(declaration.test, env);
 	} while ((test as BooleanValue).value);
 
 	return NULL();
+}
+
+export function eval_break_statement(
+	_declaration: BreakStatement,
+	_env: Environment
+): RuntimeValue {
+	throw 'BREAK_LOOP';
+}
+
+export function eval_continue_statement(
+	_declaration: ContinueStatement,
+	_env: Environment
+): RuntimeValue {
+	throw 'CONTINUE_LOOP';
 }
 
 export function eval_import_statement(

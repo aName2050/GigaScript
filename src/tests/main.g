@@ -5,9 +5,15 @@ print("inside main.g!")
 
 print(x, y)
 
-let i = 10;
+for(let i=0;i<10;i=i+1){
+    if(i == 6) { continue }
+    print(i)
+}
 
-while(true){
-    print("looping in while loop. currently have", i, "loops left")
-    i = i - 1
+let j = 0;
+
+while(j < 10) {
+    if(j == 6) { break }
+    print(j)
+    j = j + 1
 }

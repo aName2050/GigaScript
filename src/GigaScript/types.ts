@@ -19,8 +19,8 @@ export enum TokenType {
 
 	While, // While loop statement
 	For, // For loop statement
-	// Continue, // For Loop/While Loop continue statement
-	// Break, // For Loop/While Loop break statement
+	Continue, // For Loop/While Loop continue statement
+	Break, // For Loop/While Loop break statement
 
 	Import, // Import GigaScript code from another file
 	Export, // Export GigaScript code to another file (the file returns the last Export statements value)

@@ -15,6 +15,8 @@ const KEYWORDS: Record<string, TokenType> = {
 
 	for: TokenType.For,
 	while: TokenType.While,
+	break: TokenType.Break,
+	continue: TokenType.Continue,
 
 	import: TokenType.Import,
 	export: TokenType.Export,

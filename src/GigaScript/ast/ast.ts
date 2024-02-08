@@ -7,6 +7,8 @@ export type NodeType =
 	| 'TryCatchStatement'
 	| 'ForStatement'
 	| 'WhileStatement'
+	| 'BreakStatement'
+	| 'ContinueStatement'
 	| 'ImportStatement'
 	| 'ExportStatement'
 	// EXPRESSIONS
@@ -77,6 +79,14 @@ export interface WhileStatement extends Stmt {
 	kind: 'WhileStatement';
 	test: Expr;
 	body: Stmt[];
+}
+
+export interface BreakStatement extends Stmt {
+	kind: 'BreakStatement';
+}
+
+export interface ContinueStatement extends Stmt {
+	kind: 'ContinueStatement';
 }
 
 export interface ImportStatement extends Stmt {
