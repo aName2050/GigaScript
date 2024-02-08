@@ -15,6 +15,136 @@ const TOKENS: Record<string, TokenType> = {
 	'.': TokenType.Dot,
 };
 
+/**
+ * GSX Reserved Keywords
+ */
+const GSX_KEYWORDS: Record<string, { value: string; type: TokenType }> = {
+	'be': { value: '=', type: TokenType.Equals },
+	'btw': { value: '&&', type: TokenType.And },
+	'big': { value: '>', type: TokenType.GreaterThan },
+	'by': { value: '*', type: TokenType.BinOp },
+	'bro': { value: 'const', type: TokenType.Const },
+	'bruh': { value: 'func', type: TokenType.Func },
+
+	'carenot': { value: '||', type: TokenType.Or },
+	'cap': { value: 'false', type: TokenType.Identifier },
+
+	'frfr': { value: '==', type: TokenType.IsEqual },
+	'fake': { value: 'null', type: TokenType.Identifier },
+	'findOut': { value: 'catch', type: TokenType.Identifier },
+
+	'is': { value: ':', type: TokenType.Colon },
+	'imposter': { value: 'else', type: TokenType.Else },
+
+	'lil': { value: '<', type: TokenType.LessThan },
+	'left': { value: '%', type: TokenType.BinOp },
+	'lit': { value: 'let', type: TokenType.Let },
+
+	'messAround': { value: 'try', type: TokenType.Identifier },
+
+	'nah': { value: '!=', type: TokenType.NotEquals },
+	'nocap': { value: 'true', type: TokenType.Identifier },
+	'nerd': { value: 'math', type: TokenType.Identifier },
+
+	'rn': { value: ';', type: TokenType.Semicolon },
+
+	'waffle': { value: 'print', type: TokenType.Identifier },
+
+	'yoink': { value: 'import', type: TokenType.Import },
+	'yeet': { value: 'export', type: TokenType.Export },
+};
+
+// TODO: replace with GSX alt
+/**
+ * Non-GSX Reserved Keywords
+ */
+const KEYWORDS: Record<string, { value: string; type: TokenType }> = {
+	'break': { value: 'break', type: TokenType.Break },
+
+	'continue': { value: 'continue', type: TokenType.Continue },
+
+	'from': { value: 'from', type: TokenType.From },
+
+	'while': { value: 'while', type: TokenType.While },
+};
+
+export function tokenizeGSX(source: string): Token[] {
+	let tokens = new Array<Token>();
+	const src = source.split('');
+
+	// make tokens till EOF
+	while (src.length > 0) {
+		const curr = src[0];
+		const TOKEN = TOKENS[curr];
+
+		if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
+			// handle numbers
+			let num: string = src.shift()!!; // advance past first digit or negative sign
+			let decPointFound = false;
+			while (src.length > 0) {
+				if (src[0] == '.' && !decPointFound) {
+					decPointFound = true;
+					num += src.shift()!;
+				} else if (isInt(src[0])) {
+					num += src.shift()!;
+				} else break;
+			}
+
+			// console.log('tokenized', num);
+			tokens.push(token(num, TokenType.Number));
+		} else if (typeof TOKEN == 'number') {
+			// console.log('tokenized', TokenType[TOKEN]);
+			tokens.push(token(src.shift(), TOKEN));
+		} else {
+			switch (curr) {
+				case '"': // tokenize strings
+					let str = '';
+					src.shift(); // move past opening quotes
+
+					while (src.length > 0 && src[0] !== '"') {
+						str += src.shift();
+					}
+
+					src.shift(); // advance past closing quotes
+
+					tokens.push(token(str, TokenType.String));
+					break;
+
+				default:
+					if (isAlpha(curr, false)) {
+						let ident = '';
+						ident += src.shift();
+
+						while (src.length > 0 && isAlpha(src[0])) {
+							ident += src.shift();
+						}
+
+						const RESERVED = GSX_KEYWORDS[ident] || KEYWORDS[ident];
+						if (typeof RESERVED?.type == 'number') {
+							tokens.push(token(RESERVED.value, RESERVED.type));
+						} else {
+							tokens.push(token(ident, TokenType.Identifier));
+						}
+					} else if (isSkippable(src[0])) {
+						src.shift();
+					} else {
+						console.error(
+							`GSXLexerError: Unknown character: UNICODE-${src[0].charCodeAt(
+								0
+							)} ${src[0]}`
+						);
+						process.exit(1);
+					}
+					break;
+			}
+		}
+	}
+
+	tokens.push(token('EOF', TokenType.EOF));
+
+	return tokens;
+}
+
 export function readGSX(source: string): Token[] {
 	let tokens = new Array<Token>();
 	const src = source.split('');
@@ -45,274 +175,6 @@ export function readGSX(source: string): Token[] {
 		} else {
 			// multicharacter tokens + special tokens
 			switch (curr) {
-				case 'b':
-					const firstCharB = src.shift()!; // advance past first character
-					if (src[0] == 'e') {
-						src.shift(); // "be" assignment token
-						tokens.push(token('=', TokenType.Equals));
-					} else if (src[0] == 't') {
-						// "btw" ("&&") comparison found, advance past remainding characters
-						src.shift();
-						src.shift();
-						tokens.push(token('&&', TokenType.And));
-					} else if (src[0] == 'i' && src[1] == 'g') {
-						// "big" (">") comparison found
-						src.shift();
-						src.shift();
-
-						tokens.push(token('>', TokenType.GreaterThan));
-					} else if (src[0] == 'y') {
-						// "by" ("*") token found, advance past token
-						src.shift();
-
-						tokens.push(token('*', TokenType.BinOp));
-					} else if (src[0] == 'r' && src[1] == 'o') {
-						// "bro" ("const") token found, advance past
-						src.shift();
-						src.shift();
-
-						tokens.push(token('const', TokenType.Const));
-					} else if (
-						src[0] == 'r' &&
-						src[1] == 'u' &&
-						src[2] == 'h'
-					) {
-						// "bruh" ("func") found, advance past token
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('func', TokenType.Func));
-					} else {
-						src.unshift(firstCharB);
-						tokens = handleSymbols(src, tokens);
-					}
-
-					break;
-
-				case 'c':
-					const firstCharC = src.shift()!; // advance past first character
-					if (
-						src[0] == 'a' &&
-						src[1] == 'r' &&
-						src[2] == 'e' &&
-						src[3] == 'n' &&
-						src[4] == 'o' &&
-						src[5] == 't'
-					) {
-						// "carenot" comparison found, advance past "arenot" token remainder
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('||', TokenType.Or));
-					} else if (src[0] == 'a' && src[1] == 'p') {
-						// "cap" found (false), advance past
-						src.shift();
-						src.shift();
-
-						tokens.push(token('false', TokenType.Identifier));
-					} else {
-						src.unshift(firstCharC);
-						tokens = handleSymbols(src, tokens);
-					}
-
-					break;
-
-				case 'f':
-					const firstCharF = src.shift()!; // advance past first character
-					if (src[0] == 'r' && src[1] == 'f' && src[2] == 'r') {
-						// "frfr" comparison token found, advance past "rfr" token remainder
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('==', TokenType.IsEqual));
-					} else if (
-						src[0] == 'a' &&
-						src[1] == 'k' &&
-						src[2] == 'e'
-					) {
-						// "fake" symbol found (null), advance past
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('null', TokenType.Identifier));
-					} else if (
-						src[0] == 'i' &&
-						src[1] == 'n' &&
-						src[2] == 'd' &&
-						src[3] == 'O' &&
-						src[4] == 'u' &&
-						src[5] == 't'
-					) {
-						// "findOut" (catch) found, advance past
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('catch', TokenType.Identifier));
-					} else if (
-						src[0] == 'r' &&
-						src[1] == 'o' &&
-						src[2] == 'm'
-					) {
-						// "from"
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('from', TokenType.From));
-					} else {
-						src.unshift(firstCharF);
-						tokens = handleSymbols(src, tokens);
-					}
-
-					break;
-
-				case 'i':
-					const firstCharI = src.shift()!; // advance past first character
-					if (src[0] == 's') {
-						// "is" token found (:), advance past
-						src.shift();
-
-						tokens.push(token(':', TokenType.Colon));
-					} else if (
-						src[0] == 'm' &&
-						src[1] == 'p' &&
-						src[2] == 'o' &&
-						src[3] == 's' &&
-						src[4] == 't' &&
-						src[5] == 'e' &&
-						src[6] == 'r'
-					) {
-						// "imposter" (else) statement found, advance past
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('else', TokenType.Else));
-					} else {
-						src.unshift(firstCharI);
-						tokens = handleSymbols(src, tokens);
-					}
-
-					break;
-
-				case 'l':
-					const firstCharL = src.shift()!; // advance past first token
-					if (src[0] == 'i' && src[1] == 'l') {
-						// "lil" token found, continue past
-						src.shift();
-						src.shift();
-
-						tokens.push(token('<', TokenType.LessThan));
-					} else if (
-						src[0] == 'e' &&
-						src[1] == 'f' &&
-						src[2] == 't'
-					) {
-						// "left" found (%), advance past
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('%', TokenType.BinOp));
-					} else if (src[0] == 'i' && src[1] == 't') {
-						// "lit" ("let") variable declaration found, advance past token
-						src.shift();
-						src.shift();
-
-						tokens.push(token('let', TokenType.Let));
-					} else {
-						src.unshift(firstCharL);
-						tokens = handleSymbols(src, tokens);
-					}
-
-					break;
-
-				case 'm':
-					const firstCharM = src.shift()!;
-					if (
-						src[0] == 'e' &&
-						src[1] == 's' &&
-						src[2] == 's' &&
-						src[3] == 'A' &&
-						src[4] == 'r' &&
-						src[5] == 'o' &&
-						src[6] == 'u' &&
-						src[7] == 'n' &&
-						src[8] == 'd'
-					) {
-						// "messAround" (try) found, advance past
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('try', TokenType.Identifier));
-					} else {
-						src.unshift(firstCharM);
-						tokens = handleSymbols(src, tokens);
-					}
-
-					break;
-
-				case 'n':
-					const firstCharN = src.shift()!; // advance past first character
-					if (src[0] == 'a' && src[1] == 'h') {
-						// "nah" comparison token found, advance past "ah" token remainder
-						src.shift();
-						src.shift();
-
-						tokens.push(token('!=', TokenType.NotEquals));
-					} else if (
-						src[0] == 'o' &&
-						src[1] == 'c' &&
-						src[2] == 'a' &&
-						src[3] == 'p'
-					) {
-						// "nocap" (true) found, advance past
-						src.shift();
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('true', TokenType.Identifier));
-					} else if (
-						src[0] == 'e' &&
-						src[1] == 'r' &&
-						src[2] == 'd'
-					) {
-						// "nerd" (math) native function found, advance past
-						src.shift();
-						src.shift();
-						src.shift();
-
-						tokens.push(token('math', TokenType.Identifier));
-					} else {
-						src.unshift(firstCharN);
-						tokens = handleSymbols(src, tokens);
-					}
-
-					break;
-
 				case 'r':
 					const firstCharR = src.shift()!; // advance past first character
 					if (src[0] == 'n') {
