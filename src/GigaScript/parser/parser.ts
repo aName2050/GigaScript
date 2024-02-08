@@ -18,6 +18,7 @@ import {
 	ForStatement,
 	ImportStatement,
 	ExportStatement,
+	WhileStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Token, TokenType } from '../types';
@@ -112,8 +113,8 @@ export default class Parser {
 				return this.parse_if_statement();
 			case TokenType.For:
 				return this.parse_for_statement();
-			// case TokenType.While:
-			// 	return this.parse_while_statement();
+			case TokenType.While:
+				return this.parse_while_statement();
 			case TokenType.Import:
 				return this.parse_import_statement();
 			case TokenType.Export:
@@ -179,10 +180,29 @@ export default class Parser {
 		} as ForStatement;
 	}
 
-	// private parse_while_statement(): Stmt {
-	// 	// TODO: finish
+	private parse_while_statement(): Stmt {
+		this.eat(); // advance past while keyword
 
-	// }
+		this.expect(
+			TokenType.OpenParen,
+			'Expected "(" following while statement'
+		);
+
+		const test = this.parse_expr();
+
+		this.expect(
+			TokenType.CloseParen,
+			'Expected ")" following while statement test expression.'
+		);
+
+		const body = this.parse_block_statement();
+
+		return {
+			kind: 'WhileStatement',
+			test,
+			body,
+		} as WhileStatement;
+	}
 
 	private parse_if_statement(): Stmt {
 		this.eat(); // advance past if keyword

@@ -8,6 +8,7 @@ import {
 	Stmt,
 	TryCatchStatement,
 	VarDeclaration,
+	WhileStatement,
 } from '../../ast/ast';
 import Parser from '../../parser/parser';
 import { readGSX } from '../../lexer/gsx';
@@ -127,6 +128,24 @@ export function eval_for_statement(
 
 	do {
 		eval_assignment(update, env);
+		eval_body(body, new Environment(env.cwd, env), false);
+
+		test = evaluate(declaration.test, env);
+	} while ((test as BooleanValue).value);
+
+	return NULL();
+}
+
+export function eval_while_statement(
+	declaration: WhileStatement,
+	env: Environment
+): RuntimeValue {
+	env = new Environment(env.cwd, env);
+
+	let test = evaluate(declaration.test, env);
+	const body = declaration.body;
+
+	do {
 		eval_body(body, new Environment(env.cwd, env), false);
 
 		test = evaluate(declaration.test, env);
