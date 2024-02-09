@@ -52,6 +52,7 @@ const GSX_KEYWORDS: TOKEN_METADATA = {
 
 	'some': { value: '/', type: TokenType.BinOp },
 	'sus': { value: 'if', type: TokenType.If },
+	'skirt': { value: 'break', type: TokenType.Break },
 
 	'waffle': { value: 'print', type: TokenType.Identifier },
 	'with': { value: '+', type: TokenType.BinOp },
@@ -67,8 +68,6 @@ const GSX_KEYWORDS: TOKEN_METADATA = {
  * Non-GSX Reserved Keywords
  */
 const KEYWORDS: TOKEN_METADATA = {
-	'break': { value: 'break', type: TokenType.Break },
-
 	'continue': { value: 'continue', type: TokenType.Continue },
 
 	'from': { value: 'from', type: TokenType.From },
