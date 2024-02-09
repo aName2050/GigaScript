@@ -19,7 +19,7 @@ const REPL = {
 	env: createGlobalScope(file),
 };
 
-import { readGSX, tokenizeGSX } from './GigaScript/lexer/gsx';
+import { tokenizeGSX } from './GigaScript/lexer/gsx';
 
 if (file) {
 	// run file

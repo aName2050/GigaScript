@@ -13,7 +13,7 @@ import {
 	WhileStatement,
 } from '../../ast/ast';
 import Parser from '../../parser/parser';
-import { readGSX } from '../../lexer/gsx';
+import { tokenizeGSX } from '../../lexer/gsx';
 import Environment, { createGlobalScope } from '../environment';
 import { evaluate } from '../interpreter';
 import {
@@ -232,7 +232,7 @@ export function eval_import_statement(
 		return NULL();
 	} else if (fileLocation.endsWith('.gsx')) {
 		// handle gen-z GigaScript files
-		const translation = readGSX(file);
+		const translation = tokenizeGSX(file);
 		const program = parser.generateGSXAST(translation);
 		evaluate(program, extEnv);
 
