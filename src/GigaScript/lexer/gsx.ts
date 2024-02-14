@@ -149,7 +149,7 @@ export function tokenizeGSX(source: string): Token[] {
 
 	tokens.push(token('EOF', TokenType.EOF));
 
-	console.log(tokens);
+	// console.log(tokens);
 
 	return tokens;
 }
