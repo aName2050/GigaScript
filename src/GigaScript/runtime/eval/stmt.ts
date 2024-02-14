@@ -224,7 +224,7 @@ export function eval_import_statement(
 		for (let i = 0; i < exportedValues.length; i++) {
 			const val = exportedValues[i];
 			if (variable == val[0]) {
-				const value = (val[1] as RuntimeValue).value;
+				const value = val[1] as RuntimeValue;
 				env.delcareVar(variable, value, true);
 			}
 		}
@@ -241,7 +241,7 @@ export function eval_import_statement(
 		for (let i = 0; i < exportedValues.length; i++) {
 			const val = exportedValues[i];
 			if (variable == val[0]) {
-				const value = (val[1] as RuntimeValue).value;
+				const value = val[1] as RuntimeValue;
 				env.delcareVar(variable, value, true);
 			}
 		}
