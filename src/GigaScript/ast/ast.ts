@@ -3,6 +3,7 @@ export type NodeType =
 	| 'Program'
 	| 'VarDeclaration'
 	| 'FunctionDeclaration'
+	| 'ClassDeclaration'
 	| 'IfStatement'
 	| 'TryCatchStatement'
 	| 'ForStatement'
@@ -52,6 +53,13 @@ export interface FunctionDeclaration extends Stmt {
 	parameters: string[];
 	name: string;
 	body: Stmt[];
+}
+
+export interface ClassDeclaration extends Stmt {
+	kind: 'ClassDeclaration';
+	name: string;
+	properties: Property[];
+	methods: Property[];
 }
 
 export interface IfStatement extends Stmt {

@@ -14,6 +14,11 @@ export enum TokenType {
 
 	Func, // Function declaration
 
+	Class, // Class declaration
+	Private, // Private Class property/method
+	Public, // Public Class property/method
+	New, // New Class Object initializer
+
 	If, // If statement
 	Else, // If statement alternate path
 
@@ -72,4 +77,9 @@ export enum TokenType {
 export interface Token {
 	value: string; // the raw value as seen in the language
 	type: TokenType; // token structure
+}
+
+export interface ClassOptions {
+	properties: Object;
+	methods: Object;
 }

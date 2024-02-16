@@ -21,9 +21,10 @@ import {
 	WhileStatement,
 	BreakStatement,
 	ContinueStatement,
+	ClassDeclaration,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
-import { Token, TokenType } from '../types';
+import { ClassOptions, Token, TokenType } from '../types';
 
 /**
  * Produces valid AST from source.
@@ -111,6 +112,8 @@ export default class Parser {
 				return this.parse_var_declaration();
 			case TokenType.Func:
 				return this.parse_func_declaration();
+			case TokenType.Class:
+				return this.parse_class_declaration();
 			case TokenType.If:
 				return this.parse_if_statement();
 			case TokenType.For:
@@ -392,6 +395,50 @@ export default class Parser {
 		);
 
 		return declaration;
+	}
+
+	private parse_class_declaration(): Stmt {
+		this.eat(); // advance past class keyword
+
+		const name = this.expect(
+			TokenType.Identifier,
+			'Expected identifier following class declaration.'
+		).value;
+
+		this.expect(
+			TokenType.OpenBrace,
+			'Expected "{" following class identifier.'
+		);
+
+		const Class = this.parse_class_body();
+
+		this.expect(TokenType.CloseBrace, 'Expected "}" following class body.');
+
+		return {
+			kind: 'ClassDeclaration',
+			name,
+			properties: Class.properties,
+			methods: Class.methods,
+		} as ClassDeclaration;
+	}
+
+	private parse_class_body(): ClassOptions {
+		// Check for public/private properties/methods
+		if (this.at().type == TokenType.Public) {
+			// public property/method
+			this.tokens.shift(); // advance past Public token
+			if (
+				this.at().type == TokenType.Let ||
+				this.at().type == TokenType.Const
+			) {
+				// handle variable
+				const variable = this.parse_var_declaration();
+
+				console.log(variable);
+			}
+		}
+
+		return {} as ClassOptions;
 	}
 
 	/**

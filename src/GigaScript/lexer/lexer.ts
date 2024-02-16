@@ -10,6 +10,11 @@ const KEYWORDS: Record<string, TokenType> = {
 
 	func: TokenType.Func,
 
+	class: TokenType.Class,
+	private: TokenType.Private,
+	public: TokenType.Public,
+	new: TokenType.New,
+
 	if: TokenType.If,
 	else: TokenType.Else,
 

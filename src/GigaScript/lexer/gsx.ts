@@ -68,11 +68,15 @@ const GSX_KEYWORDS: TOKEN_METADATA = {
  * Non-GSX Reserved Keywords
  */
 const KEYWORDS: TOKEN_METADATA = {
-	'continue': { value: 'continue', type: TokenType.Continue },
+	'class': { value: 'class', type: TokenType.Class },
+	'private': { value: 'private', type: TokenType.Private },
+	'public': { value: 'public', type: TokenType.Public },
+	'new': { value: 'new', type: TokenType.New },
 
 	'from': { value: 'from', type: TokenType.From },
 
 	'while': { value: 'while', type: TokenType.While },
+	'continue': { value: 'continue', type: TokenType.Continue },
 };
 
 export function tokenizeGSX(source: string): Token[] {
