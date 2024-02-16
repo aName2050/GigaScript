@@ -423,18 +423,21 @@ export default class Parser {
 	}
 
 	private parse_class_body(): ClassOptions {
+		const properties = new Array<Property>();
 		// Check for public/private properties/methods
-		if (this.at().type == TokenType.Public) {
-			// public property/method
-			this.tokens.shift(); // advance past Public token
-			if (
-				this.at().type == TokenType.Let ||
-				this.at().type == TokenType.Const
-			) {
-				// handle variable
-				const variable = this.parse_var_declaration();
+		while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
+			if (this.at().type == TokenType.Public) {
+				// public property/method
+				this.tokens.shift(); // advance past Public token
+				if (
+					this.at().type == TokenType.Let ||
+					this.at().type == TokenType.Const
+				) {
+					// handle variable
+					const property = this.parse_var_declaration();
 
-				console.log(variable);
+					console.log(property);
+				}
 			}
 		}
 
