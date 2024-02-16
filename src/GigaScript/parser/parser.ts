@@ -429,8 +429,15 @@ export default class Parser {
 		const methods = new Array<ClassMethod>();
 		// Check for public/private properties/methods
 		while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
+			if (
+				this.at().type != TokenType.Public &&
+				this.at().type != TokenType.Private
+			) {
+				console.log(this.at());
+				// continue;
+			}
 			// Check if property/method is public or private
-			const isPublic = this.eat().type == TokenType.Public;
+			const isPublic = this.at().type == TokenType.Public;
 			const identifier = this.expect(
 				TokenType.Identifier,
 				`Expected identifier following ${
