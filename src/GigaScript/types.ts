@@ -1,5 +1,7 @@
 // [ LEXER ]
 
+import { ClassMethod, ClassProperty } from './ast/ast';
+
 // Contains the tokens that are parser understands
 export enum TokenType {
 	// Literal Types (USER_DEFINED)
@@ -80,6 +82,6 @@ export interface Token {
 }
 
 export interface ClassOptions {
-	properties: Object;
-	methods: Object;
+	properties: ClassProperty[];
+	methods: ClassMethod[];
 }

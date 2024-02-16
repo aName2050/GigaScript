@@ -22,7 +22,10 @@ export type NodeType =
 	| 'NumericLiteral'
 	| 'StringLiteral'
 	| 'Identifier'
-	| 'BinaryExpr';
+	| 'BinaryExpr'
+	// CLASSES
+	| 'ClassProperty'
+	| 'ClassMethod';
 
 /**
  * Statements don't result in a value at runtime
@@ -58,8 +61,23 @@ export interface FunctionDeclaration extends Stmt {
 export interface ClassDeclaration extends Stmt {
 	kind: 'ClassDeclaration';
 	name: string;
-	properties: Property[];
-	methods: Property[];
+	properties: ClassProperty[];
+	methods: ClassMethod[];
+}
+
+export interface ClassProperty extends Expr {
+	kind: 'ClassProperty';
+	public: boolean;
+	identifier: string;
+	value?: Expr;
+}
+
+export interface ClassMethod extends Expr {
+	kind: 'ClassMethod';
+	public: boolean;
+	identifier: string;
+	parameters: string[];
+	body: Stmt[];
 }
 
 export interface IfStatement extends Stmt {

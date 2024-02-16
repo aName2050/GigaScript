@@ -7,6 +7,6 @@ print("Hello world!")
 print(x, y, z)
 
 class TestClass {
-    public const ClassProp = "constant";
-    public let otherClassProp = "mutable";
+    public ClassProp = "variable";
+    public otherClassProp = "mutable";
 }
