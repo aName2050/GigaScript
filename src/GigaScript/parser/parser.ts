@@ -26,7 +26,7 @@ import {
 	ClassMethod,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
-import { ClassOptions, Token, TokenType } from '../types';
+import { Class, Token, TokenType } from '../types';
 
 /**
  * Produces valid AST from source.
@@ -424,7 +424,7 @@ export default class Parser {
 		} as ClassDeclaration;
 	}
 
-	private parse_class_body(): ClassOptions {
+	private parse_class_body(): Class {
 		const properties = new Array<ClassProperty>();
 		const methods = new Array<ClassMethod>();
 		// Check for public/private properties/methods
@@ -503,7 +503,7 @@ export default class Parser {
 		return {
 			properties,
 			methods,
-		} as ClassOptions;
+		} as Class;
 	}
 
 	/**

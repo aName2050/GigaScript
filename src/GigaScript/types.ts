@@ -81,7 +81,7 @@ export interface Token {
 	type: TokenType; // token structure
 }
 
-export interface ClassOptions {
+export interface Class {
 	properties: ClassProperty[];
 	methods: ClassMethod[];
 }
