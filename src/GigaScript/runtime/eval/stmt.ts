@@ -1,5 +1,6 @@
 import {
 	BreakStatement,
+	ClassDeclaration,
 	ContinueStatement,
 	ExportStatement,
 	ForStatement,
@@ -26,6 +27,7 @@ import {
 import { eval_assignment } from './expr';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { Class } from '../../types';
 
 export function eval_program(program: Program, env: Environment): RuntimeValue {
 	let lastEvaluated: RuntimeValue = NULL();
@@ -260,6 +262,19 @@ export function eval_export_statement(
 	const exportedValue = evaluate(declaration.exportedValue, env);
 
 	env.addExportedValue(declaration.identifier, exportedValue);
+
+	return NULL();
+}
+
+export function eval_class_declaration(
+	declaration: ClassDeclaration,
+	env: Environment
+): RuntimeValue {
+	env.declareClass(
+		declaration.name,
+		declaration.properties,
+		declaration.methods
+	);
 
 	return NULL();
 }

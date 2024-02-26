@@ -20,6 +20,7 @@ import {
 	WhileStatement,
 	BreakStatement,
 	ContinueStatement,
+	ClassDeclaration,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -42,6 +43,7 @@ import {
 	eval_while_statement,
 	eval_break_statement,
 	eval_continue_statement,
+	eval_class_declaration,
 } from './eval/stmt';
 
 export function evaluate(node: Stmt, env: Environment): RuntimeValue {
@@ -87,6 +89,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 
 		case 'FunctionDeclaration':
 			return eval_func_declaration(node as FunctionDeclaration, env);
+
+		case 'ClassDeclaration':
+			return eval_class_declaration(node as ClassDeclaration, env);
 
 		case 'IfStatement':
 			return eval_if_statement(node as IfStatement, env);

@@ -9,7 +9,14 @@ import {
 	UNDEFINED,
 } from './values';
 import * as NativeFunctions from '../native/functions';
-import { Identifier, MemberExpr } from '../ast/ast';
+import {
+	ClassMethod,
+	ClassProperty,
+	Identifier,
+	MemberExpr,
+	ObjectLiteral,
+} from '../ast/ast';
+import { Class } from '../types';
 
 /**
  * Create the default global environment
@@ -40,13 +47,31 @@ export default class Environment {
 	private constants: Set<string>;
 	public cwd: string;
 	public exports: Map<string, RuntimeValue>;
+	private classes: Map<string, Class>;
 
 	constructor(currDir: string, parentEnv?: Environment) {
 		this.parent = parentEnv;
 		this.cwd = currDir;
+
 		this.variables = new Map();
 		this.constants = new Set();
 		this.exports = new Map();
+		this.classes = new Map();
+	}
+
+	public declareClass(
+		className: string,
+		properties: Array<ClassProperty>,
+		methods: Array<ClassMethod>
+	): RuntimeValue {
+		if (this.classes.has(className))
+			throw `Cannot redeclare class "${className}".`;
+
+		this.classes.set(className, { properties, methods } as Class);
+
+		console.log(this.classes);
+
+		return NULL();
 	}
 
 	public addExportedValue(identifier: string, value: RuntimeValue): void {
