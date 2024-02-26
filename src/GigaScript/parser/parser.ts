@@ -430,71 +430,73 @@ export default class Parser {
 		// Check for public/private properties/methods
 		while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
 			if (
-				this.at().type != TokenType.Public &&
-				this.at().type != TokenType.Private
+				this.at().type == TokenType.Public ||
+				this.at().type == TokenType.Private
 			) {
-				console.log(this.at());
-				// continue;
-			}
-			// Check if property/method is public or private
-			const isPublic = this.at().type == TokenType.Public;
-			const identifier = this.expect(
-				TokenType.Identifier,
-				`Expected identifier following ${
-					isPublic ? 'public' : 'private'
-				} keyword declaration.`
-			).value;
+				const isPublic = this.eat().type === TokenType.Public; // advance past public/private keyword and check if public property/method
+				const identifier = this.expect(
+					TokenType.Identifier,
+					`Expected identifier following ${
+						isPublic ? 'public' : 'private'
+					} keyword declaration.`
+				).value;
 
-			if (this.at().type == TokenType.Semicolon) {
-				// undefined PROPERTY
-				this.eat(); // advance past semicolon
+				if (this.at().type == TokenType.Semicolon) {
+					// undefined PROPERTY
+					this.eat(); // advance past semicolon
 
-				const classProp = {
-					kind: 'ClassProperty',
-					public: isPublic,
-					identifier,
-				} as ClassProperty;
+					const classProp = {
+						kind: 'ClassProperty',
+						public: isPublic,
+						identifier,
+					} as ClassProperty;
 
-				properties.push(classProp);
-			} else if (this.at().type == TokenType.Equals) {
-				// defined PROPERTY
-				this.eat(); // advance past =
-				const classProp = {
-					kind: 'ClassProperty',
-					public: isPublic,
-					identifier,
-					value: this.parse_expr(),
-				} as ClassProperty;
+					properties.push(classProp);
+				} else if (this.at().type == TokenType.Equals) {
+					// defined PROPERTY
+					this.eat(); // advance past =
+					const classProp = {
+						kind: 'ClassProperty',
+						public: isPublic,
+						identifier,
+						value: this.parse_expr(),
+					} as ClassProperty;
 
-				properties.push(classProp);
-			} else if (this.at().type == TokenType.OpenParen) {
-				// defined METHOD
-				const args = this.parse_args();
-				const params: string[] = [];
-				for (const arg of args) {
-					if (arg.kind !== 'Identifier') {
-						console.log(arg);
-						throw 'Expected paramters to of type string.';
+					this.expect(
+						TokenType.Semicolon,
+						'Expected semicolon following class property declaration.'
+					);
+
+					properties.push(classProp);
+				} else if (this.at().type == TokenType.OpenParen) {
+					// defined METHOD
+					const args = this.parse_args();
+					const params: string[] = [];
+					for (const arg of args) {
+						if (arg.kind !== 'Identifier') {
+							console.log(arg);
+							throw 'Expected paramters to of type string.';
+						}
+
+						params.push((arg as Identifier).symbol);
 					}
 
-					params.push((arg as Identifier).symbol);
+					const body: Stmt[] = this.parse_block_statement();
+
+					const classMethod = {
+						kind: 'ClassMethod',
+						public: isPublic,
+						identifier,
+						parameters: params,
+						body,
+					} as ClassMethod;
+
+					methods.push(classMethod);
+				} else {
+					throw `Unexpected token following ${
+						isPublic ? 'public' : 'private'
+					} property declaration. Token: ${this.at()}`;
 				}
-
-				const body: Stmt[] = this.parse_block_statement();
-
-				const classMethod = {
-					kind: 'ClassMethod',
-					public: isPublic,
-					identifier,
-					parameters: params,
-					body,
-				} as ClassMethod;
-
-				methods.push(classMethod);
-			} else {
-				throw `Unexpected token following ${
-					isPublic ? 'public' : 'private'
-				} property declaration. Token: ${this.at()}`;
 			}
 		}
 

@@ -8,5 +8,9 @@ print(x, y, z)
 
 class TestClass {
     public ClassProp = "variable";
-    public otherClassProp = "mutable";
+    private otherClassProp = "mutable";
+
+    public Method(param) {
+        print(param)
+    }
 }
