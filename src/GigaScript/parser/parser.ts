@@ -24,6 +24,7 @@ import {
 	ClassDeclaration,
 	ClassProperty,
 	ClassMethod,
+	ClassInit,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Class, Token, TokenType } from '../types';
@@ -45,6 +46,7 @@ export default class Parser {
 	 * Returns current token
 	 */
 	private at(): Token {
+		console.log(this.tokens);
 		return this.tokens[0] as Token;
 	}
 
@@ -54,6 +56,13 @@ export default class Parser {
 	private eat(): Token {
 		const prev = this.tokens.shift() as Token;
 		return prev;
+	}
+
+	/**
+	 * Returns the next token
+	 */
+	private next(): Token {
+		return this.tokens[1] as Token;
 	}
 
 	/**
@@ -521,7 +530,7 @@ export default class Parser {
 
 		if (this.at().type == TokenType.Equals) {
 			this.eat(); // advance past equals token
-			const value = this.parse_assignment_expr();
+			const value = this.parse_class_init();
 			return {
 				value,
 				assigne: left,
@@ -530,6 +539,23 @@ export default class Parser {
 		}
 
 		return left;
+	}
+
+	private parse_class_init(): Expr {
+		if (this.at().type == TokenType.New) {
+			this.eat(); // advance past "new" keyword
+			const identifier = this.expect(
+				TokenType.Identifier,
+				'Expected identifier following "new" keyword.'
+			).value;
+
+			return {
+				kind: 'ClassInitExpr',
+				name: identifier,
+			} as ClassInit;
+		}
+
+		return this.parse_assignment_expr();
 	}
 
 	private parse_object_expr(): Expr {

@@ -16,6 +16,7 @@ export type NodeType =
 	| 'AssignmentExpr'
 	| 'MemberExpr'
 	| 'CallExpr'
+	| 'ClassInitExpr'
 	// LITERALS
 	| 'Property'
 	| 'ObjectLiteral'
@@ -78,6 +79,11 @@ export interface ClassMethod extends Expr {
 	identifier: string;
 	parameters: string[];
 	body: Stmt[];
+}
+
+export interface ClassInit extends Expr {
+	kind: 'ClassInitExpr';
+	name: string;
 }
 
 export interface IfStatement extends Stmt {
