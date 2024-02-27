@@ -525,12 +525,10 @@ export default class Parser {
 	 * Handle variable reassignments
 	 */
 	private parse_assignment_expr(): Expr {
-		const left = this.parse_object_expr();
-		console.log(left);
+		const left = this.parse_class_init();
 		if (this.at().type == TokenType.Equals) {
 			this.eat(); // advance past equals token
-			const value = this.parse_class_init();
-			console.log(value);
+			const value = this.parse_assignment_expr();
 			return {
 				value,
 				assigne: left,
@@ -561,7 +559,7 @@ export default class Parser {
 			} as ClassInit;
 		}
 
-		return this.parse_assignment_expr();
+		return this.parse_object_expr();
 	}
 
 	private parse_object_expr(): Expr {
