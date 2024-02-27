@@ -1,6 +1,6 @@
 class TestClass {
-    public ClassProp = "thisIsAVariable";
-    private otherClassProp = "thisIsMutable";
+    public ClassProp = 2 + 2;
+    private otherClassProp = "this not visible when calling 'new TestClass()'";
 
     public Method(param) {
         print("inside public class method")
@@ -10,3 +10,5 @@ class TestClass {
 }
 
 let test = new TestClass();
+print(test.ClassProp)
+test.Method("64")
