@@ -2,6 +2,7 @@ import {
 	AssignmentExpr,
 	BinaryExpr,
 	CallExpr,
+	ClassInit,
 	Identifier,
 	MemberExpr,
 	ObjectLiteral,
@@ -264,4 +265,13 @@ export function eval_member_expr(
 	} else {
 		throw 'EvalError: A member expression cannot be evaluated with a member or assignment expression.';
 	}
+}
+
+export function eval_class_init_expr(
+	node: ClassInit,
+	env: Environment
+): RuntimeValue {
+	const classOBJ = env.getClassAsObject(node.name);
+
+	return classOBJ;
 }

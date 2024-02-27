@@ -21,6 +21,7 @@ import {
 	BreakStatement,
 	ContinueStatement,
 	ClassDeclaration,
+	ClassInit,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -30,6 +31,7 @@ import {
 	eval_object_expr,
 	eval_call_expr,
 	eval_member_expr,
+	eval_class_init_expr,
 } from './eval/expr';
 import {
 	eval_func_declaration,
@@ -78,6 +80,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 
 		case 'MemberExpr':
 			return eval_member_expr(env, null, node as MemberExpr);
+
+		case 'ClassInitExpr':
+			return eval_class_init_expr(node as ClassInit, env);
 
 		// Handle program evaluate
 		case 'Program':

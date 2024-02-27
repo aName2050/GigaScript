@@ -1,22 +1,30 @@
 import {
 	BOOL,
+	FunctionValue,
 	NATIVE_FUNCTION,
 	NULL,
 	NUMBER,
+	OBJECT,
 	ObjectValue,
 	RuntimeValue,
 	STRING,
 	UNDEFINED,
+	UndefinedValue,
 } from './values';
 import * as NativeFunctions from '../native/functions';
 import {
+	ClassInit,
 	ClassMethod,
 	ClassProperty,
+	Expr,
 	Identifier,
 	MemberExpr,
 	ObjectLiteral,
+	Property,
+	Stmt,
 } from '../ast/ast';
 import { Class } from '../types';
+import { evaluate } from './interpreter';
 
 /**
  * Create the default global environment
@@ -69,9 +77,52 @@ export default class Environment {
 
 		this.classes.set(className, { properties, methods } as Class);
 
-		console.log(this.classes);
-
 		return NULL();
+	}
+
+	public getClassAsObject(className: string): RuntimeValue {
+		const Class = this.classes.get(className);
+		if (!Class) throw `RuntimeError: ${className} does not exist.`;
+
+		const { properties, methods } = Class;
+
+		const obj = {
+			type: 'object',
+			properties: new Map<string, RuntimeValue>(),
+		} as ObjectValue;
+
+		// add class properties to class object
+		properties.forEach(prop => {
+			// only public props are supported for now
+			if (prop.public) {
+				// get the prop value
+				const propVal = evaluate(
+					prop.value as Stmt,
+					this as Environment
+				);
+
+				obj.properties.set(prop.identifier, propVal);
+			}
+		});
+
+		// add class methods to class object
+		methods.forEach(method => {
+			// only public methods are supported for now
+			if (method.public) {
+				// convert to function value
+				const func = {
+					type: 'function',
+					name: method.identifier,
+					parameters: method.parameters,
+					declarationEnv: this as Environment,
+					body: method.body,
+				} as FunctionValue;
+
+				obj.properties.set(method.identifier, func);
+			}
+		});
+
+		return obj;
 	}
 
 	public addExportedValue(identifier: string, value: RuntimeValue): void {
