@@ -7,30 +7,31 @@ import {
 	FunctionValue,
 	UndefinedValue,
 	StringValue,
-} from "../runtime/values";
+	ValueType,
+} from '../runtime/values';
 
 export function getValue(
 	runtimeVal: RuntimeValue
 ): number | boolean | null | undefined | string | object {
 	switch (runtimeVal.type) {
-		case "number":
+		case 'number':
 			return (runtimeVal as NumberValue).value;
-		case "string":
+		case 'string':
 			return (runtimeVal as StringValue).value;
-		case "boolean":
+		case 'boolean':
 			return (runtimeVal as BooleanValue).value;
-		case "null":
+		case 'null':
 			return (runtimeVal as NullValue).value;
-		case "undefined":
+		case 'undefined':
 			return (runtimeVal as UndefinedValue).value;
-		case "object":
+		case 'object':
 			let obj: { [key: string]: any } = {};
 			const aObj = runtimeVal as ObjectValue;
 			aObj.properties.forEach((value, key) => {
 				obj[key] = getValue(value);
 			});
 			return obj;
-		case "function":
+		case 'function':
 			const fn = runtimeVal as FunctionValue;
 
 			return {
