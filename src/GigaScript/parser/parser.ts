@@ -46,7 +46,6 @@ export default class Parser {
 	 * Returns current token
 	 */
 	private at(): Token {
-		console.log(this.tokens);
 		return this.tokens[0] as Token;
 	}
 
@@ -527,10 +526,11 @@ export default class Parser {
 	 */
 	private parse_assignment_expr(): Expr {
 		const left = this.parse_object_expr();
-
+		console.log(left);
 		if (this.at().type == TokenType.Equals) {
 			this.eat(); // advance past equals token
 			const value = this.parse_class_init();
+			console.log(value);
 			return {
 				value,
 				assigne: left,
@@ -548,6 +548,12 @@ export default class Parser {
 				TokenType.Identifier,
 				'Expected identifier following "new" keyword.'
 			).value;
+
+			this.expect(
+				TokenType.OpenParen,
+				'Expected "(" following class identifier.'
+			);
+			this.expect(TokenType.CloseParen, 'Expected ")"');
 
 			return {
 				kind: 'ClassInitExpr',
@@ -831,6 +837,7 @@ export default class Parser {
 	 * Order of Precedence
 	 *
 	 * Assignment Operators =
+	 * New Class Init
 	 * Object
 	 * Try Catch Expr
 	 * Multiplication * / %

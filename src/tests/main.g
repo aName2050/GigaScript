@@ -1,8 +1,10 @@
 class TestClass {
-    public ClassProp = "variable";
-    private otherClassProp = "mutable";
+    public ClassProp = "thisIsAVariable";
+    private otherClassProp = "thisIsMutable";
 
     public Method(param) {
+        print("inside public class method")
+        print("param passed:")
         print(param)
     }
 }
