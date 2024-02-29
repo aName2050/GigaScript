@@ -4,26 +4,20 @@ A programming language written in TypeScript, with two forms of syntax, one base
 
 There are two forms of this language, ***.g** and ***.gsx**. ***.g** files use traditional syntax similar to JavaScript/TypeScript. ***.gsx** files use the Gen Z slang syntax. GigaChads use ***.gsx** :).
 
-## .g <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript.png" />
+## .g <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript.png" /> (GigaScript)
 
 The boring version of GigaScript...
 
-## .gsx <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript-X.png" />
+[GigaScript Documentation](https://github.com/aName2050/GigaScript/wiki/GigaScript-Documentation)
+
+## .gsx <img src="https://github.com/aName2050/GigaScript/blob/main/assets/GigaScript-X.png" /> (GigaScript-X)
 
 The cool version of GigaScript!
 
-## How to run
-### Start a REPL
+[GigaScript-X Documentation](https://github.com/aName2050/GigaScript/wiki/GigaScript-X-Documentation)
 
-```
-npm run gigascript
-```
-
-### Run a file
-
-```
-npm run gigascript [file_location]
-```
+## Run GigaScript and GigaScript-X
+You can learn how to run GigaScript and GigaScript-X on your machine [here](https://github.com/aName2050/GigaScript/wiki/Run-GigaScript-or-GigaScript%E2%80%90X).
 
 # Credits
 
