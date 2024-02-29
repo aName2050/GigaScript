@@ -254,6 +254,12 @@ break
 import
 export
 from
+try
+catch
+print
+math
+timestamp
+format
 ```
 
 > [!CAUTION]
@@ -507,3 +513,4 @@ _main.g_
 _anotherFile.g_
 1. **Declare** a **constant** variable called `x` with the value `10`.
 2. **Export** the **variable** `x`.
+
