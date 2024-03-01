@@ -9,6 +9,7 @@ const KEYWORDS: Record<string, TokenType> = {
 	const: TokenType.Const,
 
 	func: TokenType.Func,
+	return: TokenType.Return,
 
 	class: TokenType.Class,
 	private: TokenType.Private,

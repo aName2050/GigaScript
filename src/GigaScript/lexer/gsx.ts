@@ -77,6 +77,8 @@ const KEYWORDS: TOKEN_METADATA = {
 
 	'while': { value: 'while', type: TokenType.While },
 	'continue': { value: 'continue', type: TokenType.Continue },
+
+	'return': { value: 'return', type: TokenType.Return },
 };
 
 export function tokenizeGSX(source: string): Token[] {

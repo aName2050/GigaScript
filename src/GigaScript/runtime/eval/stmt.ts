@@ -8,6 +8,7 @@ import {
 	IfStatement,
 	ImportStatement,
 	Program,
+	ReturnStatement,
 	Stmt,
 	TryCatchStatement,
 	VarDeclaration,
@@ -23,11 +24,11 @@ import {
 	FunctionValue,
 	BooleanValue,
 	STRING,
+	UNDEFINED,
 } from '../values';
 import { eval_assignment } from './expr';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Class } from '../../types';
 
 export function eval_program(program: Program, env: Environment): RuntimeValue {
 	let lastEvaluated: RuntimeValue = NULL();
@@ -41,7 +42,9 @@ export function eval_var_declaration(
 	declaration: VarDeclaration,
 	env: Environment
 ): RuntimeValue {
-	const value = declaration.value ? evaluate(declaration.value, env) : NULL();
+	const value = declaration.value
+		? evaluate(declaration.value, env)
+		: UNDEFINED();
 
 	return env.delcareVar(declaration.identifier, value, declaration.constant);
 }
@@ -93,7 +96,6 @@ export function eval_body(
 
 	// evaluate each line of the body
 	for (const stmt of body) {
-		// TODO: implement continue and break keywords
 		result = evaluate(stmt, scope);
 	}
 
@@ -277,4 +279,12 @@ export function eval_class_declaration(
 	);
 
 	return NULL();
+}
+
+export function eval_return_statement(
+	statement: ReturnStatement,
+	env: Environment
+): RuntimeValue {
+	const value = evaluate(statement.value, env);
+	return value;
 }

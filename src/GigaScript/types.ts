@@ -15,6 +15,7 @@ export enum TokenType {
 	Const, // Constant variable declaration
 
 	Func, // Function declaration
+	Return, // Returns a value
 
 	Class, // Class declaration
 	Private, // Private Class property/method

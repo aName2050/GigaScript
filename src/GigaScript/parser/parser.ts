@@ -25,6 +25,7 @@ import {
 	ClassProperty,
 	ClassMethod,
 	ClassInit,
+	ReturnStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Class, Token, TokenType } from '../types';
@@ -122,6 +123,8 @@ export default class Parser {
 				return this.parse_var_declaration();
 			case TokenType.Func:
 				return this.parse_func_declaration();
+			case TokenType.Return:
+				return this.parse_return_statement();
 			case TokenType.Class:
 				return this.parse_class_declaration();
 			case TokenType.If:
@@ -357,6 +360,22 @@ export default class Parser {
 		} as FunctionDeclaration;
 
 		return func;
+	}
+
+	private parse_return_statement(): Stmt {
+		this.eat(); // advance past return keyword
+
+		const value = this.parse_expr();
+
+		this.expect(
+			TokenType.Semicolon,
+			'Expected ";" following return statement.'
+		);
+
+		return {
+			kind: 'ReturnStatement',
+			value,
+		} as ReturnStatement;
 	}
 
 	/**

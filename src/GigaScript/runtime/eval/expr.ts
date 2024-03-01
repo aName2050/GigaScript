@@ -22,6 +22,7 @@ import {
 	UndefinedValue,
 	NullValue,
 	NUMBER,
+	UNDEFINED,
 } from '../values';
 
 /**
@@ -229,11 +230,15 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeValue {
 			scope.delcareVar(varName, args[i], false);
 		}
 
-		let result: RuntimeValue = NULL();
+		let result: RuntimeValue = UNDEFINED();
 
 		// evaluate the function body line by line
 		for (const stmt of func.body) {
-			result = evaluate(stmt, scope);
+			if (stmt.kind == 'ReturnStatement') {
+				result = evaluate(stmt, scope);
+				break;
+			}
+			evaluate(stmt, scope);
 		}
 
 		return result;

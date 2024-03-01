@@ -1,14 +1,6 @@
-class TestClass {
-    public ClassProp = 2 + 2;
-    private otherClassProp = "this not visible when calling 'new TestClass()'";
-
-    public Method(param) {
-        print("inside public class method")
-        print("param passed:")
-        print(param)
-    }
+func add(a, b, z) {
+    const c = a + b;
+    return c * z;
 }
 
-let test = new TestClass();
-print(test.ClassProp)
-test.Method("64")
+print(add(1, 1, 2))

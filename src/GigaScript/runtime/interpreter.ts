@@ -1,4 +1,10 @@
-import { NULL, NumberValue, RuntimeValue, StringValue } from './values';
+import {
+	NULL,
+	NumberValue,
+	RuntimeValue,
+	StringValue,
+	UNDEFINED,
+} from './values';
 import {
 	AssignmentExpr,
 	BinaryExpr,
@@ -22,6 +28,7 @@ import {
 	ContinueStatement,
 	ClassDeclaration,
 	ClassInit,
+	ReturnStatement,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -46,6 +53,7 @@ import {
 	eval_break_statement,
 	eval_continue_statement,
 	eval_class_declaration,
+	eval_return_statement,
 } from './eval/stmt';
 
 export function evaluate(node: Stmt, env: Environment): RuntimeValue {
@@ -94,6 +102,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 
 		case 'FunctionDeclaration':
 			return eval_func_declaration(node as FunctionDeclaration, env);
+
+		case 'ReturnStatement':
+			return eval_return_statement(node as ReturnStatement, env);
 
 		case 'ClassDeclaration':
 			return eval_class_declaration(node as ClassDeclaration, env);
