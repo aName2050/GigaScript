@@ -55,11 +55,42 @@ export const math = OBJECT(
 				return NUMBER(Math.round(num));
 			})
 		)
-        .set('random', NATIVE_FUNCTION((args, _scope) => {
-            const max = Math.floor((args[0] as NumberValue).value);
-            const min = Math.ceil((args[0] as NumberValue).value);
-            return NUMBER(Math.random() * (max - min + 1) + min);
-        }))
+		.set(
+			'random',
+			NATIVE_FUNCTION((args, _scope) => {
+				const max = Math.floor((args[0] as NumberValue).value);
+				const min = Math.ceil((args[1] as NumberValue).value);
+				return NUMBER(Math.random() * (max - min + 1) + min);
+			})
+		)
+		.set(
+			'ceil',
+			NATIVE_FUNCTION((args, _scope) => {
+				return NUMBER(Math.ceil((args[0] as NumberValue).value));
+			})
+		)
+		.set(
+			'exp',
+			NATIVE_FUNCTION((args, _scope) => {
+				return NUMBER(Math.exp((args[0] as NumberValue).value));
+			})
+		)
+		.set(
+			'floor',
+			NATIVE_FUNCTION((args, _scope) => {
+				return NUMBER(Math.floor((args[0] as NumberValue).value));
+			})
+		)
+		.set(
+			'max',
+			NATIVE_FUNCTION((args, _scope) => {
+				const values: Array<number> = new Array<number>();
+				args.forEach(arg => {
+					values.push((arg as NumberValue).value);
+				});
+				return NUMBER(Math.max(...values));
+			})
+		)
 );
 
 export const format = NATIVE_FUNCTION((args, scope) => {
