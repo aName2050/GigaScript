@@ -29,6 +29,7 @@ import {
 	ClassDeclaration,
 	ClassInit,
 	ReturnStatement,
+	ThrowStatement,
 } from '../ast/ast';
 import Environment from './environment';
 import {
@@ -54,6 +55,7 @@ import {
 	eval_continue_statement,
 	eval_class_declaration,
 	eval_return_statement,
+	eval_throw_statement,
 } from './eval/stmt';
 
 export function evaluate(node: Stmt, env: Environment): RuntimeValue {
@@ -132,6 +134,9 @@ export function evaluate(node: Stmt, env: Environment): RuntimeValue {
 
 		case 'ExportStatement':
 			return eval_export_statement(node as ExportStatement, env);
+
+		case 'ThrowStatement':
+			return eval_throw_statement(node as ThrowStatement, env);
 
 		// Handle types not implemented
 		default:

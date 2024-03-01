@@ -34,6 +34,8 @@ export enum TokenType {
 	Export, // Export GigaScript code to another file (the file returns the last Export statements value)
 	From, // From sets the imported value to a symbol
 
+	Throw, // Throws an exception
+
 	// Comparison Operators
 	GreaterThan, // >
 	LessThan, // <

@@ -3,4 +3,6 @@ func add(a, b, z) {
     return c * z;
 }
 
+throw "wow an error! in gigascript!";
+
 print(add(1, 1, 2))

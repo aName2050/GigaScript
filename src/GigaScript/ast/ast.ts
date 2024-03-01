@@ -13,6 +13,7 @@ export type NodeType =
 	| 'ContinueStatement'
 	| 'ImportStatement'
 	| 'ExportStatement'
+	| 'ThrowStatement'
 	// EXPRESSIONS
 	| 'AssignmentExpr'
 	| 'MemberExpr'
@@ -137,6 +138,11 @@ export interface ExportStatement extends Stmt {
 	kind: 'ExportStatement';
 	identifier: string;
 	exportedValue: Expr;
+}
+
+export interface ThrowStatement extends Stmt {
+	kind: 'ThrowStatement';
+	message: Expr;
 }
 
 /**

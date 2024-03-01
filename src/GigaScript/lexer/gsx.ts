@@ -79,6 +79,8 @@ const KEYWORDS: TOKEN_METADATA = {
 	'continue': { value: 'continue', type: TokenType.Continue },
 
 	'return': { value: 'return', type: TokenType.Return },
+
+	'throw': { value: 'throw', type: TokenType.Throw },
 };
 
 export function tokenizeGSX(source: string): Token[] {

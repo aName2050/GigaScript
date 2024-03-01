@@ -10,6 +10,7 @@ import {
 	Program,
 	ReturnStatement,
 	Stmt,
+	ThrowStatement,
 	TryCatchStatement,
 	VarDeclaration,
 	WhileStatement,
@@ -287,4 +288,13 @@ export function eval_return_statement(
 ): RuntimeValue {
 	const value = evaluate(statement.value, env);
 	return value;
+}
+
+export function eval_throw_statement(
+	statement: ThrowStatement,
+	env: Environment
+): RuntimeValue {
+	const message = evaluate(statement.message, env);
+
+	throw message.value;
 }

@@ -26,6 +26,7 @@ import {
 	ClassMethod,
 	ClassInit,
 	ReturnStatement,
+	ThrowStatement,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Class, Token, TokenType } from '../types';
@@ -141,6 +142,8 @@ export default class Parser {
 				return this.parse_import_statement();
 			case TokenType.Export:
 				return this.parse_export_statement();
+			case TokenType.Throw:
+				return this.parse_throw_statement();
 
 			default:
 				return this.parse_expr();
@@ -531,6 +534,18 @@ export default class Parser {
 			properties,
 			methods,
 		} as Class;
+	}
+
+	private parse_throw_statement(): Stmt {
+		this.eat(); // advance past throw keyword
+		const message = this.parse_expr();
+
+		this.expect(
+			TokenType.Semicolon,
+			'Expected ";"  following throw statement.'
+		);
+
+		return { kind: 'ThrowStatement', message } as ThrowStatement;
 	}
 
 	/**
