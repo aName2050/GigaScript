@@ -1,14 +1,9 @@
 import {
-	BooleanValue,
-	FunctionValue,
 	NATIVE_FUNCTION,
 	NULL,
 	NUMBER,
-	NullValue,
 	NumberValue,
 	OBJECT,
-	ObjectValue,
-	RuntimeValue,
 	STRING,
 	StringValue,
 } from '../runtime/values';
@@ -89,6 +84,23 @@ export const math = OBJECT(
 					values.push((arg as NumberValue).value);
 				});
 				return NUMBER(Math.max(...values));
+			})
+		)
+		.set(
+			'pow',
+			NATIVE_FUNCTION((args, _scope) => {
+				return NUMBER(
+					Math.pow(
+						(args[0] as NumberValue).value,
+						(args[1] as NumberValue).value
+					)
+				);
+			})
+		)
+		.set(
+			'round',
+			NATIVE_FUNCTION((args, _scope) => {
+				return NUMBER(Math.round((args[0] as NumberValue).value));
 			})
 		)
 );
