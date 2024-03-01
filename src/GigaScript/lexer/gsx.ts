@@ -27,6 +27,7 @@ const GSX_KEYWORDS: TOKEN_METADATA = {
 	'by': { value: '*', type: TokenType.BinOp },
 	'bro': { value: 'const', type: TokenType.Const },
 	'bruh': { value: 'func', type: TokenType.Func },
+	'build': { value: 'constructor', type: TokenType.Constructor },
 
 	'carenot': { value: '||', type: TokenType.Or },
 	'cap': { value: 'false', type: TokenType.Identifier },
@@ -72,6 +73,7 @@ const KEYWORDS: TOKEN_METADATA = {
 	'private': { value: 'private', type: TokenType.Private },
 	'public': { value: 'public', type: TokenType.Public },
 	'new': { value: 'new', type: TokenType.New },
+	'this': { value: 'this', type: TokenType.This },
 
 	'from': { value: 'from', type: TokenType.From },
 

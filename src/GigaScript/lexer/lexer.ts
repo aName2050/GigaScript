@@ -15,6 +15,8 @@ const KEYWORDS: Record<string, TokenType> = {
 	private: TokenType.Private,
 	public: TokenType.Public,
 	new: TokenType.New,
+	constructor: TokenType.Constructor,
+	this: TokenType.This,
 
 	if: TokenType.If,
 	else: TokenType.Else,

@@ -21,6 +21,8 @@ export enum TokenType {
 	Private, // Private Class property/method
 	Public, // Public Class property/method
 	New, // New Class Object initializer
+	Constructor, // Class Constructor
+	This, // Access class properties from within the class
 
 	If, // If statement
 	Else, // If statement alternate path
