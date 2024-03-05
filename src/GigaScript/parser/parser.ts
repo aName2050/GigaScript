@@ -122,33 +122,47 @@ export default class Parser {
 		switch (this.at().type) {
 			case TokenType.Let:
 			case TokenType.Const:
+				// console.log('parsing let | const');
 				return this.parse_var_declaration();
 			case TokenType.Func:
+				// console.log('parsing func');
 				return this.parse_func_declaration();
 			case TokenType.Return:
+				// console.log('parsing return');
 				return this.parse_return_statement();
 			case TokenType.Class:
+				// console.log('parsing class');
 				return this.parse_class_declaration();
 			case TokenType.Constructor:
+				// console.log('parsing constructor');
 				return this.parse_constructor_statement();
 			case TokenType.If:
+				// console.log('parsing if');
 				return this.parse_if_statement();
 			case TokenType.For:
+				// console.log('parsing for');
 				return this.parse_for_statement();
 			case TokenType.While:
+				// console.log('parsing while');
 				return this.parse_while_statement();
 			case TokenType.Break:
+				// console.log('parsing break');
 				return this.parse_break_statement();
 			case TokenType.Continue:
+				// console.log('parsing continue');
 				return this.parse_continue_statement();
 			case TokenType.Import:
+				// console.log('parsing import');
 				return this.parse_import_statement();
 			case TokenType.Export:
+				// console.log('parsing export');
 				return this.parse_export_statement();
 			case TokenType.Throw:
+				// console.log('parsing throw');
 				return this.parse_throw_statement();
 
 			default:
+				// console.log('parsing expression');
 				return this.parse_expr();
 		}
 	}
@@ -465,7 +479,7 @@ export default class Parser {
 		for (const arg of args) {
 			if (arg.kind !== 'Identifier') {
 				console.log(arg);
-				throw 'Expected paramters to of type string.';
+				throw 'Expected paramters to be of type string.';
 			}
 
 			parameters.push((arg as Identifier).symbol);
@@ -481,8 +495,9 @@ export default class Parser {
 	}
 
 	private parse_class_body(): Class {
-		const properties = new Array<ClassProperty>();
-		const methods = new Array<ClassMethod>();
+		const properties: ClassProperty[] = new Array<ClassProperty>();
+		const methods: ClassMethod[] = new Array<ClassMethod>();
+		let constructor: Stmt | undefined = undefined;
 		// Check for public/private properties/methods
 		while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
 			if (
@@ -553,10 +568,13 @@ export default class Parser {
 						isPublic ? 'public' : 'private'
 					} property declaration. Token: ${this.at()}`;
 				}
+			} else if (this.at().type == TokenType.Constructor) {
+				constructor = this.parse_constructor_statement();
 			}
 		}
 
 		return {
+			constructor,
 			properties,
 			methods,
 		} as Class;
@@ -607,15 +625,12 @@ export default class Parser {
 				'Expected identifier following "new" keyword.'
 			).value;
 
-			this.expect(
-				TokenType.OpenParen,
-				'Expected "(" following class identifier.'
-			);
-			this.expect(TokenType.CloseParen, 'Expected ")"');
+			const args = this.parse_args();
 
 			return {
 				kind: 'ClassInitExpr',
 				name: identifier,
+				args,
 			} as ClassInit;
 		}
 

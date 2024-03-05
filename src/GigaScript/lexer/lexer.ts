@@ -185,7 +185,7 @@ export function tokenize(source: string): Token[] {
 
 	tokens.push({ value: 'EOF', type: TokenType.EOF });
 
-	console.log(tokens);
+	// console.log(tokens);
 
 	return tokens;
 }

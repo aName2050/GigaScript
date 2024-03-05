@@ -72,6 +72,7 @@ export interface ClassDeclaration extends Stmt {
 	name: string;
 	properties: ClassProperty[];
 	methods: ClassMethod[];
+	constructor: Stmt;
 }
 
 export interface ClassProperty extends Expr {
@@ -98,6 +99,7 @@ export interface ClassConstructor extends Stmt {
 export interface ClassInit extends Expr {
 	kind: 'ClassInitExpr';
 	name: string;
+	args: Expr[];
 }
 
 export interface IfStatement extends Stmt {

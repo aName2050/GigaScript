@@ -57,6 +57,38 @@ export default class Environment {
 	public exports: Map<string, RuntimeValue>;
 	private classes: Map<string, Class>;
 
+	public DEBUG = {
+		DUMP_ALL: () => {
+			console.log('ENV_DUMP');
+			console.log('parent');
+			console.log(this.parent);
+
+			console.log('variables');
+			console.log(this.variables);
+
+			console.log('constants');
+			console.log(this.constants);
+
+			console.log('cwd');
+			console.log(this.cwd);
+
+			console.log('exports');
+			console.log(this.exports);
+
+			console.log('classes');
+			this.classes.forEach(classObj => {
+				console.log(classObj);
+			});
+		},
+		DUMP_CLASSES: () => {
+			console.log('ENV_CLASS_DUMP');
+			this.classes.forEach((classObj, name) => {
+				console.log(name);
+				console.log(classObj);
+			});
+		},
+	};
+
 	constructor(currDir: string, parentEnv?: Environment) {
 		this.parent = parentEnv;
 		this.cwd = currDir;
@@ -70,12 +102,17 @@ export default class Environment {
 	public declareClass(
 		className: string,
 		properties: Array<ClassProperty>,
-		methods: Array<ClassMethod>
+		methods: Array<ClassMethod>,
+		constructor: Stmt
 	): RuntimeValue {
 		if (this.classes.has(className))
 			throw `Cannot redeclare class "${className}".`;
 
-		this.classes.set(className, { properties, methods } as Class);
+		this.classes.set(className, {
+			properties,
+			methods,
+			constructor,
+		} as Class);
 
 		return NULL();
 	}

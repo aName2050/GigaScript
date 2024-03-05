@@ -276,7 +276,8 @@ export function eval_class_declaration(
 	env.declareClass(
 		declaration.name,
 		declaration.properties,
-		declaration.methods
+		declaration.methods,
+		declaration.constructor
 	);
 
 	return NULL();

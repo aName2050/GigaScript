@@ -59,6 +59,12 @@ import {
 } from './eval/stmt';
 
 export function evaluate(node: Stmt, env: Environment): RuntimeValue {
+	if (!node || !node.kind) {
+		console.error('RuntimeError: Unknown or undefined node', node);
+		env.DEBUG.DUMP_CLASSES();
+		process.exit(1);
+	}
+
 	switch (node.kind) {
 		// Handle literals
 		case 'NumericLiteral':

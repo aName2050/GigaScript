@@ -3,20 +3,17 @@ class TestClass {
     private PrivateProp = "you can't see me!";
 
     constructor(publicProp) {
-        this.PublicProp = publicProp
+        print("constructing...", publicProp)
     }
 
     public printPrivateProp() {
-        print(this.PrivateProp)
+        print(PrivateProp)
     }
 
     public logPublicProp(logMessage) {
-        print(logMessage, this.changeText(this.PublicProp))
+        print(logMessage, PublicProp)
     }
 
-    private changeText(text){
-        return text + " modified!";
-    }
 }
 
 const test = new TestClass("hello world!");
