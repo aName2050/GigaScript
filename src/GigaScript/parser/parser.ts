@@ -27,6 +27,7 @@ import {
 	ClassInit,
 	ReturnStatement,
 	ThrowStatement,
+	ClassConstructor,
 } from '../ast/ast';
 import { tokenize } from '../lexer/lexer';
 import { Class, Token, TokenType } from '../types';
@@ -128,6 +129,8 @@ export default class Parser {
 				return this.parse_return_statement();
 			case TokenType.Class:
 				return this.parse_class_declaration();
+			case TokenType.Constructor:
+				return this.parse_constructor_statement();
 			case TokenType.If:
 				return this.parse_if_statement();
 			case TokenType.For:
@@ -452,6 +455,29 @@ export default class Parser {
 			properties: Class.properties,
 			methods: Class.methods,
 		} as ClassDeclaration;
+	}
+
+	private parse_constructor_statement(): Stmt {
+		this.eat(); // advance past constructor keyword
+
+		const args = this.parse_args();
+		const parameters: string[] = [];
+		for (const arg of args) {
+			if (arg.kind !== 'Identifier') {
+				console.log(arg);
+				throw 'Expected paramters to of type string.';
+			}
+
+			parameters.push((arg as Identifier).symbol);
+		}
+
+		const body = this.parse_block_statement();
+
+		return {
+			kind: 'ClassConstructor',
+			parameters,
+			body,
+		} as ClassConstructor;
 	}
 
 	private parse_class_body(): Class {
@@ -801,17 +827,14 @@ export default class Parser {
 	private parse_args(): Expr[] {
 		this.expect(
 			TokenType.OpenParen,
-			'Expected "(" after function identifier.'
+			'Expected "(" before parameters list.'
 		);
 		const args =
 			this.at().type == TokenType.CloseParen
 				? []
 				: this.parse_arguments_list();
 
-		this.expect(
-			TokenType.CloseParen,
-			'Expected ")" after function parameters'
-		);
+		this.expect(TokenType.CloseParen, 'Expected ")" after parameters');
 		return args;
 	}
 

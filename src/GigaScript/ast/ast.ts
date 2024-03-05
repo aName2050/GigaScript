@@ -5,6 +5,7 @@ export type NodeType =
 	| 'FunctionDeclaration'
 	| 'ReturnStatement'
 	| 'ClassDeclaration'
+	| 'ClassConstructor'
 	| 'IfStatement'
 	| 'TryCatchStatement'
 	| 'ForStatement'
@@ -84,6 +85,12 @@ export interface ClassMethod extends Expr {
 	kind: 'ClassMethod';
 	public: boolean;
 	identifier: string;
+	parameters: string[];
+	body: Stmt[];
+}
+
+export interface ClassConstructor extends Stmt {
+	kind: 'ClassConstructor';
 	parameters: string[];
 	body: Stmt[];
 }
