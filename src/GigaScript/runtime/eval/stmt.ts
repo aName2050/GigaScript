@@ -274,7 +274,6 @@ export function eval_class_declaration(
 	declaration: ClassDeclaration,
 	env: Environment
 ): RuntimeValue {
-	console.log(declaration.constructor as ClassConstructor);
 	env.declareClass(
 		declaration.name,
 		declaration.properties,

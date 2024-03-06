@@ -1,6 +1,7 @@
 // [ LEXER ]
 
 import { ClassMethod, ClassProperty, Stmt } from './ast/ast';
+import Environment from './runtime/environment';
 
 // Contains the tokens that are parser understands
 export enum TokenType {

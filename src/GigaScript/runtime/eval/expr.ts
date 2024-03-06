@@ -2,6 +2,7 @@ import {
 	AssignmentExpr,
 	BinaryExpr,
 	CallExpr,
+	ClassConstructor,
 	ClassInit,
 	Identifier,
 	MemberExpr,
@@ -276,7 +277,10 @@ export function eval_class_init_expr(
 	node: ClassInit,
 	env: Environment
 ): RuntimeValue {
-	const classOBJ = env.getClassAsObject(node.name);
+	env.construct(node.name, node.args);
 
-	return classOBJ;
+	// TODO: fix this very broken code
+	// I have no idea what I'm doing....
+
+	return UNDEFINED();
 }

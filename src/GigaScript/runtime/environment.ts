@@ -130,7 +130,7 @@ export default class Environment {
 
 		// add class properties to class object
 		properties.forEach(prop => {
-			// only public props are supported for now
+			// private props can only be accessed inside the class
 			if (prop.public) {
 				// get the prop value
 				const propVal = evaluate(
@@ -144,7 +144,7 @@ export default class Environment {
 
 		// add class methods to class object
 		methods.forEach(method => {
-			// only public methods are supported for now
+			// private methods can only be accessed inside the class
 			if (method.public) {
 				// convert to function value
 				const func = {
@@ -163,7 +163,17 @@ export default class Environment {
 	}
 
 	public construct(className: string, args: Expr[]) {
-		// TODO:
+		const classOBJ = this.classes.get(className);
+		if (!classOBJ) throw `RuntimeError: ${className} does not exist.`;
+		if (!classOBJ.constructor)
+			throw `RuntimeError: ${className} does not have a constructor.`;
+
+		const returned = evaluate(
+			classOBJ.constructor,
+			new Environment(this.cwd, this)
+		);
+
+		console.log('returned:', returned);
 	}
 
 	public addExportedValue(identifier: string, value: RuntimeValue): void {
