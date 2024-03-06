@@ -7,11 +7,11 @@ class TestClass {
     }
 
     public printPrivateProp() {
-        print(PrivateProp)
+        print("PrivateProp")
     }
 
     public logPublicProp(logMessage) {
-        print(logMessage, PublicProp)
+        print(logMessage, "PublicProp")
     }
 
 }

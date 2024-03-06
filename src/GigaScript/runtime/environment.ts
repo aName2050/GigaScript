@@ -84,7 +84,7 @@ export default class Environment {
 			console.log('ENV_CLASS_DUMP');
 			this.classes.forEach((classObj, name) => {
 				console.log(name);
-				console.log(classObj);
+				console.log(classObj.constructor);
 			});
 		},
 	};
@@ -160,6 +160,10 @@ export default class Environment {
 		});
 
 		return obj;
+	}
+
+	public construct(className: string, args: Expr[]) {
+		// TODO:
 	}
 
 	public addExportedValue(identifier: string, value: RuntimeValue): void {

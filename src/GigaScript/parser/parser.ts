@@ -133,9 +133,6 @@ export default class Parser {
 			case TokenType.Class:
 				// console.log('parsing class');
 				return this.parse_class_declaration();
-			case TokenType.Constructor:
-				// console.log('parsing constructor');
-				return this.parse_constructor_statement();
 			case TokenType.If:
 				// console.log('parsing if');
 				return this.parse_if_statement();
@@ -468,6 +465,7 @@ export default class Parser {
 			name,
 			properties: Class.properties,
 			methods: Class.methods,
+			constructor: Class.constructor,
 		} as ClassDeclaration;
 	}
 
