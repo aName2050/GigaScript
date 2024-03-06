@@ -267,6 +267,11 @@ export function eval_member_expr(
 			evaluate(node.value, env)
 		);
 
+		if (VAR.type == 'object') {
+			// TODO: update member eval to allow: obj.complex.x (and longer expressions)
+			// return eval_member_expr(env,);
+		}
+
 		return VAR;
 	} else {
 		throw 'EvalError: A member expression cannot be evaluated with a member or assignment expression.';
