@@ -9,11 +9,11 @@
  *
  * @readonly
  */
-export enum Tokens {
+export enum TokenID {
 	// [Literal Types]
-	/** 0 - 9 */
+	/** Any number between 0 and 9 */
 	_Number,
-	/** abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 ~!@#$%^&*()_+`-=[]\{}|;':",./<>? */
+	/** Any combination of characters and numbers (certain characters need to be escaped) */
 	_String,
 
 	/** True value */
@@ -77,8 +77,14 @@ export enum Tokens {
 	/** Throw exception statement */
 	Throw,
 
-	/** Binary Operator (+ - * / %) */
+	/** Binary Operation (+ - * / %) */
 	BinOp,
+
+	/** Bitwise Operation ( >> << & | ~ ^ ) */
+	BitOp,
+
+	/** End Of File (EOF) */
+	__EOF__,
 
 	// { SYMBOLS }
 	// Punctation
@@ -90,20 +96,92 @@ export enum Tokens {
 	Dot,
 	/** Comma ( , ) */
 	Comma,
+	/** Exclamation ( ! ) */
+	Exclamation,
+	/** Ampersand ( & ) */
+	Ampersand,
+	/** Bar */
+	Bar,
+
+	// Binary Operators
+	/** Plus ( + ) */
+	Plus,
+	/** Minus ( - ) */
+	Minus,
+	/** Asterisk ( * )*/
+	Asterisk,
+	/** Slash ( / ) */
+	Slash,
+	/** Percent */
+	Percent,
 
 	// Assignment Operators
 	/** Equals ( = ) */
 	Equals,
 	/** Plus Equals ( += ) */
 	PlusEquals,
-	/** Plus Equals ( -= ) */
+	/** Minus Equals ( -= ) */
 	MinusEquals,
-	/** Plus Equals ( *= ) */
-	AsterikEquals,
-	/** Plus Equals ( /= ) */
-	// PlusEquals,
-	/** Plus Equals ( %= ) */
-	// PlusEquals,
+	/** Asterisk Equals ( *= ) */
+	AsteriskEquals,
+	/** Slash Equals ( /= ) */
+	SlashEquals,
+	/** Percent Equals ( %= ) */
+	PercentEquals,
 
-	//
+	// Increment/Decrement Operators
+	/** Increment ( ++ ) */
+	PlusPlus,
+	/** Decrement ( -- ) */
+	MinusMinus,
+
+	// Comparison Operators
+	/** Greater Than ( > ) */
+	GreaterThan,
+	/** Less Than ( < ) */
+	LessThan,
+	/** Greater Than or Equal to ( >= ) */
+	GreaterThanEquals,
+	/** Less Than or Equal to ( <= ) */
+	LessThanEquals,
+	/** Equal to ( == ) */
+	EqualsEquals,
+	/** Not Equal to ( != ) */
+	ExclamationEquals,
+	/** And ( && ) */
+	AmpersandAmpersand,
+	/** Or ( || ) */
+	BarBar,
+
+	// Bitwise Operators
+	// TODO:
+
+	// { GROUPING }
+	/** Open Parenthesis ( ( )*/
+	OpenParen,
+	/** Closed Parenthesis ( ) ) */
+	CloseParen,
+	/** Open Brace ( { ) */
+	OpenBrace,
+	/** Close Brace ( } ) */
+	CloseBrace,
+	/** Open Bracket ( [ ) */
+	OpenBracket,
+	/** CloseBracket ( ] ) */
+	CloseBracket,
+	/** Double Quote ( " ) */
+	DoubleQuote,
+	/** Single Quote ( ' ) */
+}
+
+export enum TokenType {}
+
+/** Represents a single token */
+export interface Token {
+	/** Token ID */
+	id: TokenID;
+	/** Token structure */
+	type: TokenType;
+	/** Raw value as seen in the source file */
+	value: string;
 }
