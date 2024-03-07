@@ -41,6 +41,7 @@ function run(filename: string) {
 	if (filename.endsWith('.g')) {
 		// handle standard GigaScript files
 		const program = parser.generateAST(file);
+		console.log(program);
 		const res = evaluate(program, env);
 
 		return res;

@@ -259,6 +259,8 @@ export function eval_member_expr(
 	if (expr) {
 		// find and return value of property accessed through member expression
 		const VAR = env.lookupOrModifyObj(expr);
+		// TODO: update member eval to allow: obj.complex.x (and longer expressions)
+
 		return VAR;
 	} else if (node) {
 		// handle assignments into member objects, including adding new properties through -> obj.newProp = newValue
@@ -266,11 +268,6 @@ export function eval_member_expr(
 			node.assigne as MemberExpr,
 			evaluate(node.value, env)
 		);
-
-		if (VAR.type == 'object') {
-			// TODO: update member eval to allow: obj.complex.x (and longer expressions)
-			// return eval_member_expr(env,);
-		}
 
 		return VAR;
 	} else {
@@ -282,10 +279,11 @@ export function eval_class_init_expr(
 	node: ClassInit,
 	env: Environment
 ): RuntimeValue {
-	env.construct(node.name, node.args);
+	const classOBJ = env.getClassAsObject(node.name);
+	// env.construct(node.name, node.args);
 
 	// TODO: fix this very broken code
 	// I have no idea what I'm doing....
 
-	return UNDEFINED();
+	return classOBJ;
 }

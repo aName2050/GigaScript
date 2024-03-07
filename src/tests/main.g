@@ -1,4 +1,13 @@
+class Person {
+  private name;
 
 
-const testObj = { complex: { x: 2 } };
-print(testObj.complex.x)
+
+  public greet() {
+    print("Hey there, I'm " + "this.name" + "!")
+  }
+}
+
+const john = new Person("John Doe");
+
+john.greet()

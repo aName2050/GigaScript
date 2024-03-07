@@ -568,6 +568,10 @@ export default class Parser {
 				}
 			} else if (this.at().type == TokenType.Constructor) {
 				constructor = this.parse_constructor_statement();
+			} else {
+				throw `ParseError: Expected "public", "private", or "constructor" keywords. Instead got "${
+					this.at().value
+				}"`;
 			}
 		}
 
