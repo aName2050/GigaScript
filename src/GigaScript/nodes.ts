@@ -1,27 +1,14 @@
-/**
- * tokens.ts
- *
- * All available tokens in GigaScript
- */
-
-import { TokenType } from './nodes';
-
-/**
- * GigaScript tokens
- *
- * @readonly
- */
-export enum TokenID {
+export enum TokenType {
 	// [Literal Types]
 	/** Any number between 0 and 9 */
-	_Number,
+	Number,
 	/** Any combination of characters and numbers (certain characters need to be escaped) */
-	_String,
+	String,
 
 	/** True value */
-	_True,
+	True,
 	/** False value */
-	_False,
+	False,
 
 	/** User defined symbol */
 	Identifier,
@@ -105,6 +92,18 @@ export enum TokenID {
 	/** Bar */
 	Bar,
 
+	// Binary Operators
+	/** Plus ( + ) */
+	Plus,
+	/** Minus ( - ) */
+	Minus,
+	/** Multiply ( * )*/
+	Multiply,
+	/** Diivde ( / ) */
+	Divide,
+	/** Modulo */
+	Modulo,
+
 	// Assignment Operators
 	/** Equals ( = ) */
 	Equals,
@@ -112,18 +111,18 @@ export enum TokenID {
 	PlusEquals,
 	/** Minus Equals ( -= ) */
 	MinusEquals,
-	/** Asterisk Equals ( *= ) */
-	AsteriskEquals,
-	/** Slash Equals ( /= ) */
-	SlashEquals,
-	/** Percent Equals ( %= ) */
-	PercentEquals,
+	/** Multiply Equals ( *= ) */
+	MultiplyEquals,
+	/** Divide Equals ( /= ) */
+	DivideEquals,
+	/** Modulo Equals ( %= ) */
+	ModuloEquals,
 
 	// Increment/Decrement Operators
 	/** Increment ( ++ ) */
-	PlusPlus,
+	Increment,
 	/** Decrement ( -- ) */
-	MinusMinus,
+	Decrement,
 
 	// Comparison Operators
 	/** Greater Than ( > ) */
@@ -131,17 +130,17 @@ export enum TokenID {
 	/** Less Than ( < ) */
 	LessThan,
 	/** Greater Than or Equal to ( >= ) */
-	GreaterThanEquals,
+	GreaterThanOrEquals,
 	/** Less Than or Equal to ( <= ) */
-	LessThanEquals,
+	LessThanOrEquals,
 	/** Equal to ( == ) */
-	EqualsEquals,
+	IsEqual,
 	/** Not Equal to ( != ) */
-	ExclamationEquals,
+	NotEqual,
 	/** And ( && ) */
-	AmpersandAmpersand,
+	And,
 	/** Or ( || ) */
-	BarBar,
+	Or,
 
 	// Bitwise Operators
 	// TODO:
@@ -163,14 +162,4 @@ export enum TokenID {
 	DoubleQuote,
 	/** Single Quote ( ' ) */
 	SingleQuote,
-}
-
-/** Represents a single token */
-export interface Token {
-	/** Token ID */
-	id: TokenID;
-	/** Token structure */
-	type: TokenType;
-	/** Raw value as seen in the source file */
-	value: string;
 }
