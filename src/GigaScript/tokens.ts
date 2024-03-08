@@ -4,6 +4,7 @@
  * All available tokens in GigaScript
  */
 
+import { OpPrec } from './lexer/types';
 import { TokenType } from './nodes';
 
 /**
@@ -78,6 +79,11 @@ export enum TokenID {
 	// { SPECIAL }
 	/** Throw exception statement */
 	Throw,
+
+	/** Try statement */
+	Try,
+	/** Catch statement */
+	Catch,
 
 	/** Binary Operation (+ - * / %) */
 	BinOp,
@@ -173,4 +179,10 @@ export interface Token {
 	type: TokenType;
 	/** Raw value as seen in the source file */
 	value: string;
+	/** GigaScript Token Data */
+	__GSC: {
+		OPC: OpPrec;
+		_START: number;
+		_END: number;
+	};
 }

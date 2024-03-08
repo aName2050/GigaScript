@@ -66,6 +66,11 @@ export enum TokenType {
 	/** Throw exception statement */
 	Throw,
 
+	/** Try statement */
+	Try,
+	/** Catch statement */
+	Catch,
+
 	/** Binary Operation (+ - * / %) */
 	BinOp,
 
