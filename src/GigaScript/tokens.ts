@@ -172,6 +172,7 @@ export enum TokenID {
 	/** Double Quote ( " ) */
 	DoubleQuote,
 	/** Single Quote ( ' ) */
+	SingleQuote,
 }
 
 export enum TokenType {}
