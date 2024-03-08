@@ -1,3 +1,14 @@
+/**
+ * nodes.ts
+ *
+ * Token structures associated with the specific token IDs
+ */
+
+/**
+ * GigaScript Token Types
+ *
+ * @readonly
+ */
 export enum TokenType {
 	// [Literal Types]
 	/** Any number between 0 and 9 */
