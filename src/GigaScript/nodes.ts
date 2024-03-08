@@ -4,6 +4,8 @@
  * Token structures associated with the specific token IDs
  */
 
+import { Token, TokenID } from './tokens';
+
 /**
  * GigaScript Token Types
  *
@@ -15,11 +17,6 @@ export enum TokenType {
 	Number,
 	/** Any combination of characters and numbers (certain characters need to be escaped) */
 	String,
-
-	/** True value */
-	True,
-	/** False value */
-	False,
 
 	/** User defined symbol */
 	Identifier,
@@ -124,15 +121,15 @@ export enum TokenType {
 	/** Equals ( = ) */
 	Equals,
 	/** Plus Equals ( += ) */
-	PlusEquals,
+	AsgAdd,
 	/** Minus Equals ( -= ) */
-	MinusEquals,
+	AsgMin,
 	/** Multiply Equals ( *= ) */
-	MultiplyEquals,
+	AsgMult,
 	/** Divide Equals ( /= ) */
-	DivideEquals,
+	AsgDiv,
 	/** Modulo Equals ( %= ) */
-	ModuloEquals,
+	AsgMod,
 
 	// Increment/Decrement Operators
 	/** Increment ( ++ ) */
@@ -179,3 +176,15 @@ export enum TokenType {
 	/** Single Quote ( ' ) */
 	SingleQuote,
 }
+
+export const Keywords: Record<string, Token> = {
+	'let': { id: TokenID.Let, type: TokenType.Let, value: 'let' } as Token,
+};
+
+export const Tokens: Record<string, Token> = {
+	'(': {
+		id: TokenID.OpenParen,
+		type: TokenType.OpenParen,
+		value: '(',
+	} as Token,
+};

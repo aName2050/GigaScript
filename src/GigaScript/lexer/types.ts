@@ -4,19 +4,17 @@ export enum OpPrec {
 	None,
 	/** Assignment operation (2) */
 	Assignment,
-	/** Conditional expression (3) */
-	Conditional,
-	/** Logical OR comparison (4) */
+	/** Logical OR comparison (3) */
 	LOGIC_OR,
-	/** Logical AND operation (5) */
+	/** Logical AND operation (4) */
 	LOGIC_AND,
-	/** Bitwise OR operation (6) */
+	/** Bitwise OR operation (5) */
 	BITWISE_OR,
-	/** Bitwise XOR (Exclusive OR) operation (7) */
+	/** Bitwise XOR (Exclusive OR) operation (6) */
 	BITWISE_XOR,
-	/** Bitwise AND operation (8) */
+	/** Bitwise AND operation (7) */
 	BITWISE_AND,
-	/** Equality expression ( == and != ) (9) */
+	/** Equality expression ( == and != ) (8) */
 	Equality,
 	/** [BINOP] Additive expression ( + and - ) (9) */
 	Additive,
