@@ -31,7 +31,7 @@ export enum TokenID {
 	_Null,
 
 	/** User defined symbol */
-	Identifier,
+	_Identifier,
 
 	// [Keywords]
 	// { VARIABLES }
@@ -187,9 +187,11 @@ export interface Token {
 	value: string;
 	/** GigaScript Token Data */
 	__GSC: {
-		OPC: OpPrec;
-		_START: number;
-		_END: number;
+		_OPC: OpPrec;
+		_POS: {
+			Line: number;
+			Column: number;
+		};
 	};
 }
 
@@ -205,12 +207,16 @@ function setTokenData(
 		id,
 		type,
 		value,
-		__GSC: { OPC, _START: 0, _END: 0 },
+		__GSC: { _OPC: OPC, _POS: { Line: 0, Column: 0 } },
 	} as Token;
 
 	Tokens[value] = token;
 
 	return token;
+}
+
+export function getTokenByValue(value: string): Token {
+	return Tokens[value];
 }
 
 // [keywords]
@@ -299,5 +305,21 @@ setTokenData(
 setTokenData(TokenID.Exclamation, NodeType.Not, '!', OpPrec.None);
 setTokenData(TokenID.AmpersandAmpersand, NodeType.And, '&&', OpPrec.LOGIC_AND);
 setTokenData(TokenID.BarBar, NodeType.Or, '||', OpPrec.LOGIC_OR);
+
+// [grouping]
+setTokenData(TokenID.OpenParen, NodeType.OpenParen, '(', OpPrec.None);
+setTokenData(TokenID.CloseParen, NodeType.CloseParen, ')', OpPrec.None);
+
+setTokenData(TokenID.OpenBrace, NodeType.OpenBrace, '{', OpPrec.None);
+setTokenData(TokenID.CloseBrace, NodeType.CloseBrace, '}', OpPrec.None);
+
+setTokenData(TokenID.OpenBracket, NodeType.OpenBracket, '[', OpPrec.None);
+setTokenData(TokenID.CloseBracket, NodeType.CloseBracket, ']', OpPrec.None);
+
+setTokenData(TokenID.DoubleQuote, NodeType.DoubleQuote, '"', OpPrec.None);
+setTokenData(TokenID.SingleQuote, NodeType.SingleQuote, "'", OpPrec.None);
+
+// [special]
+setTokenData(TokenID.__EOF__, NodeType.__EOF__, '<EOF>', OpPrec.None);
 
 export { Tokens };
