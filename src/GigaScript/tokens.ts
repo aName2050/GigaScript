@@ -5,7 +5,7 @@
  */
 
 import { OpPrec } from './lexer/types';
-import { TokenType } from './nodes';
+import { NodeType } from './nodes';
 
 /**
  * GigaScript tokens
@@ -182,7 +182,7 @@ export interface Token {
 	/** Token ID */
 	id: TokenID;
 	/** Token structure */
-	type: TokenType;
+	type: NodeType;
 	/** Raw value as seen in the source file */
 	value: string;
 	/** GigaScript Token Data */
@@ -197,7 +197,7 @@ let Tokens: Record<string, Token> = {};
 
 function setTokenData(
 	id: TokenID,
-	type: TokenType,
+	type: NodeType,
 	value: string,
 	OPC: OpPrec
 ): Token {
@@ -214,79 +214,90 @@ function setTokenData(
 }
 
 // [keywords]
-setTokenData(TokenID._True, TokenType.Identifier, 'true', OpPrec.None);
-setTokenData(TokenID._False, TokenType.Identifier, 'false', OpPrec.None);
+setTokenData(TokenID._True, NodeType.Identifier, 'true', OpPrec.None);
+setTokenData(TokenID._False, NodeType.Identifier, 'false', OpPrec.None);
 
-setTokenData(TokenID.Let, TokenType.Let, 'let', OpPrec.None);
-setTokenData(TokenID.Const, TokenType.Const, 'const', OpPrec.None);
-setTokenData(TokenID.Func, TokenType.Func, 'func', OpPrec.None);
-setTokenData(TokenID.Return, TokenType.Return, 'return', OpPrec.None);
-setTokenData(TokenID.Class, TokenType.Class, 'class', OpPrec.None);
-setTokenData(TokenID.Private, TokenType.Private, 'private', OpPrec.None);
-setTokenData(TokenID.Public, TokenType.Public, 'public', OpPrec.None);
-setTokenData(TokenID.New, TokenType.New, 'new', OpPrec.None);
+setTokenData(TokenID.Let, NodeType.Let, 'let', OpPrec.None);
+setTokenData(TokenID.Const, NodeType.Const, 'const', OpPrec.None);
+setTokenData(TokenID.Func, NodeType.Func, 'func', OpPrec.None);
+setTokenData(TokenID.Return, NodeType.Return, 'return', OpPrec.None);
+setTokenData(TokenID.Class, NodeType.Class, 'class', OpPrec.None);
+setTokenData(TokenID.Private, NodeType.Private, 'private', OpPrec.None);
+setTokenData(TokenID.Public, NodeType.Public, 'public', OpPrec.None);
+setTokenData(TokenID.New, NodeType.New, 'new', OpPrec.None);
 setTokenData(
 	TokenID.Constructor,
-	TokenType.Constructor,
+	NodeType.Constructor,
 	'constructor',
 	OpPrec.None
 );
-setTokenData(TokenID.If, TokenType.If, 'if', OpPrec.None);
-setTokenData(TokenID.Else, TokenType.Else, 'else', OpPrec.None);
-setTokenData(TokenID.While, TokenType.While, 'while', OpPrec.None);
-setTokenData(TokenID.For, TokenType.For, 'for', OpPrec.None);
-setTokenData(TokenID.Continue, TokenType.Continue, 'continue', OpPrec.None);
-setTokenData(TokenID.Break, TokenType.Break, 'break', OpPrec.None);
-setTokenData(TokenID.Import, TokenType.Import, 'import', OpPrec.None);
-setTokenData(TokenID.Export, TokenType.Export, 'export', OpPrec.None);
-setTokenData(TokenID.From, TokenType.From, 'from', OpPrec.None);
-setTokenData(TokenID.Throw, TokenType.Throw, 'throw', OpPrec.None);
-setTokenData(TokenID.Try, TokenType.Try, 'try', OpPrec.None);
-setTokenData(TokenID.Catch, TokenType.Catch, 'catch', OpPrec.None);
+setTokenData(TokenID.If, NodeType.If, 'if', OpPrec.None);
+setTokenData(TokenID.Else, NodeType.Else, 'else', OpPrec.None);
+setTokenData(TokenID.While, NodeType.While, 'while', OpPrec.None);
+setTokenData(TokenID.For, NodeType.For, 'for', OpPrec.None);
+setTokenData(TokenID.Continue, NodeType.Continue, 'continue', OpPrec.None);
+setTokenData(TokenID.Break, NodeType.Break, 'break', OpPrec.None);
+setTokenData(TokenID.Import, NodeType.Import, 'import', OpPrec.None);
+setTokenData(TokenID.Export, NodeType.Export, 'export', OpPrec.None);
+setTokenData(TokenID.From, NodeType.From, 'from', OpPrec.None);
+setTokenData(TokenID.Throw, NodeType.Throw, 'throw', OpPrec.None);
+setTokenData(TokenID.Try, NodeType.Try, 'try', OpPrec.None);
+setTokenData(TokenID.Catch, NodeType.Catch, 'catch', OpPrec.None);
 
 // [symbols]
 // binary operation
-setTokenData(TokenID.BinOp, TokenType.Plus, '+', OpPrec.Additive);
-setTokenData(TokenID.BinOp, TokenType.Minus, '-', OpPrec.Additive);
-setTokenData(TokenID.BinOp, TokenType.Multiply, '*', OpPrec.Multiplicative);
-setTokenData(TokenID.BinOp, TokenType.Divide, '/', OpPrec.Multiplicative);
-setTokenData(TokenID.BinOp, TokenType.Modulo, 'let', OpPrec.Multiplicative);
+setTokenData(TokenID.BinOp, NodeType.Plus, '+', OpPrec.Additive);
+setTokenData(TokenID.BinOp, NodeType.Minus, '-', OpPrec.Additive);
+setTokenData(TokenID.BinOp, NodeType.Multiply, '*', OpPrec.Multiplicative);
+setTokenData(TokenID.BinOp, NodeType.Divide, '/', OpPrec.Multiplicative);
+setTokenData(TokenID.BinOp, NodeType.Modulo, 'let', OpPrec.Multiplicative);
 // bitwise operations
 // TODO: implement bitwise operations
 // punctation
-setTokenData(TokenID.Semicolon, TokenType.Semicolon, ';', OpPrec.None);
-setTokenData(TokenID.Colon, TokenType.Colon, ':', OpPrec.None);
-setTokenData(TokenID.Dot, TokenType.Dot, '.', OpPrec.None);
-setTokenData(TokenID.Comma, TokenType.Comma, ',', OpPrec.None);
-setTokenData(TokenID.Exclamation, TokenType.Exclamation, '!', OpPrec.None);
-setTokenData(TokenID.Ampersand, TokenType.Ampersand, '&', OpPrec.None);
-setTokenData(TokenID.Bar, TokenType.Bar, '|', OpPrec.None);
+setTokenData(TokenID.Semicolon, NodeType.Semicolon, ';', OpPrec.None);
+setTokenData(TokenID.Colon, NodeType.Colon, ':', OpPrec.None);
+setTokenData(TokenID.Dot, NodeType.Dot, '.', OpPrec.None);
+setTokenData(TokenID.Comma, NodeType.Comma, ',', OpPrec.None);
+setTokenData(TokenID.Ampersand, NodeType.Ampersand, '&', OpPrec.None);
+setTokenData(TokenID.Bar, NodeType.Bar, '|', OpPrec.None);
 
 // [assignments]
-setTokenData(TokenID.Equals, TokenType.Equals, '=', OpPrec.Assignment);
-setTokenData(TokenID.PlusEquals, TokenType.AsgAdd, '+=', OpPrec.Assignment);
-setTokenData(TokenID.MinusEquals, TokenType.AsgMin, '-=', OpPrec.Assignment);
-setTokenData(
-	TokenID.AsteriskEquals,
-	TokenType.AsgMult,
-	'*=',
-	OpPrec.Assignment
-);
-setTokenData(TokenID.SlashEquals, TokenType.AsgDiv, '/=', OpPrec.Assignment);
-setTokenData(TokenID.PercentEquals, TokenType.AsgMod, '%=', OpPrec.Assignment);
+setTokenData(TokenID.Equals, NodeType.Equals, '=', OpPrec.Assignment);
+setTokenData(TokenID.PlusEquals, NodeType.AsgAdd, '+=', OpPrec.Assignment);
+setTokenData(TokenID.MinusEquals, NodeType.AsgMin, '-=', OpPrec.Assignment);
+setTokenData(TokenID.AsteriskEquals, NodeType.AsgMult, '*=', OpPrec.Assignment);
+setTokenData(TokenID.SlashEquals, NodeType.AsgDiv, '/=', OpPrec.Assignment);
+setTokenData(TokenID.PercentEquals, NodeType.AsgMod, '%=', OpPrec.Assignment);
 
 // [unary]
-setTokenData(TokenID.PlusPlus, TokenType.Increment, '++', OpPrec.Unary);
-setTokenData(TokenID.MinusMinus, TokenType.Decrement, '--', OpPrec.None);
+setTokenData(TokenID.PlusPlus, NodeType.Increment, '++', OpPrec.Unary);
+setTokenData(TokenID.MinusMinus, NodeType.Decrement, '--', OpPrec.None);
 
 // [comparisons]
-setTokenData(TokenID.GreaterThan, TokenType.GreaterThan, '>', OpPrec.None);
-setTokenData(TokenID.LessThan, TokenType.LessThan, '<', OpPrec.None);
-// setTokenData(
-// 	TokenID.GreaterThanEquals,
-// 	TokenType.GreaterThanOrEquals,
-// 	'<=',
-// 	OpPrec.None
-// );
+setTokenData(TokenID.GreaterThan, NodeType.GreaterThan, '>', OpPrec.None);
+setTokenData(TokenID.LessThan, NodeType.LessThan, '<', OpPrec.None);
+setTokenData(
+	TokenID.GreaterThanEquals,
+	NodeType.GreaterThanOrEquals,
+	'>=',
+	OpPrec.None
+);
+setTokenData(
+	TokenID.LessThanEquals,
+	NodeType.LessThanOrEquals,
+	'<=',
+	OpPrec.None
+);
+setTokenData(TokenID.EqualsEquals, NodeType.IsEqual, '==', OpPrec.Equality);
+setTokenData(
+	TokenID.ExclamationEquals,
+	NodeType.NotEqual,
+	'!=',
+	OpPrec.Equality
+);
+// [logical expressions]
+setTokenData(TokenID.Exclamation, NodeType.Not, '!', OpPrec.None);
+setTokenData(TokenID.AmpersandAmpersand, NodeType.And, '&&', OpPrec.LOGIC_AND);
+setTokenData(TokenID.BarBar, NodeType.Or, '||', OpPrec.LOGIC_OR);
 
 export { Tokens };

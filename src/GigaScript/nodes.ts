@@ -7,11 +7,11 @@
 import { Token, TokenID } from './tokens';
 
 /**
- * GigaScript Token Types
+ * GigaScript Node Types
  *
  * @readonly
  */
-export enum TokenType {
+export enum NodeType {
 	// [Literal Types]
 	/** Any number between 0 and 9 */
 	Number,
@@ -98,8 +98,6 @@ export enum TokenType {
 	Dot,
 	/** Comma ( , ) */
 	Comma,
-	/** Exclamation ( ! ) */
-	Exclamation,
 	/** Ampersand ( & ) */
 	Ampersand,
 	/** Bar */
@@ -150,6 +148,10 @@ export enum TokenType {
 	IsEqual,
 	/** Not Equal to ( != ) */
 	NotEqual,
+
+	// Logical Expressions
+	/** Exclamation ( ! ) */
+	Not,
 	/** And ( && ) */
 	And,
 	/** Or ( || ) */
@@ -176,15 +178,3 @@ export enum TokenType {
 	/** Single Quote ( ' ) */
 	SingleQuote,
 }
-
-export const Keywords: Record<string, Token> = {
-	'let': { id: TokenID.Let, type: TokenType.Let, value: 'let' } as Token,
-};
-
-export const Tokens: Record<string, Token> = {
-	'(': {
-		id: TokenID.OpenParen,
-		type: TokenType.OpenParen,
-		value: '(',
-	} as Token,
-};
