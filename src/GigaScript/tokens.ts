@@ -110,12 +110,6 @@ export enum TokenID {
 	Dot,
 	/** Comma ( , ) */
 	Comma,
-	/** Exclamation ( ! ) */
-	Exclamation,
-	/** Ampersand ( & ) */
-	Ampersand,
-	/** Bar */
-	Bar,
 
 	// Assignment Operators
 	/** Equals ( = ) */
@@ -150,13 +144,30 @@ export enum TokenID {
 	EqualsEquals,
 	/** Not Equal to ( != ) */
 	ExclamationEquals,
-	/** And ( && ) */
+
+	// Logical Operators
+	/** Logical And ( && ) */
 	AmpersandAmpersand,
-	/** Or ( || ) */
+	/** Logical Or ( || ) */
 	BarBar,
+	/** Logical Not ( ! ) */
+	Exclamation,
 
 	// Bitwise Operators
-	// TODO:
+	/** Bitwise AND ( & ) */
+	Ampersand,
+	/** Bitwise OR ( | ) */
+	Bar,
+	/** Bitwise XOR ( ^ ) */
+	Caret,
+	/** Bitwise NOT ( ~ ) */
+	Tilda,
+	/** Bitwise LEFT SHIFT ( << ) */
+	LessThanLessThan,
+	/** Bitwise SIGNED RIGHT SHIFT ( >> ) */
+	GreaterThanGreaterThan,
+	/** Bitwise ZERO-FILL RIGHT SHIFT ( >>> ) */
+	GreaterThanGreaterThanGreaterThan,
 
 	// { GROUPING }
 	/** Open Parenthesis ( ( )*/
@@ -189,8 +200,8 @@ export interface Token {
 	__GSC: {
 		_OPC: OpPrec;
 		_POS: {
-			Line: number;
-			Column: number;
+			Line: number | null;
+			Column: number | null;
 		};
 	};
 }
@@ -207,7 +218,7 @@ function setTokenData(
 		id,
 		type,
 		value,
-		__GSC: { _OPC: OPC, _POS: { Line: 0, Column: 0 } },
+		__GSC: { _OPC: OPC, _POS: { Line: null, Column: null } },
 	} as Token;
 
 	Tokens[value] = token;
@@ -215,7 +226,7 @@ function setTokenData(
 	return token;
 }
 
-export function getTokenByValue(value: string): Token {
+export function getTokenByValue(value: string): Token | undefined {
 	return Tokens[value];
 }
 
@@ -256,16 +267,36 @@ setTokenData(TokenID.BinOp, NodeType.Plus, '+', OpPrec.Additive);
 setTokenData(TokenID.BinOp, NodeType.Minus, '-', OpPrec.Additive);
 setTokenData(TokenID.BinOp, NodeType.Multiply, '*', OpPrec.Multiplicative);
 setTokenData(TokenID.BinOp, NodeType.Divide, '/', OpPrec.Multiplicative);
-setTokenData(TokenID.BinOp, NodeType.Modulo, 'let', OpPrec.Multiplicative);
+setTokenData(TokenID.BinOp, NodeType.Modulo, '%', OpPrec.Multiplicative);
 // bitwise operations
-// TODO: implement bitwise operations
+setTokenData(TokenID.Ampersand, NodeType.Bitwise_AND, '&', OpPrec.BITWISE_AND);
+setTokenData(TokenID.Bar, NodeType.Bitwise_OR, '|', OpPrec.BITWISE_OR);
+setTokenData(TokenID.Caret, NodeType.Bitwise_XOR, '^', OpPrec.BITWISE_XOR);
+setTokenData(TokenID.Tilda, NodeType.Bitwise_NOT, '~', OpPrec.None);
+setTokenData(
+	TokenID.LessThanLessThan,
+	NodeType.Bitwise_LShift,
+	'<<',
+	OpPrec.BITWISE_SHIFT
+);
+setTokenData(
+	TokenID.GreaterThanGreaterThan,
+	NodeType.Bitwise_SRShift,
+	'>>',
+	OpPrec.BITWISE_SHIFT
+);
+setTokenData(
+	TokenID.GreaterThanGreaterThanGreaterThan,
+	NodeType.Bitwise_ZFRShift,
+	'>>>',
+	OpPrec.BITWISE_SHIFT
+);
+
 // punctation
 setTokenData(TokenID.Semicolon, NodeType.Semicolon, ';', OpPrec.None);
 setTokenData(TokenID.Colon, NodeType.Colon, ':', OpPrec.None);
 setTokenData(TokenID.Dot, NodeType.Dot, '.', OpPrec.None);
 setTokenData(TokenID.Comma, NodeType.Comma, ',', OpPrec.None);
-setTokenData(TokenID.Ampersand, NodeType.Ampersand, '&', OpPrec.None);
-setTokenData(TokenID.Bar, NodeType.Bar, '|', OpPrec.None);
 
 // [assignments]
 setTokenData(TokenID.Equals, NodeType.Equals, '=', OpPrec.Assignment);

@@ -18,13 +18,14 @@ export function tokenize(source: string): Token[] {
 	const tokens: Array<Token> = new Array<Token>();
 	const src = source.split('');
 
-	let line = 0;
-	let col = 0;
+	let line = 1;
+	let col = 1;
 
 	// Loop until <EOF>
 	while (src.length > 0) {
 		const curr = src[0];
 		const token: Token | undefined = getTokenByValue(curr);
+		const tokenPos = { line, Col: col };
 
 		if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
 			let num = src.shift()!; // set first digit or negative sign
@@ -47,11 +48,45 @@ export function tokenize(source: string): Token[] {
 					TokenID._Number,
 					NodeType.Number,
 					num,
-					line,
-					col,
+					tokenPos.line,
+					tokenPos.Col,
 					OpPrec.None
 				)
 			);
+		} else if (typeof token == 'object') {
+			switch (token.value) {
+				case '=':
+					src.shift();
+					col++;
+					const multiCharToken = src[0] === '=' ? '==' : '=';
+					src[0] == '=' && src.shift() && col++;
+					tokens.push({
+						...Tokens[multiCharToken],
+						__GSC: {
+							_OPC: Tokens[multiCharToken].__GSC._OPC,
+							_POS: {
+								Line: tokenPos.line,
+								Column: tokenPos.Col,
+							},
+						},
+					});
+					break;
+
+				default:
+					// matches single character tokens
+					tokens.push(
+						createToken(
+							token.id,
+							token.type,
+							token.value,
+							tokenPos.line,
+							tokenPos.Col,
+							token.__GSC._OPC
+						)
+					);
+					src.shift() && col++;
+					break;
+			}
 		} else {
 			switch (curr) {
 				default:
@@ -69,13 +104,51 @@ export function tokenize(source: string): Token[] {
 
 						// check for reserved keywords
 						const RESERVED = Tokens[ident];
-						if (typeof RESERVED == 'number') {
-							// tokens.push(createToken(RESERVED[], NodeType.Identifier, ident))
+						if (typeof RESERVED == 'object') {
+							tokens.push(
+								createToken(
+									RESERVED.id,
+									RESERVED.type,
+									RESERVED.value,
+									tokenPos.line,
+									tokenPos.Col,
+									RESERVED.__GSC._OPC
+								)
+							);
+						} else {
+							// user defined symbol
+							tokens.push(
+								createToken(
+									TokenID._Identifier,
+									NodeType.Identifier,
+									ident,
+									tokenPos.line,
+									tokenPos.Col,
+									OpPrec.None
+								)
+							);
 						}
+					} else if (isEOL(curr)) {
+						// end of current line
+						line++;
+						src.shift();
+						col = 1;
+						tokenPos.Col = 1;
+					} else if (isWhitespace(curr)) {
+						src.shift() && col++;
+					} else {
+						console.error(
+							`LexerError: Unknown character: UNICODE-${curr.charCodeAt(
+								0
+							)} ${curr}`
+						);
+						process.exit(1);
 					}
 			}
 		}
 	}
+
+	// console.log(tokens);
 
 	return tokens;
 }

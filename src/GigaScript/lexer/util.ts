@@ -59,7 +59,8 @@ export function isInt(str: string): boolean {
  * @returns Whether the string is a whitespace character
  */
 export function isWhitespace(str: string): boolean {
-	return str == 's' || str == '\t' || str == '\r';
+	// prettier-ignore
+	return str == ' ' || str == '\t' || str == '\r';
 }
 
 /**

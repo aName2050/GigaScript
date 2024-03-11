@@ -98,10 +98,6 @@ export enum NodeType {
 	Dot,
 	/** Comma ( , ) */
 	Comma,
-	/** Ampersand ( & ) */
-	Ampersand,
-	/** Bar */
-	Bar,
 
 	// Binary Operators
 	/** Plus ( + ) */
@@ -158,7 +154,20 @@ export enum NodeType {
 	Or,
 
 	// Bitwise Operators
-	// TODO:
+	/** Bitwise AND ( & ) */
+	Bitwise_AND,
+	/** Bitwise OR ( | ) */
+	Bitwise_OR,
+	/** Bitwise XOR ( ^ ) */
+	Bitwise_XOR,
+	/** Bitwise NOT ( ~ ) */
+	Bitwise_NOT,
+	/** Bitwise LEFT SHIFT ( << ) */
+	Bitwise_LShift,
+	/** Bitwise SIGNED RIGHT SHIFT ( >> ) */
+	Bitwise_SRShift,
+	/** Bitwise ZERO-FILL RIGHT SHIFT ( >>> ) */
+	Bitwise_ZFRShift,
 
 	// { GROUPING }
 	/** Open Parenthesis ( ( )*/

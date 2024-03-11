@@ -16,6 +16,8 @@ export enum OpPrec {
 	BITWISE_AND,
 	/** Equality expression ( == and != ) (8) */
 	Equality,
+	/** Bitwise Shift Operation ( << and >> and >>> ) */
+	BITWISE_SHIFT,
 	/** [BINOP] Additive expression ( + and - ) (9) */
 	Additive,
 	/** [BINOP] Multiplicative expression ( / and * and % ) (10) */
