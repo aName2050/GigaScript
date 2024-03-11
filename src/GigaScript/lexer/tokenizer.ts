@@ -59,8 +59,8 @@ export function tokenize(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						const multiCharToken = curr === '=' ? '==' : '=';
-						src[0] == '=' && src.shift() && col++;
+						const multiCharToken = src[0] === '=' ? '==' : '=';
+						src[0] === '=' ? src.shift() && col++ : null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -80,9 +80,9 @@ export function tokenize(source: string): Token[] {
 						col++;
 						const multiCharToken =
 							src[0] === '=' ? '+=' : src[0] === '+' ? '++' : '+';
-						(src[0] == '=' || src[0] == '+') &&
-							src.shift() &&
-							col++;
+						src[0] == '=' || src[0] == '+'
+							? src.shift() && col++
+							: null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -102,9 +102,9 @@ export function tokenize(source: string): Token[] {
 						col++;
 						const multiCharToken =
 							src[0] === '=' ? '-=' : src[0] === '-' ? '--' : '-';
-						(src[0] == '=' || src[0] == '-') &&
-							src.shift() &&
-							col++;
+						src[0] == '=' || src[0] == '-'
+							? src.shift() && col++
+							: null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -123,7 +123,7 @@ export function tokenize(source: string): Token[] {
 						src.shift();
 						col++;
 						const multiCharToken = src[0] === '=' ? '*=' : '*';
-						src[0] == '=' && src.shift() && col++;
+						src[0] == '=' ? src.shift() && col++ : null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -142,7 +142,7 @@ export function tokenize(source: string): Token[] {
 						src.shift();
 						col++;
 						const multiCharToken = src[0] === '=' ? '/=' : '/';
-						src[0] == '=' && src.shift() && col++;
+						src[0] == '=' ? src.shift() && col++ : null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -161,7 +161,7 @@ export function tokenize(source: string): Token[] {
 						src.shift();
 						col++;
 						const multiCharToken = src[0] === '=' ? '%=' : '%';
-						src[0] == '=' && src.shift() && col++;
+						src[0] == '=' ? src.shift() && col++ : null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -187,12 +187,17 @@ export function tokenize(source: string): Token[] {
 								: src[1] === '>'
 								? '>>>'
 								: '>';
-
-						(src[0] == '=' ||
-							src[0] == '>' ||
-							(src[1] == '>' && src.shift() && col++)) &&
-							src.shift() &&
+						if (src[0] == '>' || src[0] == '=') {
+							src.shift();
 							col++;
+						} else if (src[0] == '>' && src[1] == '>') {
+							src.shift();
+							col++;
+							src.shift();
+							col++;
+						}
+
+						console.log(multiCharToken);
 
 						tokens.push({
 							...Tokens[multiCharToken],
@@ -212,10 +217,17 @@ export function tokenize(source: string): Token[] {
 						src.shift();
 						col++;
 						const multiCharToken =
-							src[0] === '=' ? '<=' : src[0] === '<' ? '<<' : '<';
-						(src[0] == '=' || src[0] == '<') &&
-							src.shift() &&
-							col++;
+							src[0] === '='
+								? '<='
+								: src[0] === '<'
+								? '<<'
+								: src[0] === '<' && src[1] === '='
+								? '<<='
+								: '<';
+						// src[0] == '=' || src[0] == '<'
+						// 	? src.shift() && col++
+						// 	: null;
+						console.log('at <: ', multiCharToken);
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -234,7 +246,7 @@ export function tokenize(source: string): Token[] {
 						src.shift();
 						col++;
 						const multiCharToken = src[0] === '=' ? '!=' : '!';
-						src[0] == '=' && src.shift() && col++;
+						src[0] == '=' ? src.shift() && col++ : null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -254,9 +266,9 @@ export function tokenize(source: string): Token[] {
 						col++;
 						const multiCharToken =
 							src[0] === '&' ? '&&' : src[0] === '=' ? '&=' : '&';
-						(src[0] == '&' || src[0] == '=') &&
-							src.shift() &&
-							col++;
+						src[0] == '&' || src[0] == '='
+							? src.shift() && col++
+							: null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -276,9 +288,9 @@ export function tokenize(source: string): Token[] {
 						col++;
 						const multiCharToken =
 							src[0] === '|' ? '||' : src[0] === '=' ? '|=' : '|';
-						(src[0] == '|' || src[0] == '=') &&
-							src.shift() &&
-							col++;
+						src[0] == '|' || src[0] == '='
+							? src.shift() && col++
+							: null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -297,7 +309,7 @@ export function tokenize(source: string): Token[] {
 						src.shift();
 						col++;
 						const multiCharToken = src[0] === '=' ? '^=' : '^';
-						src[0] == '^' && src.shift() && col++;
+						src[0] == '=' ? src.shift() && col++ : null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -316,7 +328,7 @@ export function tokenize(source: string): Token[] {
 						src.shift();
 						col++;
 						const multiCharToken = src[0] === '=' ? '~=' : '~';
-						src[0] == '~' && src.shift() && col++;
+						src[0] == '~' ? src.shift() && col++ : null;
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
