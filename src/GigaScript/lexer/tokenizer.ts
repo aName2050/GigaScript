@@ -56,20 +56,278 @@ export function tokenize(source: string): Token[] {
 		} else if (typeof token == 'object') {
 			switch (token.value) {
 				case '=':
-					src.shift();
-					col++;
-					const multiCharToken = src[0] === '=' ? '==' : '=';
-					src[0] == '=' && src.shift() && col++;
-					tokens.push({
-						...Tokens[multiCharToken],
-						__GSC: {
-							_OPC: Tokens[multiCharToken].__GSC._OPC,
-							_POS: {
-								Line: tokenPos.line,
-								Column: tokenPos.Col,
+					{
+						src.shift();
+						col++;
+						const multiCharToken = curr === '=' ? '==' : '=';
+						src[0] == '=' && src.shift() && col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
 							},
-						},
-					});
+						});
+					}
+					break;
+
+				case '+':
+					{
+						src.shift();
+						col++;
+						const multiCharToken =
+							src[0] === '=' ? '+=' : src[0] === '+' ? '++' : '+';
+						(src[0] == '=' || src[0] == '+') &&
+							src.shift() &&
+							col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '-':
+					{
+						src.shift();
+						col++;
+						const multiCharToken =
+							src[0] === '=' ? '-=' : src[0] === '-' ? '--' : '-';
+						(src[0] == '=' || src[0] == '-') &&
+							src.shift() &&
+							col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '*':
+					{
+						src.shift();
+						col++;
+						const multiCharToken = src[0] === '=' ? '*=' : '*';
+						src[0] == '=' && src.shift() && col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '/':
+					{
+						src.shift();
+						col++;
+						const multiCharToken = src[0] === '=' ? '/=' : '/';
+						src[0] == '=' && src.shift() && col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '%':
+					{
+						src.shift();
+						col++;
+						const multiCharToken = src[0] === '=' ? '%=' : '%';
+						src[0] == '=' && src.shift() && col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '>':
+					{
+						src.shift();
+						col++;
+						const multiCharToken =
+							src[0] === '='
+								? '>='
+								: src[0] === '>'
+								? '>>'
+								: src[1] === '>'
+								? '>>>'
+								: '>';
+
+						(src[0] == '=' ||
+							src[0] == '>' ||
+							(src[1] == '>' && src.shift() && col++)) &&
+							src.shift() &&
+							col++;
+
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '<':
+					{
+						src.shift();
+						col++;
+						const multiCharToken =
+							src[0] === '=' ? '<=' : src[0] === '<' ? '<<' : '<';
+						(src[0] == '=' || src[0] == '<') &&
+							src.shift() &&
+							col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '!':
+					{
+						src.shift();
+						col++;
+						const multiCharToken = src[0] === '=' ? '!=' : '!';
+						src[0] == '=' && src.shift() && col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '&':
+					{
+						src.shift();
+						col++;
+						const multiCharToken =
+							src[0] === '&' ? '&&' : src[0] === '=' ? '&=' : '&';
+						(src[0] == '&' || src[0] == '=') &&
+							src.shift() &&
+							col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '|':
+					{
+						src.shift();
+						col++;
+						const multiCharToken =
+							src[0] === '|' ? '||' : src[0] === '=' ? '|=' : '|';
+						(src[0] == '|' || src[0] == '=') &&
+							src.shift() &&
+							col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '^':
+					{
+						src.shift();
+						col++;
+						const multiCharToken = src[0] === '=' ? '^=' : '^';
+						src[0] == '^' && src.shift() && col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
+					break;
+
+				case '~':
+					{
+						src.shift();
+						col++;
+						const multiCharToken = src[0] === '=' ? '~=' : '~';
+						src[0] == '~' && src.shift() && col++;
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									Line: tokenPos.line,
+									Column: tokenPos.Col,
+								},
+							},
+						});
+					}
 					break;
 
 				default:

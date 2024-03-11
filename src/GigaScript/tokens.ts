@@ -125,6 +125,21 @@ export enum TokenID {
 	/** Percent Equals ( %= ) */
 	PercentEquals,
 
+	/** Less Than Less Than Equals ( <<= ) */
+	LessThanLessThanEquals,
+	/** Greater Than Greater Than Equals ( >>= ) */
+	GreaterThanGreaterThanEquals,
+	/** Greater Than Greater Than Greater Than Equals ( >>>= ) */
+	GreaterThanGreaterThanGreaterThanEquals,
+	/** Ampersand Equals ( &= ) */
+	AmpersandEquals,
+	/** Bar Equals ( |= ) */
+	BarEquals,
+	/** Caret Equals ( ^= ) */
+	CaretEquals,
+	/** Tilda Equals ( ~= ) */
+	TildaEquals,
+
 	// Increment/Decrement Operators
 	/** Increment ( ++ ) */
 	PlusPlus,
@@ -305,6 +320,49 @@ setTokenData(TokenID.MinusEquals, NodeType.AsgMin, '-=', OpPrec.Assignment);
 setTokenData(TokenID.AsteriskEquals, NodeType.AsgMult, '*=', OpPrec.Assignment);
 setTokenData(TokenID.SlashEquals, NodeType.AsgDiv, '/=', OpPrec.Assignment);
 setTokenData(TokenID.PercentEquals, NodeType.AsgMod, '%=', OpPrec.Assignment);
+
+setTokenData(
+	TokenID.AmpersandEquals,
+	NodeType.Bitwise_AsgAND,
+	'&=',
+	OpPrec.Assignment
+);
+setTokenData(
+	TokenID.BarEquals,
+	NodeType.Bitwise_AsgOR,
+	'|=',
+	OpPrec.Assignment
+);
+setTokenData(
+	TokenID.CaretEquals,
+	NodeType.Bitwise_AsgXOR,
+	'^=',
+	OpPrec.Assignment
+);
+setTokenData(
+	TokenID.TildaEquals,
+	NodeType.Bitwise_AsgNOT,
+	'~=',
+	OpPrec.Assignment
+);
+setTokenData(
+	TokenID.LessThanLessThanEquals,
+	NodeType.Bitwise_AsgLShift,
+	'<<=',
+	OpPrec.Assignment
+);
+setTokenData(
+	TokenID.GreaterThanGreaterThanEquals,
+	NodeType.Bitwise_AsgSRShift,
+	'>>=',
+	OpPrec.Assignment
+);
+setTokenData(
+	TokenID.GreaterThanGreaterThanGreaterThanEquals,
+	NodeType.Bitwise_AsgZFRShift,
+	'>>>=',
+	OpPrec.Assignment
+);
 
 // [unary]
 setTokenData(TokenID.PlusPlus, NodeType.Increment, '++', OpPrec.Unary);

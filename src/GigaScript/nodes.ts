@@ -108,7 +108,7 @@ export enum NodeType {
 	Multiply,
 	/** Diivde ( / ) */
 	Divide,
-	/** Modulo */
+	/** Modulo ( % ) */
 	Modulo,
 
 	// Assignment Operators
@@ -124,6 +124,21 @@ export enum NodeType {
 	AsgDiv,
 	/** Modulo Equals ( %= ) */
 	AsgMod,
+
+	/** Bitwise LShift Equals ( <<= ) */
+	Bitwise_AsgLShift,
+	/** Bitwise Signed RShift Equals Equals ( >>= ) */
+	Bitwise_AsgSRShift,
+	/** Bitwise Zero-Fill RShift Equals ( >>>= ) */
+	Bitwise_AsgZFRShift,
+	/** Bitwise AND Equals ( &= ) */
+	Bitwise_AsgAND,
+	/** Bitwise OR Equals ( |= ) */
+	Bitwise_AsgOR,
+	/** Bitwise XOR Equals ( ^= ) */
+	Bitwise_AsgXOR,
+	/** Bitwise NOT Equals ( ~= ) */
+	Bitwise_AsgNOT,
 
 	// Increment/Decrement Operators
 	/** Increment ( ++ ) */

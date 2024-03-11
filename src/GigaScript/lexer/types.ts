@@ -16,22 +16,29 @@ export enum OpPrec {
 	BITWISE_AND,
 	/** Equality expression ( == and != ) (8) */
 	Equality,
-	/** Bitwise Shift Operation ( << and >> and >>> ) */
+	/** Bitwise Shift Operation ( << and >> and >>> ) (9) */
 	BITWISE_SHIFT,
-	/** [BINOP] Additive expression ( + and - ) (9) */
+	/** [BINOP] Additive expression ( + and - ) (10) */
 	Additive,
-	/** [BINOP] Multiplicative expression ( / and * and % ) (10) */
+	/** [BINOP] Multiplicative expression ( / and * and % ) (11) */
 	Multiplicative,
 	/**
-	 * Unary expression ( oeprations with only one operand ) (11)
+	 * Unary expression ( oeprations with only one operand ) (12)
 	 *
-	 *  1. *=
-	 *  2. /=
-	 *  3. %=
-	 *  4. +=
-	 *  5. -=
-	 *  6. ++
-	 *  7. --
+	 *  1. &=
+	 *  2. |=
+	 *  3. ^=
+	 *  4. ~=
+	 *  5. <<=
+	 *  6. >>=
+	 *  7. >>>=
+	 *  8. *=
+	 *  9. /=
+	 *  10. %=
+	 *  11. +=
+	 *  12. -=
+	 *  13. ++
+	 *  14. --
 	 * */
 	Unary,
 }
