@@ -2,7 +2,7 @@
 export enum OpPrec {
 	/** No operater precedence (1) */
 	None,
-	/** Assignment operation (2) */
+	/** Assignment operation [ = ] (2) */
 	Assignment,
 	/** Logical OR comparison (3) */
 	LOGIC_OR,
@@ -25,20 +25,8 @@ export enum OpPrec {
 	/**
 	 * Unary expression ( oeprations with only one operand ) (12)
 	 *
-	 *  1. &=
-	 *  2. |=
-	 *  3. ^=
-	 *  4. ~=
-	 *  5. <<=
-	 *  6. >>=
-	 *  7. >>>=
-	 *  8. *=
-	 *  9. /=
-	 *  10. %=
-	 *  11. +=
-	 *  12. -=
-	 *  13. ++
-	 *  14. --
+	 *  1. ++
+	 *  2. --
 	 * */
 	Unary,
 }

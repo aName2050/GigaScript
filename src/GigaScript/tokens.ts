@@ -391,7 +391,7 @@ setTokenData(
 	OpPrec.Equality
 );
 // [logical expressions]
-setTokenData(TokenID.Exclamation, NodeType.Not, '!', OpPrec.None);
+setTokenData(TokenID.Exclamation, NodeType.Not, '!', OpPrec.Unary);
 setTokenData(TokenID.AmpersandAmpersand, NodeType.And, '&&', OpPrec.LOGIC_AND);
 setTokenData(TokenID.BarBar, NodeType.Or, '||', OpPrec.LOGIC_OR);
 

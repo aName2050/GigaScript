@@ -5,11 +5,15 @@ export type ASTNodeType =
 	| 'FuncDeclaration'
 	// Expressions
 	| 'AssignmentExpr'
+	| 'UnaryExpr'
+	| 'BinaryExpr'
 	// Literals
 	| 'StringLiteral'
-	| 'NumericLiteral'
-	| 'Identifier'
-	| 'BinaryExpr';
+	| 'NumberLiteral'
+	| 'ObjectProperty'
+	| 'ObjectLiteral'
+	| 'ArrayLiteral'
+	| 'Identifier';
 
 /**
  * Statements don't return a value at runtime.
