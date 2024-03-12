@@ -201,18 +201,14 @@ export function tokenize(source: string): Token[] {
 							| '>>>'
 							| '>>>=';
 
-						if (src[0] === '=') multiCharToken = '>=';
-						else if (src[0] === '>') multiCharToken = '>>';
-						else if (src[0] === '>' && src[1] === '=')
-							multiCharToken = '>>=';
+						if (src[0] === '>' && src[1] === '>' && src[2] === '=')
+							multiCharToken = '>>>=';
 						else if (src[0] === '>' && src[1] === '>')
 							multiCharToken = '>>>';
-						else if (
-							src[0] === '>' &&
-							src[1] === '>' &&
-							src[2] === '='
-						)
-							multiCharToken = '>>>=';
+						else if (src[0] === '>' && src[1] === '=')
+							multiCharToken = '>>=';
+						else if (src[0] === '>') multiCharToken = '>>';
+						else if (src[0] === '=') multiCharToken = '>=';
 						else multiCharToken = '>';
 
 						if (multiCharToken.length == 2) {
@@ -232,11 +228,6 @@ export function tokenize(source: string): Token[] {
 							col++;
 						}
 
-						console.log('tokens');
-						console.log(src);
-						console.log('source');
-						console.log(source);
-
 						tokens.push({
 							...Tokens[multiCharToken],
 							__GSC: {
@@ -254,14 +245,14 @@ export function tokenize(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						const multiCharToken =
-							src[0] === '='
-								? '<='
-								: src[0] === '<'
-								? '<<'
-								: src[0] === '<' && src[1] === '='
-								? '<<='
-								: '<';
+						let multiCharToken: '<=' | '<' | '<<' | '<<=';
+
+						if (src[0] === '<' && src[1] === '=')
+							multiCharToken = '<<=';
+						else if (src[0] === '<') multiCharToken = '<<';
+						else if (src[0] === '=') multiCharToken = '<=';
+						else multiCharToken = '<';
+
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
 							col++;

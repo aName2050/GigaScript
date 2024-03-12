@@ -36,12 +36,10 @@ function runFile(filename: string, location: string) {
 
 	if (filename.endsWith('.g')) {
 		// Run GigaScript code
-		const tokens = tokenize(file);
-		// tokens.forEach(token => {
-		// 	console.log(token);
-		// });
+		throw 'Not implemented';
 	} else if (filename.endsWith('.gsx')) {
 		// Run GigaScript-X code
+		throw 'Not implemented';
 	} else {
 		throw `${file
 			.split('.')
