@@ -37,9 +37,9 @@ function runFile(filename: string, location: string) {
 	if (filename.endsWith('.g')) {
 		// Run GigaScript code
 		const tokens = tokenize(file);
-		tokens.forEach(token => {
-			console.log(token);
-		});
+		// tokens.forEach(token => {
+		// 	console.log(token);
+		// });
 	} else if (filename.endsWith('.gsx')) {
 		// Run GigaScript-X code
 	} else {
