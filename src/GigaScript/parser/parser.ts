@@ -79,7 +79,32 @@ export default class Parser {
 	}
 
 	private parseStatement(): STATEMENT {
-		// TODO: implement parsing
-		return { kind: 'Program', body: [] } as Program; // *temp line to silence errors*
+		switch (this.current().type) {
+			case NodeType.Let:
+			case NodeType.Const:
+				return this.parseVarDeclaration();
+
+			default:
+				return this.parseExpr();
+		}
+	}
+
+	private parseVarDeclaration(): STATEMENT {
+		const issConstant = this.eat().type == NodeType.Const;
+		const symbol = this.expect(
+			NodeType.Identifier,
+			'Expected identifier following variable declaration statement.'
+		).value;
+
+		if (this.current().type == NodeType.Semicolon) {
+			this.eat(); // go past semicolon
+			if (issConstant) {
+				throw 'ParseError: Constant variables must be declared with a value.';
+			}
+
+			return {
+				kind: 'VarDeclaration',
+			} as VarDeclaration;
+		}
 	}
 }
