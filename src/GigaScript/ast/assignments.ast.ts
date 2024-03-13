@@ -1,4 +1,3 @@
-import { Expr } from '../../../old/GigaScript/ast/ast';
 import { EXPRESSION } from './ast';
 
 /**
@@ -6,8 +5,8 @@ import { EXPRESSION } from './ast';
  */
 export interface AssignmentExpr extends EXPRESSION {
 	kind: 'AssignmentExpr';
-	assigne: Expr;
-	value: Expr;
+	assigne: EXPRESSION;
+	value: EXPRESSION;
 	AsgOp: '&=' | '|=' | '^=' | '~=' | '<<=' | '>>=' | '>>>=';
 }
 
@@ -16,7 +15,7 @@ export interface AssignmentExpr extends EXPRESSION {
  */
 export interface UnaryExpr extends EXPRESSION {
 	kind: 'UnaryExpr';
-	assigne: Expr;
-	value: Expr;
+	assigne: EXPRESSION;
+	value: EXPRESSION;
 	AsgOp: '++' | '--';
 }

@@ -1,4 +1,4 @@
-import { ASTNodeType, STATEMENT, EXPRESSION } from './ast';
+import { STATEMENT, EXPRESSION } from './ast';
 
 /** Var declaration */
 export interface VarDeclaration extends STATEMENT {
