@@ -9,5 +9,18 @@ export interface BinaryExpr extends EXPRESSION {
 	kind: 'BinaryExpr';
 	lhs: EXPRESSION;
 	rhs: EXPRESSION;
-	op: '+' | '-' | '*' | '/' | '%' | '&&' | '||';
+	op:
+		| '+'
+		| '-'
+		| '*'
+		| '/'
+		| '%'
+		| '&&'
+		| '||'
+		| '!='
+		| '=='
+		| '<'
+		| '>'
+		| '>='
+		| '<=';
 }

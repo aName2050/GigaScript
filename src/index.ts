@@ -5,7 +5,8 @@ import repl from 'repl';
 import path from 'path';
 import { tokenize } from './GigaScript/lexer/tokenizer';
 
-// import parser
+import Parser from './GigaScript/parser/parser';
+import { Program } from './GigaScript/ast/ast';
 // import interpretor
 // import env
 
@@ -29,14 +30,15 @@ if (file && fileLocation) {
 }
 
 function runFile(filename: string, location: string) {
-	// create new parser instance
+	const parser = new Parser();
 	// create new global scope
 
 	let file = fs.readFileSync(filename, { encoding: 'utf-8' });
 
 	if (filename.endsWith('.g')) {
 		// Run GigaScript code
-		throw 'Not implemented';
+		const program: Program = parser.generateAST(file);
+		console.log(program);
 	} else if (filename.endsWith('.gsx')) {
 		// Run GigaScript-X code
 		throw 'Not implemented';

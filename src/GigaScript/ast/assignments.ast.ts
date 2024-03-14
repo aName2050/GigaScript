@@ -16,6 +16,5 @@ export interface AssignmentExpr extends EXPRESSION {
 export interface UnaryExpr extends EXPRESSION {
 	kind: 'UnaryExpr';
 	assigne: EXPRESSION;
-	value: EXPRESSION;
 	AsgOp: '++' | '--';
 }

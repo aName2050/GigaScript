@@ -64,7 +64,7 @@ export default class Parser {
 		return p;
 	}
 
-	private generateAST(source: string): Program {
+	public generateAST(source: string): Program {
 		this.tokens = tokenize(source);
 		const program: Program = {
 			kind: 'Program',
@@ -170,54 +170,161 @@ export default class Parser {
 
 	private parseLogAND(): EXPRESSION {
 		const lhs = this.parseBitwiseOR();
+		if (this.current().type == NodeType.And) {
+			const rhs = this.parseBitwiseOR();
+			return {
+				kind: 'BinaryExpr',
+				rhs,
+				lhs,
+				op: '&&',
+			} as BinaryExpr;
+		}
 
 		return lhs;
 	}
 
 	private parseBitwiseOR(): EXPRESSION {
 		const lhs = this.parseBitwiseXOR();
+		if (this.current().type == NodeType.And) {
+			const rhs = this.parseBitwiseOR();
+			return {
+				kind: 'BitwiseExpr',
+				rhs,
+				lhs,
+				op: '|',
+			} as BitwiseExpr;
+		}
 
 		return lhs;
 	}
 
 	private parseBitwiseXOR(): EXPRESSION {
 		const lhs = this.parseBitwiseAND();
+		if (this.current().type == NodeType.And) {
+			const rhs = this.parseBitwiseOR();
+			return {
+				kind: 'BitwiseExpr',
+				rhs,
+				lhs,
+				op: '^',
+			} as BitwiseExpr;
+		}
 
 		return lhs;
 	}
 
 	private parseBitwiseAND(): EXPRESSION {
 		const lhs = this.parseEqualityExpr();
+		if (this.current().type == NodeType.And) {
+			const rhs = this.parseBitwiseOR();
+			return {
+				kind: 'BitwiseExpr',
+				rhs,
+				lhs,
+				op: '&',
+			} as BitwiseExpr;
+		}
 
 		return lhs;
 	}
 
 	private parseEqualityExpr(): EXPRESSION {
-		const lhs = this.parseBitwiseShift();
+		let lhs = this.parseBitwiseShift();
+
+		while (['!=', '=='].includes(this.current().value)) {
+			const op = this.eat().value;
+			const rhs = this.parseEqualityExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
 
 		return lhs;
 	}
 
 	private parseBitwiseShift(): EXPRESSION {
-		const lhs = this.parseAdditiveExpr();
+		let lhs = this.parseMultiplicativeExpr();
 
-		return lhs;
-	}
-
-	private parseAdditiveExpr(): EXPRESSION {
-		const lhs = this.parseMultiplicativeExpr();
+		while (['>>', '>>>', '<<'].includes(this.current().value)) {
+			const op = this.eat().value;
+			const rhs = this.parseMultiplicativeExpr();
+			lhs = {
+				kind: 'BitwiseExpr',
+				lhs,
+				rhs,
+				op,
+			} as BitwiseExpr;
+		}
 
 		return lhs;
 	}
 
 	private parseMultiplicativeExpr(): EXPRESSION {
-		const lhs = this.parseUnaryExpr();
+		let lhs = this.parseAdditiveExpr();
+
+		while (['*', '/', '%'].includes(this.current().value)) {
+			const op = this.eat().value;
+			const rhs = this.parseAdditiveExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseAdditiveExpr(): EXPRESSION {
+		let lhs = this.parseUnaryExpr();
+
+		while (['+', '-'].includes(this.current().value)) {
+			const op = this.eat().value;
+			const rhs = this.parseUnaryExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
 
 		return lhs;
 	}
 
 	private parseUnaryExpr(): EXPRESSION {
-		const lhs = this.parsePrimary();
+		let lhs = this.parseComparisonExpr();
+
+		while (['++', '--'].includes(this.current().value)) {
+			const op = this.eat().value;
+			const rhs = this.parseComparisonExpr();
+			lhs = {
+				kind: 'UnaryExpr',
+				AsgOp: op,
+				assigne: lhs,
+			} as UnaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseComparisonExpr(): EXPRESSION {
+		let lhs = this.parsePrimary();
+
+		while (['<', '>', '<=', '>='].includes(this.current().value)) {
+			const op = this.eat().value;
+			const rhs = this.parsePrimary();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
 
 		return lhs;
 	}

@@ -463,6 +463,17 @@ export function tokenize(source: string): Token[] {
 		}
 	}
 
+	tokens.push(
+		createToken(
+			TokenID.__EOF__,
+			NodeType.__EOF__,
+			'<EOF>',
+			line,
+			col,
+			OpPrec.None
+		)
+	);
+
 	// console.log(tokens);
 
 	return tokens;

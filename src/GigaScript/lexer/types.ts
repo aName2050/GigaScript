@@ -18,10 +18,10 @@ export enum OpPrec {
 	Equality,
 	/** Bitwise Shift Operation ( << and >> and >>> ) (9) */
 	BITWISE_SHIFT,
-	/** [BINOP] Additive expression ( + and - ) (10) */
-	Additive,
-	/** [BINOP] Multiplicative expression ( / and * and % ) (11) */
+	/** [BINOP] Multiplicative expression ( / and * and % ) (10) */
 	Multiplicative,
+	/** [BINOP] Additive expression ( + and - ) (11) */
+	Additive,
 	/**
 	 * Unary expression ( oeprations with only one operand ) (12)
 	 *
