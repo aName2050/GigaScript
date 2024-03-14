@@ -11,6 +11,7 @@ import {
 	StringLiteral,
 	Property,
 } from '../ast/literals.ast';
+import { BitwiseExpr } from '../ast/bitwise.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { Token, TokenID } from '../tokens';
 import { NodeType } from '../nodes';
@@ -78,6 +79,8 @@ export default class Parser {
 		return program;
 	}
 
+	// [STATEMENT PARSING]
+
 	private parseStatement(): STATEMENT {
 		switch (this.current().type) {
 			case NodeType.Let:
@@ -91,7 +94,7 @@ export default class Parser {
 
 	private parseVarDeclaration(): STATEMENT {
 		const issConstant = this.eat().type == NodeType.Const;
-		const symbol = this.expect(
+		const identifier = this.expect(
 			NodeType.Identifier,
 			'Expected identifier following variable declaration statement.'
 		).value;
@@ -104,7 +107,159 @@ export default class Parser {
 
 			return {
 				kind: 'VarDeclaration',
+				constant: false,
+				identifier,
 			} as VarDeclaration;
+		}
+
+		this.expect(
+			NodeType.Equals,
+			'Expected "=" following variable identifier.'
+		);
+
+		const declaration = {
+			kind: 'VarDeclaration',
+			value: this.parseExpr(),
+			identifier,
+			constant: issConstant,
+		} as VarDeclaration;
+
+		this.expect(
+			NodeType.Semicolon,
+			'Expected ";" following variable declaration statement.'
+		);
+
+		return declaration;
+	}
+
+	// [EXPRESSION PARSING]
+
+	private parseExpr(): EXPRESSION {
+		return this.parseAsgExpr();
+	}
+
+	private parseAsgExpr(): EXPRESSION {
+		const lhs = this.parseLogOR();
+		if (this.current().type == NodeType.Equals) {
+			this.eat(); // advance past equals token
+			const rhs = this.parseAsgExpr();
+			return {
+				kind: 'AssignmentExpr',
+				value: rhs,
+				assigne: lhs,
+			} as AssignmentExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseLogOR(): EXPRESSION {
+		const lhs = this.parseLogAND();
+		if (this.current().type == NodeType.Or) {
+			const rhs = this.parseLogAND();
+			return {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op: '||',
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseLogAND(): EXPRESSION {
+		const lhs = this.parseBitwiseOR();
+
+		return lhs;
+	}
+
+	private parseBitwiseOR(): EXPRESSION {
+		const lhs = this.parseBitwiseXOR();
+
+		return lhs;
+	}
+
+	private parseBitwiseXOR(): EXPRESSION {
+		const lhs = this.parseBitwiseAND();
+
+		return lhs;
+	}
+
+	private parseBitwiseAND(): EXPRESSION {
+		const lhs = this.parseEqualityExpr();
+
+		return lhs;
+	}
+
+	private parseEqualityExpr(): EXPRESSION {
+		const lhs = this.parseBitwiseShift();
+
+		return lhs;
+	}
+
+	private parseBitwiseShift(): EXPRESSION {
+		const lhs = this.parseAdditiveExpr();
+
+		return lhs;
+	}
+
+	private parseAdditiveExpr(): EXPRESSION {
+		const lhs = this.parseMultiplicativeExpr();
+
+		return lhs;
+	}
+
+	private parseMultiplicativeExpr(): EXPRESSION {
+		const lhs = this.parseUnaryExpr();
+
+		return lhs;
+	}
+
+	private parseUnaryExpr(): EXPRESSION {
+		const lhs = this.parsePrimary();
+
+		return lhs;
+	}
+
+	private parsePrimary(): EXPRESSION {
+		const tk = this.current().type;
+
+		switch (tk) {
+			case NodeType.Identifier:
+				return {
+					kind: 'Identifier',
+					symbol: this.eat().value,
+				} as Identifier;
+
+			case NodeType.Number:
+				return {
+					kind: 'NumberLiteral',
+					value: parseFloat(this.eat().value),
+				} as NumberLiteral;
+
+			case NodeType.String:
+				return {
+					kind: 'StringLiteral',
+					value: this.eat().value,
+				} as StringLiteral;
+
+			case NodeType.OpenParen:
+				this.eat();
+				const value = this.parseExpr();
+				this.expect(
+					NodeType.CloseParen,
+					`Expected ")" and instead saw ${value}`
+				);
+
+				return value;
+
+			default:
+				console.error(
+					`Uncaught ParseError: Unexpected token:`,
+					this.current().value
+				);
+				process.exit(1);
 		}
 	}
 }

@@ -7,6 +7,7 @@ export type ASTNodeType =
 	| 'AssignmentExpr'
 	| 'UnaryExpr'
 	| 'BinaryExpr'
+	| 'BitwiseExpr'
 	// Literals
 	| 'StringLiteral'
 	| 'NumberLiteral'

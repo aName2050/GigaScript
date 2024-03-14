@@ -5,9 +5,9 @@ import { EXPRESSION } from './ast';
  *
  * Each side can consist of more expressions
  */
-export interface BinaryExpr extends EXPRESSION {
-	kind: 'BinaryExpr';
+export interface BitwiseExpr extends EXPRESSION {
+	kind: 'BitwiseExpr';
 	lhs: EXPRESSION;
 	rhs: EXPRESSION;
-	op: '+' | '-' | '*' | '/' | '%' | '&&' | '||';
+	op: '&' | '|' | '^' | '~' | '<<' | '>>' | '>>>';
 }
