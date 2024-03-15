@@ -8,6 +8,7 @@ import { TokenID, Token, Tokens, getTokenByValue } from '../tokens';
 import { NodeType } from '../nodes';
 import { createToken, isAlpha, isEOL, isInt, isWhitespace } from './util';
 import { OpPrec } from './types';
+import { GSError } from '../util/gserror';
 
 /**
  *
@@ -387,6 +388,55 @@ export function tokenize(source: string): Token[] {
 					}
 					break;
 
+				/**
+				 * ~ IMPORTANT ~
+				 *
+				 * Strings currently have a bug, where they are unable to
+				 * detect an unterminated string literal.
+				 * This will result in everything AFTER the quotes
+				 * to be considered part of the string, which may result in
+				 * unexpected behavior.
+				 */
+				case "'":
+				case '"':
+					{
+						let str = '';
+						src.shift(); // move past opening doubleQuotes/singleQuotes
+
+						while (
+							src.length > 0 &&
+							src[0] !== '"' &&
+							src[0] !== "'"
+						) {
+							if (token.type == NodeType.__EOF__ || isEOL(curr)) {
+								console.error(
+									new GSError(
+										`LexerError`,
+										`Unterminated string literal`,
+										`${process.argv[2] || 'GSREPL'}:${
+											tokenPos.line
+										}:${tokenPos.Col}`
+									)
+								);
+								process.exit(1);
+							}
+							str += src.shift();
+						}
+
+						src.shift(); // move past closing doubleQuotes/singleQuotes
+
+						tokens.push(
+							createToken(
+								TokenID._String,
+								NodeType.String,
+								str,
+								tokenPos.line,
+								tokenPos.Col
+							)
+						);
+					}
+					break;
+
 				default:
 					// matches single character tokens
 					tokens.push(
@@ -453,9 +503,15 @@ export function tokenize(source: string): Token[] {
 						src.shift() && col++;
 					} else {
 						console.error(
-							`LexerError: Unknown character: UNICODE-${curr.charCodeAt(
-								0
-							)} ${curr}`
+							new GSError(
+								`LexerError`,
+								` Unknown character: UNICODE-${curr.charCodeAt(
+									0
+								)} ${curr}`,
+								`${process.argv[2] || 'GSREPL'}:${
+									tokenPos.line
+								}:${tokenPos.Col}`
+							)
 						);
 						process.exit(1);
 					}

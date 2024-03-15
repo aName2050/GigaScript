@@ -15,6 +15,7 @@ import { BitwiseExpr } from '../ast/bitwise.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { Token, TokenID } from '../tokens';
 import { NodeType } from '../nodes';
+import { GSError } from '../util/gserror';
 
 /**
  * Parse token list into an AST
@@ -54,9 +55,14 @@ export default class Parser {
 	private expect(type: NodeType, errMsg: string): Token {
 		const p = this.tokens.shift() as Token;
 		if (!p || p.type != type) {
-			console.error(`ParseError: ${errMsg}`);
-			console.error(
-				`Expected NodeType{${type}}, instead got NodeType{${p.type}}`
+			console.log(
+				new GSError(
+					`ParseError: ${errMsg}`,
+					`Expected NodeType[${type}], instead saw NodeType[${p.type}]`,
+					`${process.argv[2] || 'GSREPL'}:${p.__GSC._POS.Line}:${
+						p.__GSC._POS.Column
+					}`
+				)
 			);
 			process.exit(1);
 		}
@@ -102,7 +108,13 @@ export default class Parser {
 		if (this.current().type == NodeType.Semicolon) {
 			this.eat(); // go past semicolon
 			if (issConstant) {
-				throw 'ParseError: Constant variables must be declared with a value.';
+				throw new GSError(
+					`ParseError`,
+					`Constant variables must be declared with a value.`,
+					`${process.argv[2] || 'GSREPL'}:${
+						this.current().__GSC._POS.Line
+					}:${this.current().__GSC._POS.Column}`
+				);
 			}
 
 			return {
@@ -362,9 +374,14 @@ export default class Parser {
 				return value;
 
 			default:
-				console.error(
-					`Uncaught ParseError: Unexpected token:`,
-					this.current().value
+				console.log(
+					new GSError(
+						`Uncaught ParseError`,
+						`Unexpected token "${this.current().value}"`,
+						`${process.argv[2] || 'GSREPL'}:${
+							this.current().__GSC._POS.Line
+						}:${this.current().__GSC._POS.Column}`
+					)
 				);
 				process.exit(1);
 		}
