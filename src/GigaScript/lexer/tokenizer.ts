@@ -388,15 +388,6 @@ export function tokenize(source: string): Token[] {
 					}
 					break;
 
-				/**
-				 * ~ IMPORTANT ~
-				 *
-				 * Strings currently have a bug, where they are unable to
-				 * detect an unterminated string literal.
-				 * This will result in everything AFTER the quotes
-				 * to be considered part of the string, which may result in
-				 * unexpected behavior.
-				 */
 				case "'":
 				case '"':
 					{
@@ -406,21 +397,23 @@ export function tokenize(source: string): Token[] {
 						while (
 							src.length > 0 &&
 							src[0] !== '"' &&
-							src[0] !== "'"
+							src[0] !== "'" &&
+							!isEOL(src[0])
 						) {
-							if (token.type == NodeType.__EOF__ || isEOL(curr)) {
-								console.error(
-									new GSError(
-										`LexerError`,
-										`Unterminated string literal`,
-										`${process.argv[2] || 'GSREPL'}:${
-											tokenPos.line
-										}:${tokenPos.Col}`
-									)
-								);
-								process.exit(1);
-							}
 							str += src.shift();
+						}
+
+						if (isEOL(src[0])) {
+							console.error(
+								new GSError(
+									`LexerError`,
+									`Unterminated string literal`,
+									`${process.argv[2] || 'GSREPL'}:${
+										tokenPos.line
+									}:${tokenPos.Col}`
+								)
+							);
+							process.exit(1);
 						}
 
 						src.shift(); // move past closing doubleQuotes/singleQuotes
