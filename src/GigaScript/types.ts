@@ -5,3 +5,7 @@
  */
 
 // TODO:
+export interface CLIArguments {
+	file: string;
+	useCUDA: boolean;
+}

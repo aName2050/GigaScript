@@ -3,14 +3,37 @@ import './GigaScript/tokens';
 import fs from 'fs';
 import repl from 'repl';
 import path from 'path';
-import { tokenize } from './GigaScript/lexer/tokenizer';
+import { ArgumentParser } from 'argparse';
+
+import { version } from '../package.json';
 
 import Parser from './GigaScript/parser/parser';
 import { Program } from './GigaScript/ast/ast';
+import { CLIArguments } from './GigaScript/types';
 // import interpretor
 // import env
 
-const file = process.argv[2];
+const argParser = new ArgumentParser({
+	description: 'GigaScript Runtime CLI',
+});
+
+argParser.add_argument('-v', '--version', {
+	action: 'version',
+	version,
+	help: 'GigaScript Runtime version',
+});
+argParser.add_argument('-f', '--file', {
+	// action: 'fileInput',
+	help: 'Specify the file you want to run',
+});
+argParser.add_argument('--useCUDA', {
+	// action: 'enableCUDA',
+	help: '-useCUDA <true | false>  Enables CUDA for tokenization. Requires NVIDIA GPU with CUDA Cores.',
+});
+
+const CLIArgs: CLIArguments = argParser.parse_args();
+const file: string | undefined = CLIArgs.file;
+const useCUDA: boolean = CLIArgs.useCUDA || false;
 
 let fileLocation: string | undefined = file ? path.parse(file).dir : undefined;
 
