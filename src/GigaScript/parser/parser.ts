@@ -16,6 +16,7 @@ import { tokenize } from '../lexer/tokenizer';
 import { Token, TokenID } from '../tokens';
 import { NodeType } from '../nodes';
 import { GSError } from '../util/gserror';
+import { sourceFile } from '../..';
 
 /**
  * Parse token list into an AST
@@ -55,11 +56,11 @@ export default class Parser {
 	private expect(type: NodeType, errMsg: string): Token {
 		const p = this.tokens.shift() as Token;
 		if (!p || p.type != type) {
-			console.log(
+			console.error(
 				new GSError(
 					`ParseError: ${errMsg}`,
 					`Expected NodeType[${type}], instead saw NodeType[${p.type}]`,
-					`${process.argv[2] || 'GSREPL'}:${p.__GSC._POS.Line}:${
+					`${sourceFile || 'GSREPL'}:${p.__GSC._POS.Line}:${
 						p.__GSC._POS.Column
 					}`
 				)
@@ -108,13 +109,16 @@ export default class Parser {
 		if (this.current().type == NodeType.Semicolon) {
 			this.eat(); // go past semicolon
 			if (issConstant) {
-				throw new GSError(
-					`ParseError`,
-					`Constant variables must be declared with a value.`,
-					`${process.argv[2] || 'GSREPL'}:${
-						this.current().__GSC._POS.Line
-					}:${this.current().__GSC._POS.Column}`
+				console.error(
+					new GSError(
+						`ParseError`,
+						`Constant variables must be declared with a value.`,
+						`${process.argv[2] || 'GSREPL'}:${
+							this.current().__GSC._POS.Line
+						}:${this.current().__GSC._POS.Column}`
+					)
 				);
+				process.exit(1);
 			}
 
 			return {
@@ -292,9 +296,26 @@ export default class Parser {
 	}
 
 	private parseAdditiveExpr(): EXPRESSION {
-		let lhs = this.parseUnaryExpr();
+		let lhs = this.parseComparisonExpr();
 
 		while (['+', '-'].includes(this.current().value)) {
+			const op = this.eat().value;
+			const rhs = this.parseComparisonExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseComparisonExpr(): EXPRESSION {
+		let lhs = this.parseUnaryExpr();
+
+		while (['<', '>', '<=', '>='].includes(this.current().value)) {
 			const op = this.eat().value;
 			const rhs = this.parseUnaryExpr();
 			lhs = {
@@ -309,33 +330,15 @@ export default class Parser {
 	}
 
 	private parseUnaryExpr(): EXPRESSION {
-		let lhs = this.parseComparisonExpr();
+		let lhs = this.parsePrimary();
 
 		while (['++', '--'].includes(this.current().value)) {
 			const op = this.eat().value;
-			const rhs = this.parseComparisonExpr();
 			lhs = {
 				kind: 'UnaryExpr',
 				AsgOp: op,
 				assigne: lhs,
 			} as UnaryExpr;
-		}
-
-		return lhs;
-	}
-
-	private parseComparisonExpr(): EXPRESSION {
-		let lhs = this.parsePrimary();
-
-		while (['<', '>', '<=', '>='].includes(this.current().value)) {
-			const op = this.eat().value;
-			const rhs = this.parsePrimary();
-			lhs = {
-				kind: 'BinaryExpr',
-				lhs,
-				rhs,
-				op,
-			} as BinaryExpr;
 		}
 
 		return lhs;
@@ -378,7 +381,7 @@ export default class Parser {
 					new GSError(
 						`Uncaught ParseError`,
 						`Unexpected token "${this.current().value}"`,
-						`${process.argv[2] || 'GSREPL'}:${
+						`${sourceFile || 'GSREPL'}:${
 							this.current().__GSC._POS.Line
 						}:${this.current().__GSC._POS.Column}`
 					)

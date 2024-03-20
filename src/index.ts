@@ -35,7 +35,13 @@ const CLIArgs: CLIArguments = argParser.parse_args();
 const file: string | undefined = CLIArgs.file;
 const useCUDA: boolean = CLIArgs.useCUDA || false;
 
-let fileLocation: string | undefined = file ? path.parse(file).dir : undefined;
+const fileLocation: string | undefined = file
+	? path.parse(file).dir
+	: undefined;
+
+const srcFileLocStr: string | undefined = file ? path.resolve(file) : undefined;
+
+export { CLIArgs, srcFileLocStr as sourceFile, useCUDA };
 
 const REPL = {
 	parser: undefined,

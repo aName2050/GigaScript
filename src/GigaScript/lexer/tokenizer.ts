@@ -9,6 +9,7 @@ import { NodeType } from '../nodes';
 import { createToken, isAlpha, isEOL, isInt, isWhitespace } from './util';
 import { OpPrec } from './types';
 import { GSError } from '../util/gserror';
+import { sourceFile } from '../../index';
 
 /**
  *
@@ -398,17 +399,18 @@ export function tokenize(source: string): Token[] {
 							src.length > 0 &&
 							src[0] !== '"' &&
 							src[0] !== "'" &&
-							!isEOL(src[0])
+							!isEOL(src[0]) &&
+							src.length == 0
 						) {
 							str += src.shift();
 						}
 
-						if (isEOL(src[0])) {
+						if (isEOL(src[0]) || src.length == 0) {
 							console.error(
 								new GSError(
 									`LexerError`,
 									`Unterminated string literal`,
-									`${process.argv[2] || 'GSREPL'}:${
+									`${sourceFile || 'GSREPL'}:${
 										tokenPos.line
 									}:${tokenPos.Col}`
 								)
@@ -501,9 +503,9 @@ export function tokenize(source: string): Token[] {
 								` Unknown character: UNICODE-${curr.charCodeAt(
 									0
 								)} ${curr}`,
-								`${process.argv[2] || 'GSREPL'}:${
-									tokenPos.line
-								}:${tokenPos.Col}`
+								`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
+									tokenPos.Col
+								}`
 							)
 						);
 						process.exit(1);
