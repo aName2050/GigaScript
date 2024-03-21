@@ -13,16 +13,17 @@ import {
 } from '../ast/literals.ast';
 import { BitwiseExpr } from '../ast/bitwise.ast';
 import { tokenize } from '../lexer/tokenizer';
-import { Token, TokenID } from '../tokens';
+import { Token } from '../tokens';
 import { NodeType } from '../nodes';
 import { GSError } from '../util/gserror';
 import { sourceFile } from '../..';
+import { CallExpr, MemberExpr } from '../ast/expressions.ast';
 
 /**
  * Parse token list into an AST
  */
 export default class Parser {
-	private tokens: Token[] = [];
+	private tokens: Array<Token> = [];
 
 	/**
 	 * Check for <EndOfFile> token
@@ -58,8 +59,8 @@ export default class Parser {
 		if (!p || p.type != type) {
 			console.error(
 				new GSError(
-					`ParseError: ${errMsg}`,
-					`Expected NodeType[${type}], instead saw NodeType[${p.type}]`,
+					`ParseError`,
+					`${errMsg}`,
 					`${sourceFile || 'GSREPL'}:${p.__GSC._POS.Line}:${
 						p.__GSC._POS.Column
 					}`
@@ -97,6 +98,21 @@ export default class Parser {
 			default:
 				return this.parseExpr();
 		}
+	}
+
+	private parseBlockStatement(): Array<STATEMENT> {
+		this.expect(NodeType.OpenBrace, 'Expected "{" before code block');
+
+		const body: Array<STATEMENT> = [];
+
+		while (this.notEOF() && this.current().type !== NodeType.CloseBrace) {
+			const stmt = this.parseStatement();
+			body.push(stmt);
+		}
+
+		this.expect(NodeType.CloseBrace, 'Expected "}" following code block');
+
+		return body;
 	}
 
 	private parseVarDeclaration(): STATEMENT {
@@ -146,6 +162,68 @@ export default class Parser {
 		);
 
 		return declaration;
+	}
+
+	private parseFuncDeclaration(): STATEMENT {
+		this.eat(); // advance past "func" keyword
+		const name = this.expect(
+			NodeType.Identifier,
+			'Expected identifier following "func" keyword'
+		).value;
+
+		const args = this.parseArgs();
+		const params: Array<string> = [];
+		for (const arg of args) {
+			if (arg.kind !== 'Identifier') {
+				console.log(arg);
+				console.log(
+					new GSError(
+						'ParseError',
+						'Expected parameters to be of type string',
+						`${sourceFile}:unknown:unknown`
+					)
+				);
+				process.exit(1);
+			}
+
+			params.push((arg as Identifier).symbol);
+		}
+
+		const body: Array<STATEMENT> = this.parseBlockStatement();
+
+		const func = {
+			kind: 'FuncDeclaration',
+			name,
+			body,
+			parameters: params,
+		} as FuncDeclaration;
+
+		return func;
+	}
+
+	private parseArgs(): Array<EXPRESSION> {
+		this.expect(NodeType.OpenParen, 'Expected "(" before parameter list');
+		const args =
+			this.current().type == NodeType.CloseParen
+				? []
+				: this.parseArgumentsList();
+
+		this.expect(
+			NodeType.CloseParen,
+			'Expected ")" following parameters list'
+		);
+
+		return args;
+	}
+
+	private parseArgumentsList(): Array<EXPRESSION> {
+		const args = [this.parseAsgExpr()];
+
+		while (this.current().type == NodeType.Comma && this.eat()) {
+			args.push(this.parseAsgExpr());
+		}
+
+		return args;
 	}
 
 	// [EXPRESSION PARSING]
@@ -330,7 +408,7 @@ export default class Parser {
 	}
 
 	private parseUnaryExpr(): EXPRESSION {
-		let lhs = this.parsePrimary();
+		let lhs = this.parseCallMemberExpr();
 
 		while (['++', '--'].includes(this.current().value)) {
 			const op = this.eat().value;
@@ -342,6 +420,77 @@ export default class Parser {
 		}
 
 		return lhs;
+	}
+
+	private parseCallMemberExpr(): EXPRESSION {
+		const member = this.parseMemberExpr();
+
+		if (this.current().type == NodeType.OpenParen) {
+			return this.parseCallExpr(member);
+		}
+
+		return member;
+	}
+
+	private parseMemberExpr(): EXPRESSION {
+		let object = this.parsePrimary();
+
+		while (
+			this.current().type == NodeType.Dot ||
+			this.current().type == NodeType.OpenBracket
+		) {
+			const op = this.eat();
+			let property: EXPRESSION;
+			let computed: boolean;
+
+			// non-computed, like "foo.bar"
+			if (op.type == NodeType.Dot) {
+				computed = false;
+
+				property = this.parsePrimary();
+				if (property.kind != 'Identifier') {
+					console.log(
+						new GSError(
+							'ParseError',
+							'Can not use dot operator without valid identifier',
+							`${sourceFile}:unknown:unknown`
+						)
+					);
+					process.exit(1);
+				}
+			} else {
+				// computed, like "foo['bar']"
+				computed = true;
+				property = this.parseExpr();
+				this.expect(
+					NodeType.CloseBracket,
+					'Expected "]" following computed object member expression'
+				);
+			}
+
+			object = {
+				kind: 'MemberExpr',
+				object,
+				property,
+				computed,
+			} as MemberExpr;
+		}
+
+		return object;
+	}
+
+	private parseCallExpr(caller: EXPRESSION): EXPRESSION {
+		let callExpr: EXPRESSION = {
+			kind: 'CallExpr',
+			caller,
+			args: this.parseArgs(),
+		} as CallExpr;
+
+		if (this.eat().type == NodeType.OpenParen) {
+			callExpr = this.parseCallExpr(callExpr);
+		}
+
+		return callExpr;
 	}
 
 	private parsePrimary(): EXPRESSION {
@@ -371,7 +520,7 @@ export default class Parser {
 				const value = this.parseExpr();
 				this.expect(
 					NodeType.CloseParen,
-					`Expected ")" and instead saw ${value}`
+					`Expected ")" and instead saw AST[${value.kind}]`
 				);
 
 				return value;

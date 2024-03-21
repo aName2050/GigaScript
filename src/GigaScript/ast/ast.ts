@@ -3,11 +3,14 @@ export type ASTNodeType =
 	| 'Program'
 	| 'VarDeclaration'
 	| 'FuncDeclaration'
+	| 'ReturnStatement'
 	// Expressions
 	| 'AssignmentExpr'
 	| 'UnaryExpr'
 	| 'BinaryExpr'
 	| 'BitwiseExpr'
+	| 'CallExpr'
+	| 'MemberExpr'
 	// Literals
 	| 'StringLiteral'
 	| 'NumberLiteral'

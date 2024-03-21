@@ -1,6 +1,8 @@
-import { NULL } from '../../../../../old/GigaScript/runtime/values';
 import { sourceFile } from '../../../../index';
-import { Identifier } from '../../../ast/literals.ast';
+import { AssignmentExpr } from '../../../ast/assignments.ast';
+import { BinaryExpr } from '../../../ast/binop.ast';
+import { CallExpr, MemberExpr } from '../../../ast/expressions.ast';
+import { Identifier, ObjectLiteral } from '../../../ast/literals.ast';
 import { GSError } from '../../../util/gserror';
 import Environment from '../../env';
 import {
@@ -11,6 +13,7 @@ import {
 	ObjectValue,
 	Value,
 } from '../../types';
+import { evaluate } from '../interpreter';
 
 export function evalNumericBinaryExpr(
 	lhs: Value<DataType, any>,
@@ -68,8 +71,22 @@ export function evalNumericBinaryExpr(
 				process.exit(1);
 		}
 	} else {
-		return NULL();
+		return DataConstructors.NULL();
 	}
+}
+
+export function evalBinaryExpr(
+	binop: BinaryExpr,
+	env: Environment
+): Value<DataType, any> {
+	const lhs = evaluate(binop.lhs, env);
+	const rhs = evaluate(binop.rhs, env);
+
+	return evalNumericBinaryExpr(
+		lhs as Value<DataType, any>,
+		rhs as Value<DataType, any>,
+		binop.op
+	);
 }
 
 function equals(
@@ -166,4 +183,127 @@ export function evalIdentifier(
 ): Value<DataType, any> {
 	const val = env.lookupVar(identifier.symbol);
 	return val;
+}
+
+export function evalAssignment(
+	node: AssignmentExpr,
+	env: Environment
+): Value<DataType, any> {
+	if (node.assigne.kind === 'MemberExpr') return evalMemberExpr(env, node);
+	if (node.assigne.kind !== 'Identifier') {
+		console.log(
+			new GSError(
+				'EvalError',
+				`Invalid LHS expression: ${JSON.stringify(node.assigne)}`,
+				`${sourceFile}:unknown:unknown`
+			)
+		);
+		process.exit(1);
+	}
+
+	const varName = (node.assigne as Identifier).symbol;
+
+	return env.assignVar(varName, evaluate(node.value, env));
+}
+
+export function evalMemberExpr(
+	env: Environment,
+	node?: AssignmentExpr | null,
+	expr?: MemberExpr | null
+): Value<DataType, any> {
+	if (expr) {
+		const Var = env.lookupOrModifyObject(expr);
+
+		return Var;
+	} else if (node) {
+		const Var = env.lookupOrModifyObject(
+			node.assigne as MemberExpr,
+			evaluate(node.value, env)
+		);
+
+		return Var;
+	} else {
+		console.log(
+			new GSError(
+				'EvalError',
+				'A member expression cannot be evaluated with a member or assignment expression.',
+				`${sourceFile}:unknown:unknown`
+			)
+		);
+		process.exit(1);
+	}
+}
+
+export function evalCallExpr(
+	expr: CallExpr,
+	env: Environment
+): Value<DataType, any> {
+	const args = expr.args.map(arg => evaluate(arg, env));
+	const fn = evaluate(expr.caller, env);
+
+	if (fn.type == 'nativeFn') {
+		const result = (fn as NativeFnVal).call(args, env);
+		return result;
+	}
+
+	if (fn.type == 'function') {
+		const func = fn as FuncVal;
+		const scope = new Environment(env.cwd, func.decEnv);
+
+		for (let i = 0; i < func.params.length; i++) {
+			if (func.params.length != args.length) {
+				console.log(
+					new GSError(
+						'EvalError',
+						'Paramters list and arguments list lengths do not match',
+						`${sourceFile}:unknown:unknown`
+					)
+				);
+				process.exit(1);
+			}
+
+			const varName = func.params[i];
+			scope.delcareVar(varName, args[i], false);
+		}
+
+		let result: Value<DataType, any> = DataConstructors.UNDEFINED();
+
+		for (const stmt of func.body) {
+			if (stmt.kind == 'ReturnStatement') {
+				result = evaluate(stmt, scope);
+				break;
+			}
+
+			evaluate(stmt, scope);
+		}
+
+		return result;
+	}
+
+	console.log(
+		new GSError(
+			'EvalError',
+			`Can not call a value that is not a function: ${JSON.stringify(
+				fn
+			)}`,
+			`${sourceFile}:unknown:unknown`
+		)
+	);
+	process.exit(1);
+}
+
+export function evalObjectExpr(
+	obj: ObjectLiteral,
+	env: Environment
+): Value<DataType, any> {
+	const object = { type: 'object', properties: new Map() } as ObjectValue;
+
+	for (const { key, value } of obj.properties) {
+		const val =
+			value == undefined ? env.lookupVar(key) : evaluate(value, env);
+
+		object.properties.set(key, val);
+	}
+
+	return object;
 }
