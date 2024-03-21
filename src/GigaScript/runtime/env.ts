@@ -2,7 +2,30 @@ import { Value, DataConstructors, DataType } from './types';
 import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 
-// export function createGlobalScope(cwd: string)
+export function createGlobalScope(cwd: string): Environment {
+	const env = new Environment(cwd);
+
+	// Native values
+	env.delcareVar('true', NativeValues.True, true);
+	env.delcareVar('false', NativeValues.False, true);
+	env.delcareVar('null', NativeValues.Null, true);
+	env.delcareVar('undefined', NativeValues.Undefined, true);
+
+	// Native variables
+	env.delcareVar('error', NativeValues.Error, true);
+
+	// Native functions
+	env.delcareVar('print', NativeFunctions.print, true);
+	env.delcareVar(
+		'generateTimestamp',
+		NativeFunctions.generateTimestamp,
+		true
+	);
+	env.delcareVar('math', NativeFunctions.math, true);
+	env.delcareVar('formatString', NativeFunctions.formatString, true);
+
+	return env;
+}
 
 export default class Environment {
 	private parent?: Environment;
@@ -33,6 +56,8 @@ export default class Environment {
 		return this.Exports;
 	}
 
+	// VARIABLES
+
 	public delcareVar(
 		identifier: string,
 		value: Value<DataType, any>,
@@ -60,6 +85,11 @@ export default class Environment {
 		env.variables.set(identifer, value);
 
 		return value;
+	}
+
+	public lookupVar(identifer: string): Value<DataType, any> {
+		const env = this.resolve(identifer);
+		return env.variables.get(identifer) as Value<DataType, any>;
 	}
 
 	public resolve(identifer: string): Environment {
