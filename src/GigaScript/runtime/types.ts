@@ -1,4 +1,3 @@
-import Environment from '../../../old/GigaScript/runtime/environment';
 import { STATEMENT } from '../ast/ast';
 
 export type DataType =
@@ -17,34 +16,32 @@ export interface Value<DataType, Type> {
 	value: Type;
 }
 
-export function UNDEFINED(): Value<'undefined', undefined> {
+function UNDEFINED(): Value<'undefined', undefined> {
 	return { type: 'undefined', value: undefined } as Value<
 		'undefined',
 		undefined
 	>;
 }
 
-export function NULL(): Value<'null', null> {
+function NULL(): Value<'null', null> {
 	return { type: 'null', value: null } as Value<'null', null>;
 }
 
-export function NUMBER(n = 0): Value<'number', number> {
+function NUMBER(n = 0): Value<'number', number> {
 	return { type: 'number', value: n } as Value<'number', number>;
 }
 
-export function BOOLEAN(b = false): Value<'boolean', boolean> {
+function BOOLEAN(b = false): Value<'boolean', boolean> {
 	return { type: 'boolean', value: b } as Value<'boolean', boolean>;
 }
 
-export function OBJECT(
+function OBJECT(
 	obj: Map<string, Value<DataType, any>>
 ): Value<'object', object> {
 	return { type: 'object', value: obj } as Value<'object', object>;
 }
 
-export function ARRAY(
-	arr: Array<Value<DataType, any>>
-): Value<'array', Array<any>> {
+function ARRAY(arr: Array<Value<DataType, any>>): Value<'array', Array<any>> {
 	return { type: 'array', value: arr } as Value<'array', Array<any>>;
 }
 
@@ -58,7 +55,7 @@ export interface NativeFnVal {
 	call: FunctionCall;
 }
 
-export function NATIVEFN(call: FunctionCall): NativeFnVal {
+function NATIVEFN(call: FunctionCall): NativeFnVal {
 	return { type: 'nativeFn', call } as NativeFnVal;
 }
 
@@ -69,3 +66,13 @@ export interface FuncVal {
 	// decEnv: Environment;
 	body: Array<STATEMENT>;
 }
+
+export const DataConstructors = {
+	UNDEFINED,
+	NULL,
+	NUMBER,
+	BOOLEAN,
+	OBJECT,
+	ARRAY,
+	NATIVEFN,
+};
