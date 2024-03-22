@@ -10,6 +10,8 @@ import { version } from '../package.json';
 import Parser from './GigaScript/parser/parser';
 import { Program } from './GigaScript/ast/ast';
 import { CLIArguments } from './GigaScript/types';
+import { createGlobalScope } from './GigaScript/runtime/env';
+import { evaluate } from './GigaScript/runtime/interpreter/interpreter';
 // import interpretor
 // import env
 
@@ -35,9 +37,7 @@ const CLIArgs: CLIArguments = argParser.parse_args();
 const file: string | undefined = CLIArgs.file;
 const useCUDA: boolean = CLIArgs.useCUDA || false;
 
-const fileLocation: string | undefined = file
-	? path.parse(file).dir
-	: undefined;
+const fileLocation: string = file ? path.parse(file).dir : '';
 
 const srcFileLocStr: string | undefined = file ? path.resolve(file) : undefined;
 
@@ -60,14 +60,16 @@ if (file && fileLocation) {
 
 function runFile(filename: string, location: string) {
 	const parser = new Parser();
-	// create new global scope
+	const env = createGlobalScope(fileLocation);
 
 	let file = fs.readFileSync(filename, { encoding: 'utf-8' });
 
 	if (filename.endsWith('.g')) {
 		// Run GigaScript code
 		const program: Program = parser.generateAST(file);
-		console.log(program);
+		const res = evaluate(program, env);
+
+		return res;
 	} else if (filename.endsWith('.gsx')) {
 		// Run GigaScript-X code
 		throw 'Not implemented';

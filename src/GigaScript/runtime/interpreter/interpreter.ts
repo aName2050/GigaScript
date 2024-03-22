@@ -1,5 +1,7 @@
 import { sourceFile } from '../../../index';
+import { AssignmentExpr } from '../../ast/assignments.ast';
 import { Program, STATEMENT } from '../../ast/ast';
+import { BinaryExpr } from '../../ast/binop.ast';
 import { FuncDeclaration, VarDeclaration } from '../../ast/declarations.ast';
 import { CallExpr, MemberExpr } from '../../ast/expressions.ast';
 import {
@@ -13,6 +15,8 @@ import { GSError } from '../../util/gserror';
 import Environment from '../env';
 import { DataType, Value } from '../types';
 import {
+	evalAssignment,
+	evalBinaryExpr,
 	evalCallExpr,
 	evalIdentifier,
 	evalMemberExpr,
@@ -67,6 +71,12 @@ export function evaluate(
 		case 'CallExpr':
 			return evalCallExpr(node as CallExpr, env);
 
+		case 'BinaryExpr':
+			return evalBinaryExpr(node as BinaryExpr, env);
+
+		case 'AssignmentExpr':
+			return evalAssignment(node as AssignmentExpr, env);
+
 		// Handle statements
 		case 'Program':
 			return evalProgram(node as Program, env);
@@ -85,7 +95,7 @@ export function evaluate(
 			console.log(
 				new GSError(
 					'RuntimeError',
-					'AST Node not implemented',
+					`AST Node not implemented; "${node.kind}" has not been implemented into GigaScript yet`,
 					`${sourceFile}:unknown:unknown`
 				)
 			);

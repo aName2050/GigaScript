@@ -391,45 +391,45 @@ export function tokenize(source: string): Token[] {
 
 				case "'":
 				case '"':
-					{
-						let str = '';
-						src.shift(); // move past opening doubleQuotes/singleQuotes
+					let str = '';
+					src.shift(); // move past opening doubleQuotes/singleQuotes
 
-						while (
-							src.length > 0 &&
-							src[0] !== '"' &&
-							src[0] !== "'" &&
-							!isEOL(src[0]) &&
-							src.length == 0
-						) {
-							str += src.shift();
-						}
+					while (
+						src.length > 0 &&
+						src[0] !== '"' &&
+						src[0] !== "'" &&
+						!isEOL(src[0]) &&
+						src.length != 0
+					) {
+						str += src.shift();
+						col++;
+					}
 
-						if (isEOL(src[0]) || src.length == 0) {
-							console.error(
-								new GSError(
-									`LexerError`,
-									`Unterminated string literal`,
-									`${sourceFile || 'GSREPL'}:${
-										tokenPos.line
-									}:${tokenPos.Col}`
-								)
-							);
-							process.exit(1);
-						}
-
-						src.shift(); // move past closing doubleQuotes/singleQuotes
-
-						tokens.push(
-							createToken(
-								TokenID._String,
-								NodeType.String,
-								str,
-								tokenPos.line,
-								tokenPos.Col
+					if (isEOL(src[0]) || src.length == 0) {
+						console.error(
+							new GSError(
+								`LexerError`,
+								`Unterminated string literal`,
+								`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
+									tokenPos.Col
+								}`
 							)
 						);
+						process.exit(1);
 					}
+
+					src.shift(); // move past closing doubleQuotes/singleQuotes
+
+					tokens.push(
+						createToken(
+							TokenID._String,
+							NodeType.String,
+							str,
+							tokenPos.line,
+							tokenPos.Col
+						)
+					);
+
 					break;
 
 				default:

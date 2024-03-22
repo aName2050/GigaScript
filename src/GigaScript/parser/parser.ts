@@ -18,6 +18,7 @@ import { NodeType } from '../nodes';
 import { GSError } from '../util/gserror';
 import { sourceFile } from '../..';
 import { CallExpr, MemberExpr } from '../ast/expressions.ast';
+import { ReturnStatement } from '../ast/statements.ast';
 
 /**
  * Parse token list into an AST
@@ -60,7 +61,9 @@ export default class Parser {
 			console.error(
 				new GSError(
 					`ParseError`,
-					`${errMsg}`,
+					`${errMsg}, instead saw "${
+						NodeType[type] as keyof typeof NodeType
+					}"`,
 					`${sourceFile || 'GSREPL'}:${p.__GSC._POS.Line}:${
 						p.__GSC._POS.Column
 					}`
@@ -94,6 +97,10 @@ export default class Parser {
 			case NodeType.Let:
 			case NodeType.Const:
 				return this.parseVarDeclaration();
+			case NodeType.Func:
+				return this.parseFuncDeclaration();
+			case NodeType.Return:
+				return this.parseReturnStatement();
 
 			default:
 				return this.parseExpr();
@@ -199,6 +206,22 @@ export default class Parser {
 		} as FuncDeclaration;
 
 		return func;
+	}
+
+	private parseReturnStatement(): STATEMENT {
+		this.eat(); // advance past "return" keyword
+
+		const value = this.parseExpr();
+
+		this.expect(
+			NodeType.Semicolon,
+			'Expected ";" following return statement'
+		);
+
+		return {
+			kind: 'ReturnStatement',
+			value,
+		} as ReturnStatement;
 	}
 
 	private parseArgs(): Array<EXPRESSION> {
@@ -486,7 +509,7 @@ export default class Parser {
 			args: this.parseArgs(),
 		} as CallExpr;
 
-		if (this.eat().type == NodeType.OpenParen) {
+		if (this.current().type == NodeType.OpenParen) {
 			callExpr = this.parseCallExpr(callExpr);
 		}
 
