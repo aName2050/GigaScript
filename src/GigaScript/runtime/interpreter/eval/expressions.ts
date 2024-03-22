@@ -3,7 +3,11 @@ import { AssignmentExpr, UnaryExpr } from '../../../ast/assignments.ast';
 import { BinaryExpr } from '../../../ast/binop.ast';
 import { BitwiseExpr } from '../../../ast/bitwise.ast';
 import { CallExpr, MemberExpr } from '../../../ast/expressions.ast';
-import { Identifier, ObjectLiteral } from '../../../ast/literals.ast';
+import {
+	Identifier,
+	NumberLiteral,
+	ObjectLiteral,
+} from '../../../ast/literals.ast';
 import { getValue } from '../../../util/getValue';
 import { GSError } from '../../../util/gserror';
 import Environment from '../../env';
@@ -73,7 +77,7 @@ export function evalNumericBinaryExpr(
 				process.exit(1);
 		}
 	} else {
-		return DataConstructors.NULL();
+		return DataConstructors.UNDEFINED();
 	}
 }
 
@@ -99,6 +103,33 @@ export function evalBitwiseExpr(
 	const rhs = evaluate(expr.rhs, env);
 
 	if (typeof getValue(lhs) == 'number') {
+		const nlhs = lhs as Value<'number', number>;
+		const nrhs = rhs as Value<'number', number>;
+
+		switch (expr.op) {
+			case '&':
+				return DataConstructors.NUMBER(nlhs.value & nrhs.value);
+			case '|':
+				return DataConstructors.NUMBER(nlhs.value | nrhs.value);
+			case '^':
+				return DataConstructors.NUMBER(nlhs.value ^ nrhs.value);
+			case '<<':
+				return DataConstructors.NUMBER(nlhs.value << nrhs.value);
+			case '>>':
+				return DataConstructors.NUMBER(nlhs.value >> nrhs.value);
+			case '>>>':
+				return DataConstructors.NUMBER(nlhs.value >>> nrhs.value);
+
+			default:
+				console.log(
+					new GSError(
+						'EvalError',
+						`Unknown bitwise operator "${expr.op}"`,
+						`${sourceFile}:unknown:unknown`
+					)
+				);
+				process.exit(1);
+		}
 	} else {
 		console.log(
 			new GSError(
@@ -107,10 +138,8 @@ export function evalBitwiseExpr(
 				`${sourceFile}:unknown:unknown`
 			)
 		);
-		process.exit(1);
+		return DataConstructors.UNDEFINED();
 	}
-
-	return DataConstructors.NULL();
 }
 
 function equals(
@@ -370,6 +399,12 @@ export function evalUnaryExpr(
 		env.assignVar(expr.assigne.symbol, DataConstructors.NUMBER(newValue));
 
 		return DataConstructors.NUMBER(newValue);
+	} else if (expr.AsgOp == '~') {
+		const value = env.lookupVar(expr.assigne.symbol) as Value<
+			'number',
+			number
+		>;
+		return DataConstructors.NUMBER(~value);
 	} else {
 		console.log(
 			new GSError(

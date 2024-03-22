@@ -244,6 +244,13 @@ function setTokenData(
 export function getTokenByValue(value: string): Token | undefined {
 	return Tokens[value];
 }
+export function getTokenByTypeEnum(TypeEnum: NodeType): Token | undefined {
+	for (const token in Tokens) {
+		console.log(token);
+	}
+
+	return undefined;
+}
 
 // [keywords]
 setTokenData(TokenID._True, NodeType.Identifier, 'true', OpPrec.None);

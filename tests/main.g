@@ -1,5 +1,3 @@
-let x = 0;
-x++
-print(x)
-x--
+const x = ~1;
+
 print(x)
