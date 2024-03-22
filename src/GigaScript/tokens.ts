@@ -245,11 +245,16 @@ export function getTokenByValue(value: string): Token | undefined {
 	return Tokens[value];
 }
 export function getTokenByTypeEnum(TypeEnum: NodeType): Token | undefined {
-	for (const token in Tokens) {
-		console.log(token);
+	let matchedToken: Token | undefined;
+	for (let i = 0; i < Object.entries(Tokens).length; i++) {
+		const token: Token = Object.entries(Tokens)[i][1];
+		if (token.type === TypeEnum) {
+			matchedToken = token;
+			break;
+		} else continue;
 	}
 
-	return undefined;
+	return matchedToken;
 }
 
 // [keywords]
