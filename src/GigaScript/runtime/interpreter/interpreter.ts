@@ -1,5 +1,5 @@
 import { sourceFile } from '../../../index';
-import { AssignmentExpr } from '../../ast/assignments.ast';
+import { AssignmentExpr, UnaryExpr } from '../../ast/assignments.ast';
 import { Program, STATEMENT } from '../../ast/ast';
 import { BinaryExpr } from '../../ast/binop.ast';
 import { FuncDeclaration, VarDeclaration } from '../../ast/declarations.ast';
@@ -21,6 +21,7 @@ import {
 	evalIdentifier,
 	evalMemberExpr,
 	evalObjectExpr,
+	evalUnaryExpr,
 } from './eval/expressions';
 import {
 	evalFuncDeclaration,
@@ -73,6 +74,9 @@ export function evaluate(
 
 		case 'BinaryExpr':
 			return evalBinaryExpr(node as BinaryExpr, env);
+
+		case 'UnaryExpr':
+			return evalUnaryExpr(node as UnaryExpr, env);
 
 		case 'AssignmentExpr':
 			return evalAssignment(node as AssignmentExpr, env);

@@ -1,8 +1,10 @@
 import { sourceFile } from '../../../../index';
-import { AssignmentExpr } from '../../../ast/assignments.ast';
+import { AssignmentExpr, UnaryExpr } from '../../../ast/assignments.ast';
 import { BinaryExpr } from '../../../ast/binop.ast';
+import { BitwiseExpr } from '../../../ast/bitwise.ast';
 import { CallExpr, MemberExpr } from '../../../ast/expressions.ast';
 import { Identifier, ObjectLiteral } from '../../../ast/literals.ast';
+import { getValue } from '../../../util/getValue';
 import { GSError } from '../../../util/gserror';
 import Environment from '../../env';
 import {
@@ -87,6 +89,28 @@ export function evalBinaryExpr(
 		rhs as Value<DataType, any>,
 		binop.op
 	);
+}
+
+export function evalBitwiseExpr(
+	expr: BitwiseExpr,
+	env: Environment
+): Value<DataType, any> {
+	const lhs = evaluate(expr.lhs, env);
+	const rhs = evaluate(expr.rhs, env);
+
+	if (typeof getValue(lhs) == 'number') {
+	} else {
+		console.log(
+			new GSError(
+				'EvalError',
+				'Bitwise operations can only be used on numbers',
+				`${sourceFile}:unknown:unknown`
+			)
+		);
+		process.exit(1);
+	}
+
+	return DataConstructors.NULL();
 }
 
 function equals(
@@ -306,4 +330,54 @@ export function evalObjectExpr(
 	}
 
 	return object;
+}
+
+export function evalUnaryExpr(
+	expr: UnaryExpr,
+	env: Environment
+): Value<DataType, any> {
+	if (expr.AsgOp == '++') {
+		const oldValue = getValue(env.lookupVar(expr.assigne.symbol));
+		if (typeof oldValue != 'number') {
+			console.log(
+				new GSError(
+					'EvalError',
+					'Can not use unary operator "++" on non-number value',
+					`${sourceFile}:unknown:unknown`
+				)
+			);
+			process.exit(1);
+		}
+
+		const newValue = oldValue + 1;
+		env.assignVar(expr.assigne.symbol, DataConstructors.NUMBER(newValue));
+
+		return DataConstructors.NUMBER(newValue);
+	} else if (expr.AsgOp == '--') {
+		const oldValue = getValue(env.lookupVar(expr.assigne.symbol));
+		if (typeof oldValue != 'number') {
+			console.log(
+				new GSError(
+					'EvalError',
+					'Can not use unary operator "--" on non-number value',
+					`${sourceFile}:unknown:unknown`
+				)
+			);
+			process.exit(1);
+		}
+
+		const newValue = oldValue - 1;
+		env.assignVar(expr.assigne.symbol, DataConstructors.NUMBER(newValue));
+
+		return DataConstructors.NUMBER(newValue);
+	} else {
+		console.log(
+			new GSError(
+				'EvalError',
+				`Unknown unary operator "${expr.AsgOp}"`,
+				`${sourceFile}:unknown:unknown`
+			)
+		);
+		process.exit(1);
+	}
 }

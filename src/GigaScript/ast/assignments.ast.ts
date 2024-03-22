@@ -1,4 +1,5 @@
 import { EXPRESSION } from './ast';
+import { Identifier } from './literals.ast';
 
 /**
  * Reassigns a variable to another value, using the "=" operator
@@ -15,6 +16,6 @@ export interface AssignmentExpr extends EXPRESSION {
  */
 export interface UnaryExpr extends EXPRESSION {
 	kind: 'UnaryExpr';
-	assigne: EXPRESSION;
+	assigne: Identifier;
 	AsgOp: '++' | '--';
 }

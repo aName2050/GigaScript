@@ -1,16 +1,5 @@
-const x = 32;
-
+let x = 0;
+x++
 print(x)
-
-print(true)
-print(false)
-print(undefined)
-print(null)
-print(100)
-print("hello!")
-
-func add(a, b) {
-    return a + b;
-}
-
-print(add(1, 2))
+x--
+print(x)
