@@ -1,3 +1,1 @@
-const x = ~1;
-
-print(x)
+const x = 0;

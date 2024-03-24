@@ -19,13 +19,23 @@ export type ASTNodeType =
 	| 'ArrayLiteral'
 	| 'Identifier';
 
+export interface ASTNode {
+	kind: ASTNodeType;
+	start: {
+		Line: number;
+		Column: number;
+	};
+	end: {
+		Line: number;
+		Column: number;
+	};
+}
+
 /**
  * Statements don't return a value at runtime.
  * They can contain multiple expressions
  */
-export interface STATEMENT {
-	kind: ASTNodeType;
-}
+export interface STATEMENT extends ASTNode {}
 
 /**
  * Expressions will return a value at runtime.

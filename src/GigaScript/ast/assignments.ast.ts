@@ -8,7 +8,7 @@ export interface AssignmentExpr extends EXPRESSION {
 	kind: 'AssignmentExpr';
 	assigne: EXPRESSION;
 	value: EXPRESSION;
-	AsgOp: '&=' | '|=' | '^=' | '~=' | '<<=' | '>>=' | '>>>=';
+	AsgOp: '&=' | '|=' | '^=' | '<<=' | '>>=' | '>>>=';
 }
 
 /**
@@ -17,5 +17,5 @@ export interface AssignmentExpr extends EXPRESSION {
 export interface UnaryExpr extends EXPRESSION {
 	kind: 'UnaryExpr';
 	assigne: Identifier;
-	AsgOp: '++' | '--';
+	operator: '++' | '--' | '~';
 }
