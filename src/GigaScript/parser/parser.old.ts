@@ -448,7 +448,7 @@ export default class Parser {
 			const op = this.eat().value;
 			lhs = {
 				kind: 'UnaryExpr',
-				AsgOp: op,
+				operator: op,
 				assigne: lhs,
 			} as UnaryExpr;
 		}
