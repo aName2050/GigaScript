@@ -12,6 +12,8 @@ import { Program } from './GigaScript/ast/ast';
 import { CLIArguments } from './GigaScript/types';
 import { createGlobalScope } from './GigaScript/runtime/env';
 import { evaluate } from './GigaScript/runtime/interpreter/interpreter';
+import { getTokenByTypeEnum } from './GigaScript/tokens';
+import { NodeType } from './GigaScript/nodes';
 // import interpretor
 // import env
 
@@ -66,11 +68,21 @@ function runFile(filename: string, location: string) {
 
 	if (filename.endsWith('.g')) {
 		// Run GigaScript code
-		const program: Program = parser.generateAST(file);
-
-		console.log(program);
+		parser.tokenizeSource(file);
+		parser.Tokens.forEach(token => {
+			console.log(
+				`${NodeType[token.type]} "${token.value}" -> ${JSON.stringify(
+					token.__GSC._POS
+				)}`
+			);
+			console.log(
+				'tokenLength:',
+				token.__GSC._POS.end.Column! - token.__GSC._POS.start.Column!
+			);
+		});
+		// const program: Program = parser.generateAST();
+		// console.log(program);
 		// const res = evaluate(program, env);
-
 		// return res;
 	} else if (filename.endsWith('.gsx')) {
 		// Run GigaScript-X code

@@ -215,8 +215,14 @@ export interface Token {
 	__GSC: {
 		_OPC: OpPrec;
 		_POS: {
-			Line: number | null;
-			Column: number | null;
+			start: {
+				Line: number | null;
+				Column: number | null;
+			};
+			end: {
+				Line: number | null;
+				Column: number | null;
+			};
 		};
 	};
 }
@@ -233,7 +239,19 @@ function setTokenData(
 		id,
 		type,
 		value,
-		__GSC: { _OPC: OPC, _POS: { Line: null, Column: null } },
+		__GSC: {
+			_OPC: OPC,
+			_POS: {
+				start: {
+					Line: null,
+					Column: null,
+				},
+				end: {
+					Line: null,
+					Column: null,
+				},
+			},
+		},
 	} as Token;
 
 	Tokens[value] = token;

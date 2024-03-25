@@ -50,8 +50,16 @@ export function tokenize(source: string): Token[] {
 					TokenID._Number,
 					NodeType.Number,
 					num,
-					tokenPos.line,
-					tokenPos.Col,
+					{
+						start: {
+							line: tokenPos.line,
+							column: tokenPos.Col,
+						},
+						end: {
+							line: line,
+							column: col,
+						},
+					},
 					OpPrec.None
 				)
 			);
@@ -71,8 +79,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -94,8 +108,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -117,8 +137,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -139,8 +165,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -161,8 +193,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -183,8 +221,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -235,8 +279,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -269,8 +319,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -291,8 +347,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -314,8 +376,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -337,8 +405,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -359,8 +433,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -381,8 +461,14 @@ export function tokenize(source: string): Token[] {
 							__GSC: {
 								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
-									Line: tokenPos.line,
-									Column: tokenPos.Col,
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
 								},
 							},
 						});
@@ -393,6 +479,7 @@ export function tokenize(source: string): Token[] {
 				case '"':
 					let str = '';
 					src.shift(); // move past opening doubleQuotes/singleQuotes
+					col++;
 
 					while (
 						src.length > 0 &&
@@ -419,32 +506,45 @@ export function tokenize(source: string): Token[] {
 					}
 
 					src.shift(); // move past closing doubleQuotes/singleQuotes
+					col++;
 
 					tokens.push(
-						createToken(
-							TokenID._String,
-							NodeType.String,
-							str,
-							tokenPos.line,
-							tokenPos.Col
-						)
+						createToken(TokenID._String, NodeType.String, str, {
+							start: {
+								line: tokenPos.line,
+								column: tokenPos.Col,
+							},
+							end: {
+								line: line,
+								column: col,
+							},
+						})
 					);
 
 					break;
 
 				default:
+					col++;
 					// matches single character tokens
 					tokens.push(
 						createToken(
 							token.id,
 							token.type,
 							token.value,
-							tokenPos.line,
-							tokenPos.Col,
+							{
+								start: {
+									line: tokenPos.line,
+									column: tokenPos.Col,
+								},
+								end: {
+									line: line,
+									column: col,
+								},
+							},
 							token.__GSC._OPC
 						)
 					);
-					src.shift() && col++;
+					src.shift();
 					break;
 			}
 		} else {
@@ -470,8 +570,16 @@ export function tokenize(source: string): Token[] {
 									RESERVED.id,
 									RESERVED.type,
 									RESERVED.value,
-									tokenPos.line,
-									tokenPos.Col,
+									{
+										start: {
+											line: tokenPos.line,
+											column: tokenPos.Col,
+										},
+										end: {
+											line: line,
+											column: col,
+										},
+									},
 									RESERVED.__GSC._OPC
 								)
 							);
@@ -482,8 +590,16 @@ export function tokenize(source: string): Token[] {
 									TokenID._Identifier,
 									NodeType.Identifier,
 									ident,
-									tokenPos.line,
-									tokenPos.Col,
+									{
+										start: {
+											line: tokenPos.line,
+											column: tokenPos.Col,
+										},
+										end: {
+											line: line,
+											column: col,
+										},
+									},
 									OpPrec.None
 								)
 							);
@@ -514,18 +630,25 @@ export function tokenize(source: string): Token[] {
 		}
 	}
 
+	// col++;
 	tokens.push(
 		createToken(
 			TokenID.__EOF__,
 			NodeType.__EOF__,
 			'<EOF>',
-			line,
-			col,
+			{
+				start: {
+					line: line,
+					column: col,
+				},
+				end: {
+					line: line,
+					column: col + 1,
+				},
+			},
 			OpPrec.None
 		)
 	);
-
-	// console.log(tokens);
 
 	return tokens;
 }

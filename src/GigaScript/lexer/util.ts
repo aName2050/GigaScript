@@ -15,8 +15,16 @@ export function createToken(
 	id: TokenID,
 	type: NodeType,
 	value: string,
-	Line: number,
-	Column: number,
+	PositionData: {
+		start: {
+			line: number;
+			column: number;
+		};
+		end: {
+			line: number;
+			column: number;
+		};
+	},
 	OPC?: OpPrec
 ): Token {
 	return {
@@ -25,7 +33,16 @@ export function createToken(
 		value,
 		__GSC: {
 			_OPC: getTokenByValue(value)?.__GSC._OPC || OPC,
-			_POS: { Line, Column },
+			_POS: {
+				start: {
+					Line: PositionData.start.line,
+					Column: PositionData.start.column,
+				},
+				end: {
+					Line: PositionData.end.line,
+					Column: PositionData.end.column,
+				},
+			},
 		},
 	} as Token;
 }

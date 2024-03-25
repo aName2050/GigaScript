@@ -57,9 +57,15 @@ export default class Parser {
 		return token;
 	}
 
-	public generateAST(src: string): Program {
-		this.tokens = tokenize(src);
+	public get Tokens(): Array<Token> {
+		return this.tokens;
+	}
 
+	public tokenizeSource(src: string): void {
+		this.tokens = tokenize(src);
+	}
+
+	public generateAST(): Program {
 		const program: Program = {
 			kind: 'Program',
 			body: [],
@@ -74,7 +80,7 @@ export default class Parser {
 		};
 
 		while (this.notEOF()) {
-			program.body.push(this.parseStatement());
+			// program.body.push(this.parseStatement());
 		}
 
 		// program.end = { Line: program.body[program.body.length - 1] }
@@ -85,142 +91,142 @@ export default class Parser {
 	}
 
 	// [STATEMENTS]
-	private parseStatement(): STATEMENT {
-		switch (this.current().type) {
-			case NodeType.Let:
-			case NodeType.Const:
-				return this.parseVarDeclaration();
+	// private parseStatement(): STATEMENT {
+	// 	switch (this.current().type) {
+	// 		case NodeType.Let:
+	// 		case NodeType.Const:
+	// 			return this.parseVarDeclaration();
 
-			default:
-				return this.parseExpr();
-		}
-	}
+	// 		default:
+	// 			return this.parseExpr();
+	// 	}
+	// }
 
-	private parseCodeBlock(): Array<STATEMENT> {
-		this.expect(NodeType.OpenBrace, 'at start of code block');
+	// private parseCodeBlock(): Array<STATEMENT> {
+	// 	this.expect(NodeType.OpenBrace, 'at start of code block');
 
-		const body: Array<STATEMENT> = [];
+	// 	const body: Array<STATEMENT> = [];
 
-		while (this.notEOF() && this.current().type !== NodeType.CloseBrace) {
-			const stmt = this.parseStatement();
-			body.push(stmt);
-		}
+	// 	while (this.notEOF() && this.current().type !== NodeType.CloseBrace) {
+	// 		const stmt = this.parseStatement();
+	// 		body.push(stmt);
+	// 	}
 
-		this.expect(NodeType.CloseBrace, 'at end of code block');
+	// 	this.expect(NodeType.CloseBrace, 'at end of code block');
 
-		return body;
-	}
+	// 	return body;
+	// }
 
-	// [STATEMENTS.DECLARATIONS]
+	// // [STATEMENTS.DECLARATIONS]
 
-	private parseVarDeclaration(): STATEMENT {
-		const isConstant = this.advance().type == NodeType.Const;
-		const identifier = this.expect(
-			NodeType.Identifier,
-			`following ${isConstant ? 'const' : 'let'} keyword`
-		).value;
+	// private parseVarDeclaration(): STATEMENT {
+	// 	const isConstant = this.advance().type == NodeType.Const;
+	// 	const identifier = this.expect(
+	// 		NodeType.Identifier,
+	// 		`following ${isConstant ? 'const' : 'let'} keyword`
+	// 	).value;
 
-		if (this.current().type == NodeType.Semicolon) {
-			this.advance();
-			if (isConstant) {
-				console.log(
-					new ParseError(
-						'Constant variables must be delcared with a value',
-						`${sourceFile}:${getErrorLocation(this.current())}`
-					)
-				);
-				process.exit(1);
-			}
+	// 	if (this.current().type == NodeType.Semicolon) {
+	// 		this.advance();
+	// 		if (isConstant) {
+	// 			console.log(
+	// 				new ParseError(
+	// 					'Constant variables must be delcared with a value',
+	// 					`${sourceFile}:${getErrorLocation(this.current())}`
+	// 				)
+	// 			);
+	// 			process.exit(1);
+	// 		}
 
-			return {
-				kind: 'VarDeclaration',
-				constant: false,
-				identifier,
-			} as VarDeclaration;
-		}
+	// 		return {
+	// 			kind: 'VarDeclaration',
+	// 			constant: false,
+	// 			identifier,
+	// 		} as VarDeclaration;
+	// 	}
 
-		this.expect(NodeType.Equals, 'following variable identifier');
+	// 	this.expect(NodeType.Equals, 'following variable identifier');
 
-		const declaration = {
-			kind: 'VarDeclaration',
-			value: this.parseExpr(),
-			identifier,
-			constant: isConstant,
-		} as VarDeclaration;
+	// 	const declaration = {
+	// 		kind: 'VarDeclaration',
+	// 		value: this.parseExpr(),
+	// 		identifier,
+	// 		constant: isConstant,
+	// 	} as VarDeclaration;
 
-		this.expect(NodeType.Semicolon, 'following variable declaration');
+	// 	this.expect(NodeType.Semicolon, 'following variable declaration');
 
-		return declaration;
-	}
+	// 	return declaration;
+	// }
 
-	// [EXPRESSIONS]
-	private parseExpr(): EXPRESSION {
-		return this.parsePrimaryExpression();
-	}
+	// // [EXPRESSIONS]
+	// private parseExpr(): EXPRESSION {
+	// 	return this.parsePrimaryExpression();
+	// }
 
-	private parsePrimaryExpression(): EXPRESSION {
-		const token = this.current();
+	// private parsePrimaryExpression(): EXPRESSION {
+	// 	const token = this.current();
 
-		switch (token.type) {
-			case NodeType.Identifier:
-				return {
-					kind: 'Identifier',
-					symbol: this.advance().value,
-					start: {
-						Line: token.__GSC._POS.Line,
-						Column: token.__GSC._POS.Column,
-					},
-					end: {
-						Line: token.__GSC._POS.Line,
-						Column: token.__GSC._POS.Column,
-					},
-				} as Identifier;
+	// 	switch (token.type) {
+	// 		case NodeType.Identifier:
+	// 			return {
+	// 				kind: 'Identifier',
+	// 				symbol: this.advance().value,
+	// 				start: {
+	// 					Line: token.__GSC._POS.Line,
+	// 					Column: token.__GSC._POS.Column,
+	// 				},
+	// 				end: {
+	// 					Line: token.__GSC._POS.Line,
+	// 					Column: token.__GSC._POS.Column,
+	// 				},
+	// 			} as Identifier;
 
-			case NodeType.Number:
-				return {
-					kind: 'NumberLiteral',
-					value: parseFloat(this.advance().value),
-					start: {
-						Line: token.__GSC._POS.Line,
-						Column: token.__GSC._POS.Column,
-					},
-					end: {
-						Line: token.__GSC._POS.Line,
-						Column: token.__GSC._POS.Column,
-					},
-				} as NumberLiteral;
+	// 		case NodeType.Number:
+	// 			return {
+	// 				kind: 'NumberLiteral',
+	// 				value: parseFloat(this.advance().value),
+	// 				start: {
+	// 					Line: token.__GSC._POS.Line,
+	// 					Column: token.__GSC._POS.Column,
+	// 				},
+	// 				end: {
+	// 					Line: token.__GSC._POS.Line,
+	// 					Column: token.__GSC._POS.Column,
+	// 				},
+	// 			} as NumberLiteral;
 
-			case NodeType.String:
-				return {
-					kind: 'StringLiteral',
-					value: this.advance().value,
-					start: {
-						Line: token.__GSC._POS.Line,
-						Column: token.__GSC._POS.Column,
-					},
-					end: {
-						Line: token.__GSC._POS.Line,
-						Column: token.__GSC._POS.Column,
-					},
-				} as StringLiteral;
+	// 		case NodeType.String:
+	// 			return {
+	// 				kind: 'StringLiteral',
+	// 				value: this.advance().value,
+	// 				start: {
+	// 					Line: token.__GSC._POS.Line,
+	// 					Column: token.__GSC._POS.Column,
+	// 				},
+	// 				end: {
+	// 					Line: token.__GSC._POS.Line,
+	// 					Column: token.__GSC._POS.Column,
+	// 				},
+	// 			} as StringLiteral;
 
-			case NodeType.OpenParen:
-				this.advance();
-				const value = this.parseExpr();
-				this.expect(NodeType.CloseParen);
+	// 		case NodeType.OpenParen:
+	// 			this.advance();
+	// 			const value = this.parseExpr();
+	// 			this.expect(NodeType.CloseParen);
 
-				return value;
+	// 			return value;
 
-			default:
-				console.log(
-					new ParseError(
-						`Uncaught: Unexpected token "${this.current().type}"`,
-						`${sourceFile || 'GSREPL'}:${
-							this.current().__GSC._POS.Line
-						}:${this.current().__GSC._POS.Column}`
-					)
-				);
-				process.exit(1);
-		}
-	}
+	// 		default:
+	// 			console.log(
+	// 				new ParseError(
+	// 					`Uncaught: Unexpected token "${this.current().type}"`,
+	// 					`${sourceFile || 'GSREPL'}:${
+	// 						this.current().__GSC._POS.Line
+	// 					}:${this.current().__GSC._POS.Column}`
+	// 				)
+	// 			);
+	// 			process.exit(1);
+	// 	}
+	// }
 }
