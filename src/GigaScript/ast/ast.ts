@@ -1,8 +1,8 @@
 export type ASTNodeType =
 	// Statements
 	| 'Program'
-	| 'VarDeclaration'
-	| 'FuncDeclaration'
+	| 'VariableDeclaration'
+	| 'FunctionDeclaration'
 	| 'ReturnStatement'
 	// Expressions
 	| 'AssignmentExpr'

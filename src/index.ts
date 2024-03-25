@@ -71,17 +71,17 @@ function runFile(filename: string, location: string) {
 		parser.tokenizeSource(file);
 		parser.Tokens.forEach(token => {
 			console.log(
-				`${NodeType[token.type]} "${token.value}" -> ${JSON.stringify(
-					token.__GSC._POS
-				)}`
+				`${NodeType[token.type]} value="${
+					token.value
+				}" -> pos=${JSON.stringify(token.__GSC._POS)}`
 			);
 			console.log(
-				'tokenLength:',
+				'tokenLength=',
 				token.__GSC._POS.end.Column! - token.__GSC._POS.start.Column!
 			);
 		});
-		// const program: Program = parser.generateAST();
-		// console.log(program);
+		const program: Program = parser.generateAST();
+		console.log(program);
 		// const res = evaluate(program, env);
 		// return res;
 	} else if (filename.endsWith('.gsx')) {

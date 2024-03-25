@@ -1,6 +1,6 @@
 import { sourceFile } from '../..';
 import { EXPRESSION, Program, STATEMENT } from '../ast/ast';
-import { VarDeclaration } from '../ast/declarations.ast';
+import { VariableDeclaration } from '../ast/declarations.ast';
 import { Identifier, NumberLiteral, StringLiteral } from '../ast/literals.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
@@ -30,6 +30,14 @@ export default class Parser {
 	 */
 	private advance(): Token {
 		return this.tokens.shift() as Token;
+	}
+
+	/**
+	 *
+	 * @returns the next token
+	 */
+	private next(): Token {
+		return this.tokens[1] as Token;
 	}
 
 	/**
@@ -71,162 +79,165 @@ export default class Parser {
 			body: [],
 			start: {
 				Line: 1,
-				Column: 0,
+				Column: 1,
 			},
 			end: {
 				Line: 1,
-				Column: 0,
+				Column: 1,
 			},
 		};
 
 		while (this.notEOF()) {
-			// program.body.push(this.parseStatement());
+			program.body.push(this.parseStatement());
 		}
 
-		// program.end = { Line: program.body[program.body.length - 1] }
-
-		console.log(program.body[program.body.length - 1]);
+		program.end = { ...program.body[program.body.length - 1].end };
 
 		return program;
 	}
 
 	// [STATEMENTS]
-	// private parseStatement(): STATEMENT {
-	// 	switch (this.current().type) {
-	// 		case NodeType.Let:
-	// 		case NodeType.Const:
-	// 			return this.parseVarDeclaration();
+	private parseStatement(): STATEMENT {
+		switch (this.current().type) {
+			case NodeType.Let:
+			case NodeType.Const:
+				return this.parseVarDeclaration();
 
-	// 		default:
-	// 			return this.parseExpr();
-	// 	}
-	// }
+			default:
+				return this.parseExpr();
+		}
+	}
 
-	// private parseCodeBlock(): Array<STATEMENT> {
-	// 	this.expect(NodeType.OpenBrace, 'at start of code block');
+	private parseCodeBlock(): Array<STATEMENT> {
+		this.expect(NodeType.OpenBrace, 'at start of code block');
 
-	// 	const body: Array<STATEMENT> = [];
+		const body: Array<STATEMENT> = [];
 
-	// 	while (this.notEOF() && this.current().type !== NodeType.CloseBrace) {
-	// 		const stmt = this.parseStatement();
-	// 		body.push(stmt);
-	// 	}
+		while (this.notEOF() && this.current().type !== NodeType.CloseBrace) {
+			const stmt = this.parseStatement();
+			body.push(stmt);
+		}
 
-	// 	this.expect(NodeType.CloseBrace, 'at end of code block');
+		this.expect(NodeType.CloseBrace, 'at end of code block');
 
-	// 	return body;
-	// }
+		return body;
+	}
 
-	// // [STATEMENTS.DECLARATIONS]
+	// [STATEMENTS.DECLARATIONS]
 
-	// private parseVarDeclaration(): STATEMENT {
-	// 	const isConstant = this.advance().type == NodeType.Const;
-	// 	const identifier = this.expect(
-	// 		NodeType.Identifier,
-	// 		`following ${isConstant ? 'const' : 'let'} keyword`
-	// 	).value;
+	private parseVarDeclaration(): STATEMENT {
+		const varDecTokenPos = this.current().__GSC._POS;
+		const isConstant = this.advance().type == NodeType.Const;
+		const identifier = this.expect(
+			NodeType.Identifier,
+			`following ${isConstant ? 'const' : 'let'} keyword`
+		).value;
 
-	// 	if (this.current().type == NodeType.Semicolon) {
-	// 		this.advance();
-	// 		if (isConstant) {
-	// 			console.log(
-	// 				new ParseError(
-	// 					'Constant variables must be delcared with a value',
-	// 					`${sourceFile}:${getErrorLocation(this.current())}`
-	// 				)
-	// 			);
-	// 			process.exit(1);
-	// 		}
+		if (this.current().type == NodeType.Semicolon) {
+			const semicolonPosData = this.advance().__GSC._POS;
+			if (isConstant) {
+				console.log(
+					new ParseError(
+						'Constant variables must be delcared with a value',
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					)
+				);
+				process.exit(1);
+			}
 
-	// 		return {
-	// 			kind: 'VarDeclaration',
-	// 			constant: false,
-	// 			identifier,
-	// 		} as VarDeclaration;
-	// 	}
+			return {
+				kind: 'VariableDeclaration',
+				constant: false,
+				identifier,
+				start: varDecTokenPos.start,
+				end: semicolonPosData.end,
+			} as VariableDeclaration;
+		}
 
-	// 	this.expect(NodeType.Equals, 'following variable identifier');
+		this.expect(NodeType.Equals, 'following variable identifier');
 
-	// 	const declaration = {
-	// 		kind: 'VarDeclaration',
-	// 		value: this.parseExpr(),
-	// 		identifier,
-	// 		constant: isConstant,
-	// 	} as VarDeclaration;
+		const declaration = {
+			kind: 'VariableDeclaration',
+			value: this.parseExpr(),
+			identifier,
+			constant: isConstant,
+			start: varDecTokenPos.start,
+			end: this.next().__GSC._POS.end,
+		} as VariableDeclaration;
 
-	// 	this.expect(NodeType.Semicolon, 'following variable declaration');
+		this.expect(NodeType.Semicolon, 'following variable declaration');
 
-	// 	return declaration;
-	// }
+		return declaration;
+	}
 
-	// // [EXPRESSIONS]
-	// private parseExpr(): EXPRESSION {
-	// 	return this.parsePrimaryExpression();
-	// }
+	// [EXPRESSIONS]
+	private parseExpr(): EXPRESSION {
+		return this.parsePrimaryExpression();
+	}
 
-	// private parsePrimaryExpression(): EXPRESSION {
-	// 	const token = this.current();
+	private parsePrimaryExpression(): EXPRESSION {
+		const token = this.current();
 
-	// 	switch (token.type) {
-	// 		case NodeType.Identifier:
-	// 			return {
-	// 				kind: 'Identifier',
-	// 				symbol: this.advance().value,
-	// 				start: {
-	// 					Line: token.__GSC._POS.Line,
-	// 					Column: token.__GSC._POS.Column,
-	// 				},
-	// 				end: {
-	// 					Line: token.__GSC._POS.Line,
-	// 					Column: token.__GSC._POS.Column,
-	// 				},
-	// 			} as Identifier;
+		switch (token.type) {
+			case NodeType.Identifier:
+				return {
+					kind: 'Identifier',
+					symbol: this.advance().value,
+					start: {
+						Line: token.__GSC._POS.start.Line,
+						Column: token.__GSC._POS.end.Column,
+					},
+					end: {
+						Line: token.__GSC._POS.end.Line,
+						Column: token.__GSC._POS.start.Column,
+					},
+				} as Identifier;
 
-	// 		case NodeType.Number:
-	// 			return {
-	// 				kind: 'NumberLiteral',
-	// 				value: parseFloat(this.advance().value),
-	// 				start: {
-	// 					Line: token.__GSC._POS.Line,
-	// 					Column: token.__GSC._POS.Column,
-	// 				},
-	// 				end: {
-	// 					Line: token.__GSC._POS.Line,
-	// 					Column: token.__GSC._POS.Column,
-	// 				},
-	// 			} as NumberLiteral;
+			case NodeType.Number:
+				return {
+					kind: 'NumberLiteral',
+					value: parseFloat(this.advance().value),
+					start: {
+						Line: token.__GSC._POS.start.Line,
+						Column: token.__GSC._POS.start.Column,
+					},
+					end: {
+						Line: token.__GSC._POS.end.Line,
+						Column: token.__GSC._POS.end.Column,
+					},
+				} as NumberLiteral;
 
-	// 		case NodeType.String:
-	// 			return {
-	// 				kind: 'StringLiteral',
-	// 				value: this.advance().value,
-	// 				start: {
-	// 					Line: token.__GSC._POS.Line,
-	// 					Column: token.__GSC._POS.Column,
-	// 				},
-	// 				end: {
-	// 					Line: token.__GSC._POS.Line,
-	// 					Column: token.__GSC._POS.Column,
-	// 				},
-	// 			} as StringLiteral;
+			case NodeType.String:
+				return {
+					kind: 'StringLiteral',
+					value: this.advance().value,
+					start: {
+						Line: token.__GSC._POS.start.Line,
+						Column: token.__GSC._POS.start.Column,
+					},
+					end: {
+						Line: token.__GSC._POS.end.Line,
+						Column: token.__GSC._POS.end.Column,
+					},
+				} as StringLiteral;
 
-	// 		case NodeType.OpenParen:
-	// 			this.advance();
-	// 			const value = this.parseExpr();
-	// 			this.expect(NodeType.CloseParen);
+			case NodeType.OpenParen:
+				this.advance();
+				const value = this.parseExpr();
+				this.expect(NodeType.CloseParen);
 
-	// 			return value;
+				return value;
 
-	// 		default:
-	// 			console.log(
-	// 				new ParseError(
-	// 					`Uncaught: Unexpected token "${this.current().type}"`,
-	// 					`${sourceFile || 'GSREPL'}:${
-	// 						this.current().__GSC._POS.Line
-	// 					}:${this.current().__GSC._POS.Column}`
-	// 				)
-	// 			);
-	// 			process.exit(1);
-	// 	}
-	// }
+			default:
+				console.log(
+					new ParseError(
+						`Uncaught: Unexpected token "${this.current().type}"`,
+						`${sourceFile || 'GSREPL'}:${
+							this.current().__GSC._POS.start.Line
+						}:${this.current().__GSC._POS.start.Column}`
+					)
+				);
+				process.exit(1);
+		}
+	}
 }
