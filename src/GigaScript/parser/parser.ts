@@ -11,6 +11,7 @@ import {
 	VariableDeclaration,
 } from '../ast/declarations.ast';
 import { Identifier, NumberLiteral, StringLiteral } from '../ast/literals.ast';
+import { ReturnStatement } from '../ast/statements.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
 import { Token, getTokenByTypeEnum } from '../tokens';
@@ -131,6 +132,8 @@ export default class Parser {
 
 			case NodeType.Func:
 				return this.parseFunctionDeclaration();
+			case NodeType.Return:
+				return this.parseReturnStatement();
 
 			default:
 				return this.parseExpr();
@@ -263,6 +266,24 @@ export default class Parser {
 		return func;
 	}
 
+	private parseReturnStatement(): STATEMENT {
+		const returnTokenPos = this.advance().__GSC._POS;
+
+		const value = this.parseExpr();
+
+		const semicolonTokenPos = this.expect(
+			NodeType.Semicolon,
+			'following return statement'
+		).__GSC._POS;
+
+		return {
+			kind: 'ReturnStatement',
+			value,
+			start: returnTokenPos.start,
+			end: semicolonTokenPos.end,
+		} as ReturnStatement;
+	}
+
 	// [FUNCTIONS.ARGUMENTS/PARAMETERS]
 	private parseArgs(): Array<EXPRESSION> {
 		this.expect(NodeType.OpenParen, 'before parameter list');
@@ -292,6 +313,12 @@ export default class Parser {
 		return this.parsePrimaryExpression();
 	}
 
+	/**
+	 * Expressions parsed in Order of Precedence (_OPC)
+	 * See lexer/types.ts for more info
+	 */
+
+	// Handles everything else
 	private parsePrimaryExpression(): EXPRESSION {
 		const token = this.current();
 
