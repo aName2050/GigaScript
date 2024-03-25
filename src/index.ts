@@ -69,17 +69,6 @@ function runFile(filename: string, location: string) {
 	if (filename.endsWith('.g')) {
 		// Run GigaScript code
 		parser.tokenizeSource(file);
-		parser.Tokens.forEach(token => {
-			console.log(
-				`${NodeType[token.type]} value="${
-					token.value
-				}" -> pos=${JSON.stringify(token.__GSC._POS)}`
-			);
-			console.log(
-				'tokenLength=',
-				token.__GSC._POS.end.Column! - token.__GSC._POS.start.Column!
-			);
-		});
 		const program: Program = parser.generateAST();
 		console.log(program);
 		// const res = evaluate(program, env);

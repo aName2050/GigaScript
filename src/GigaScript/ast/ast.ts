@@ -4,6 +4,8 @@ export type ASTNodeType =
 	| 'VariableDeclaration'
 	| 'FunctionDeclaration'
 	| 'ReturnStatement'
+	| 'CodeBlockNode'
+	| 'EOF'
 	// Expressions
 	| 'AssignmentExpr'
 	| 'UnaryExpr'
@@ -49,4 +51,14 @@ export interface EXPRESSION extends STATEMENT {}
 export interface Program extends STATEMENT {
 	kind: 'Program';
 	body: STATEMENT[];
+}
+
+export interface CodeBlockNode extends STATEMENT {
+	kind: 'CodeBlockNode';
+	body: Array<STATEMENT>;
+}
+
+export interface EndOfFileNode extends ASTNode {
+	kind: 'EOF';
+	value: '<EOF>';
 }

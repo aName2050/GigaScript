@@ -1,4 +1,4 @@
-import { STATEMENT, EXPRESSION } from './ast';
+import { STATEMENT, EXPRESSION, CodeBlockNode } from './ast';
 
 /** Var declaration */
 export interface VariableDeclaration extends STATEMENT {
@@ -13,5 +13,5 @@ export interface FunctionDeclaration extends STATEMENT {
 	kind: 'FunctionDeclaration';
 	parameters: Array<string>;
 	name: string;
-	body: Array<STATEMENT>;
+	body: CodeBlockNode;
 }
