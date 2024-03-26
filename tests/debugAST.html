@@ -7,9 +7,7 @@
 		<style>
 			body {
 				font-family: Arial;
-				margin: 0;
 				padding: 0;
-				margin-left: 10%;
 				background-color: #f4f4f4;
 			}
 
@@ -35,8 +33,8 @@
 			<textarea
 				name="AST JSON"
 				id="ASTInput"
-				rows="50"
-				cols="100"
+				rows="25"
+				cols="200"
 			></textarea>
 			<br />
 			<button id="buildTree" type="button">View as tree</button>
@@ -78,7 +76,7 @@
 					if (typeof keyValue == 'object') {
 						const openGroup = Array.isArray(keyValue) ? '[' : '{';
 						const closeGroup = Array.isArray(keyValue) ? ']' : '}';
-						html += '<li><span>' + node + '</span> ' + openGroup;
+						html += '<li><span>' + node + '</span>: ' + openGroup;
 						html += buildHTMLFromAST(keyValue);
 						html += closeGroup + '</li>';
 					} else {
