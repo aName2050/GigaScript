@@ -11,6 +11,21 @@
 				padding: 0;
 				background-color: #f4f4f4;
 			}
+
+			li {
+				padding: 2px;
+				border: 1px solid black;
+				border-radius: 10px;
+			}
+
+			ul {
+				list-style-type: none;
+			}
+
+			#ast-container {
+				border: 1px solid black;
+				border-radius: 10px;
+			}
 		</style>
 	</head>
 	<body>
@@ -24,6 +39,7 @@
 			></textarea>
 			<br />
 			<button id="buildTree" type="button">View as tree</button>
+			<button id="clear" type="button">Clear</button>
 		</div>
 		<h2>AST Tree</h2>
 		<div id="ast-container"></div>
@@ -31,14 +47,25 @@
 			var btn = document.getElementById('buildTree');
 			var txtarea = document.getElementById('ASTInput');
 
+			var clear = document.getElementById('clear');
+
+			var container = document.getElementById('ast-container');
+
 			btn.addEventListener(
 				'click',
 				function () {
 					if (!txtarea.value) return alert('an input is required');
-					var container = document.getElementById('ast-container');
 					container.innerHTML = buildHTMLFromAST(
 						JSON.parse(txtarea.value)
 					);
+				},
+				false
+			);
+
+			clear.addEventListener(
+				'click',
+				function () {
+					container.innerHTML = '';
 				},
 				false
 			);
@@ -48,9 +75,11 @@
 				for (var node in ast) {
 					const keyValue = ast[node];
 					if (typeof keyValue == 'object') {
-						html += '<li><span>' + node + '</span>';
+						const openGroup = Array.isArray(keyValue) ? '[' : '{';
+						const closeGroup = Array.isArray(keyValue) ? ']' : '}';
+						html += '<li><span>' + node + '</span> ' + openGroup;
 						html += buildHTMLFromAST(keyValue);
-						html += '</li>';
+						html += closeGroup + '</li>';
 					} else {
 						html += '<li>';
 						html += `${node}: ${keyValue}`;
