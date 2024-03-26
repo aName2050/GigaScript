@@ -28,16 +28,21 @@ argParser.add_argument('-v', '--version', {
 });
 argParser.add_argument('-f', '--file', {
 	// action: 'fileInput',
-	help: 'Specify the file you want to run',
+	help: '-f <file> OR --file <file>  Specify the file you want to run',
 });
 argParser.add_argument('--useCUDA', {
 	// action: 'enableCUDA',
-	help: '-useCUDA <true | false>  Enables CUDA for tokenization. Requires NVIDIA GPU with CUDA Cores.',
+	help: '--useCUDA <true | false>  Enables CUDA for tokenization. Requires NVIDIA GPU with CUDA Cores.',
+});
+argParser.add_argument('--ASTOnly', {
+	// action: 'disableEvaluation'
+	help: '--ASTOnly <true | false>  Disables evaluation and only outputs the AST for debugging purposes.',
 });
 
 const CLIArgs: CLIArguments = argParser.parse_args();
 const file: string | undefined = CLIArgs.file;
 const useCUDA: boolean = CLIArgs.useCUDA || false;
+const ASTOnly: boolean = CLIArgs.ASTOnly || false;
 
 const fileLocation: string = file ? path.parse(file).dir : '';
 
@@ -70,7 +75,9 @@ function runFile(filename: string, location: string) {
 		// Run GigaScript code
 		parser.tokenizeSource(file);
 		const program: Program = parser.generateAST();
-		console.log(program);
+		if (ASTOnly) {
+			console.log(JSON.stringify(program));
+		}
 		// const res = evaluate(program, env);
 		// return res;
 	} else if (filename.endsWith('.gsx')) {
