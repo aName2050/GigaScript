@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>AST Viewer</title>
+		<style>
+			body {
+				font-family: Arial;
+				/* margin: 0; */
+				padding: 0;
+				background-color: #f4f4f4;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="astBuilder">
+			<h1>Build AST</h1>
+			<textarea
+				name="AST JSON"
+				id="ASTInput"
+				rows="50"
+				cols="100"
+			></textarea>
+			<br />
+			<button id="buildTree" type="button">View as tree</button>
+		</div>
+		<h2>AST Tree</h2>
+		<div id="ast-container"></div>
+		<script>
+			var btn = document.getElementById('buildTree');
+			var txtarea = document.getElementById('ASTInput');
+
+			btn.addEventListener(
+				'click',
+				function () {
+					if (!txtarea.value) return alert('an input is required');
+					var container = document.getElementById('ast-container');
+					container.innerHTML = buildHTMLFromAST(
+						JSON.parse(txtarea.value)
+					);
+				},
+				false
+			);
+
+			function buildHTMLFromAST(ast) {
+				let html = '<ul>';
+				for (var node in ast) {
+					const keyValue = ast[node];
+					if (typeof keyValue == 'object') {
+						html += '<li><span>' + node + '</span>';
+						html += buildHTMLFromAST(keyValue);
+						html += '</li>';
+					} else {
+						html += '<li>';
+						html += `${node}: ${keyValue}`;
+						html += '</li>';
+					}
+				}
+
+				html += '</ul>';
+				return html;
+			}
+		</script>
+		<br />
+		<br />
+		<br />
+	</body>
+</html>
