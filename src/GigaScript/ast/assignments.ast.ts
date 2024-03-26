@@ -8,7 +8,7 @@ export interface AssignmentExpr extends EXPRESSION {
 	kind: 'AssignmentExpr';
 	assigne: EXPRESSION;
 	value: EXPRESSION;
-	AsgOp: '&=' | '|=' | '^=' | '<<=' | '>>=' | '>>>=';
+	AsgOp: '&=' | '|=' | '^=' | '<<=' | '>>=' | '>>>=' | '=';
 }
 
 /**

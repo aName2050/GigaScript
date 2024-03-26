@@ -1,4 +1,5 @@
 import { sourceFile } from '../..';
+import { AssignmentExpr } from '../ast/assignments.ast';
 import {
 	CodeBlockNode,
 	EXPRESSION,
@@ -6,6 +7,7 @@ import {
 	Program,
 	STATEMENT,
 } from '../ast/ast';
+import { BinaryExpr } from '../ast/binop.ast';
 import {
 	FunctionDeclaration,
 	VariableDeclaration,
@@ -310,13 +312,70 @@ export default class Parser {
 
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
-		return this.parsePrimaryExpression();
+		return this.parseAsgExpr();
 	}
 
 	/**
 	 * Expressions parsed in Order of Precedence (_OPC)
 	 * See lexer/types.ts for more info
 	 */
+
+	private parseAsgExpr(): EXPRESSION {
+		const lhs = this.parseMultiplicativeExpr();
+
+		if (this.current().type == NodeType.Equals) {
+			this.advance();
+			const rhs = this.parseAsgExpr();
+			return {
+				kind: 'AssignmentExpr',
+				value: rhs,
+				assigne: lhs,
+				AsgOp: '=',
+				start: lhs.start,
+				end: rhs.end,
+			} as AssignmentExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseMultiplicativeExpr(): EXPRESSION {
+		let lhs = this.parseAdditiveExpr();
+
+		while (['*', '/', '%'].includes(this.current().value)) {
+			const op = this.advance().value;
+			const rhs = this.parseMultiplicativeExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseAdditiveExpr(): EXPRESSION {
+		let lhs = this.parsePrimaryExpression();
+
+		while (['+', '-'].includes(this.current().value)) {
+			const op = this.advance().value;
+			const rhs = this.parseAdditiveExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
 
 	// Handles everything else
 	private parsePrimaryExpression(): EXPRESSION {
