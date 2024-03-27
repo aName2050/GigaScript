@@ -4,6 +4,7 @@ export type ASTNodeType =
 	| 'VariableDeclaration'
 	| 'FunctionDeclaration'
 	| 'ReturnStatement'
+	| 'TryCatchStatement'
 	| 'CodeBlockNode'
 	| 'EOF'
 	// Expressions

@@ -20,7 +20,7 @@ import {
 	Property,
 	StringLiteral,
 } from '../ast/literals.ast';
-import { ReturnStatement } from '../ast/statements.ast';
+import { ReturnStatement, TryCatchStatement } from '../ast/statements.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
 import { Token, getTokenByTypeEnum } from '../tokens';
@@ -349,8 +349,7 @@ export default class Parser {
 
 	private parseObjectExpr(): EXPRESSION {
 		if (this.current().type !== NodeType.OpenBrace) {
-			// TODO: implement Try-Catch blocks
-			return this.parseMultiplicativeExpr();
+			return this.parseTryCatchExpr();
 		}
 
 		const startTokenPos = this.advance().__GSC._POS;
@@ -432,6 +431,60 @@ export default class Parser {
 			start: startTokenPos.start,
 			end: closeBracePos.end,
 		} as ObjectLiteral;
+	}
+
+	private parseTryCatchExpr(): EXPRESSION {
+		if (this.current().type != NodeType.Try)
+			return this.parseMultiplicativeExpr();
+
+		const tryTokenPos = this.advance().__GSC._POS;
+
+		const tryBody = this.parseCodeBlock();
+
+		const catchTokenPos = this.expect(
+			NodeType.Catch,
+			'in "Try-Catch" statement'
+		);
+
+		const args = this.parseArgs();
+		const params: Array<string> = [];
+
+		if (args.length != 1) {
+			console.log(
+				new ParseError(
+					'"Catch" statements can only have one argument, containing the error variable',
+					`${sourceFile}:${catchTokenPos.__GSC._POS.start.Line}:${catchTokenPos.__GSC._POS.start.Column}`
+				)
+			);
+		}
+
+		for (const arg of args) {
+			if (arg.kind !== 'Identifier') {
+				console.log(arg);
+				console.log(
+					new ParseError(
+						'Expected arguments to be identifiers',
+						`${sourceFile}:${
+							this.current().__GSC._POS.start.Line
+						}:${this.current().__GSC._POS.start.Column}`
+					)
+				);
+				process.exit(1);
+			}
+
+			params.push((arg as Identifier).symbol);
+		}
+
+		const catchBody = this.parseCodeBlock();
+
+		return {
+			kind: 'TryCatchStatement',
+			tryBody,
+			catchBody,
+			errorIdentifier: params[0],
+			start: tryTokenPos.start,
+			end: catchBody.end,
+		} as TryCatchStatement;
 	}
 
 	private parseMultiplicativeExpr(): EXPRESSION {

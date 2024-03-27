@@ -18,3 +18,9 @@ const obj = {
 print(obj.x)
 print(obj.string)
 print(obj.complex.foo)
+
+try {
+    print("hello world!")
+} catch (e) {
+    print(e)
+}
