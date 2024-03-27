@@ -12,8 +12,14 @@ import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../ast/declarations.ast';
-import { CallExpr } from '../ast/expressions.ast';
-import { Identifier, NumberLiteral, StringLiteral } from '../ast/literals.ast';
+import { CallExpr, MemberExpr } from '../ast/expressions.ast';
+import {
+	Identifier,
+	NumberLiteral,
+	ObjectLiteral,
+	Property,
+	StringLiteral,
+} from '../ast/literals.ast';
 import { ReturnStatement } from '../ast/statements.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
@@ -323,7 +329,7 @@ export default class Parser {
 	//
 
 	private parseAsgExpr(): EXPRESSION {
-		const lhs = this.parseMultiplicativeExpr();
+		const lhs = this.parseObjectExpr();
 
 		if (this.current().type == NodeType.Equals) {
 			this.advance();
@@ -339,6 +345,93 @@ export default class Parser {
 		}
 
 		return lhs;
+	}
+
+	private parseObjectExpr(): EXPRESSION {
+		if (this.current().type !== NodeType.OpenBrace) {
+			// TODO: implement Try-Catch blocks
+			return this.parseMultiplicativeExpr();
+		}
+
+		const startTokenPos = this.advance().__GSC._POS;
+		const properties = new Array<Property>();
+
+		while (this.notEOF() && this.current().type != NodeType.CloseBrace) {
+			const key = this.expect(
+				NodeType.Identifier,
+				'as key for KEY-VALUE pair declaration on object expression'
+			);
+
+			if (this.current().type == NodeType.Comma) {
+				// { key, }
+				this.advance();
+				properties.push({
+					key: key.value,
+					kind: 'ObjectProperty',
+					start: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+					end: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+				});
+				continue;
+			} else if (this.current().type == NodeType.CloseBrace) {
+				// { key }
+				properties.push({
+					key: key.value,
+					kind: 'ObjectProperty',
+					start: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+					end: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+				} as Property);
+				continue;
+			}
+
+			// { key: value }
+			this.expect(NodeType.Colon, 'after identifier');
+			const value = this.parseExpr();
+
+			properties.push({
+				kind: 'ObjectProperty',
+				value,
+				key: key.value,
+				start: {
+					Line: key.__GSC._POS.start.Line!,
+					Column: key.__GSC._POS.start.Column!,
+				},
+				end: {
+					Line: key.__GSC._POS.start.Line!,
+					Column: key.__GSC._POS.start.Column!,
+				},
+			} as Property);
+
+			if (this.current().type != NodeType.CloseBrace) {
+				this.expect(
+					NodeType.Comma,
+					'or closing brace following property declaration'
+				);
+			}
+		}
+
+		const closeBracePos = this.expect(
+			NodeType.CloseBrace,
+			'at end of object declaration expression'
+		).__GSC._POS;
+
+		return {
+			kind: 'ObjectLiteral',
+			properties,
+			start: startTokenPos.start,
+			end: closeBracePos.end,
+		} as ObjectLiteral;
 	}
 
 	private parseMultiplicativeExpr(): EXPRESSION {
@@ -361,7 +454,7 @@ export default class Parser {
 	}
 
 	private parseAdditiveExpr(): EXPRESSION {
-		let lhs = this.parsePrimaryExpression();
+		let lhs = this.parseCallMemberExpr();
 
 		while (['+', '-'].includes(this.current().value)) {
 			const op = this.advance().value;
@@ -386,7 +479,7 @@ export default class Parser {
 	//
 
 	private parseCallMemberExpr(): EXPRESSION {
-		const member = this.parseCallMemberExpr();
+		const member = this.parseMemberExpr();
 
 		if (this.current().type == NodeType.OpenParen) {
 			return this.parseCallExpr(member);
@@ -423,14 +516,38 @@ export default class Parser {
 			let computed: boolean;
 
 			if (op.type == NodeType.Dot) {
+				// non-computed values, like "foo.bar"
 				computed = false;
 				property = this.parsePrimaryExpression();
 
 				if (property.kind != 'Identifier') {
-					// con;
+					console.log(
+						new ParseError(
+							'A dot operator must be used with a valid identifier',
+							`${sourceFile}:${property.start.Line}:${property.start.Column}`
+						)
+					);
+					process.exit(1);
 				}
+			} else {
+				// computed values, like "foo[bar]"
+				computed = true;
+				property = this.parseExpr();
+				this.expect(
+					NodeType.CloseBracket,
+					'following computed object member expression'
+				);
 			}
+
+			object = {
+				kind: 'MemberExpr',
+				object,
+				property,
+				computed,
+			} as MemberExpr;
 		}
+
+		return object;
 	}
 
 	// Handles everything else

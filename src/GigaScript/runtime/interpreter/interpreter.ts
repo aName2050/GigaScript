@@ -41,7 +41,7 @@ export function evaluate(
 			new GSError(
 				'RuntimeError',
 				'Unknown or undefined node during interpretation',
-				`${sourceFile}:unknown:unknown`
+				`${sourceFile}`
 			)
 		);
 		process.exit(1);
@@ -64,15 +64,15 @@ export function evaluate(
 		case 'Identifier':
 			return evalIdentifier(node as Identifier, env);
 
-		// case 'ObjectLiteral':
-		// 	return evalObjectExpr(node as ObjectLiteral, env);
+		case 'ObjectLiteral':
+			return evalObjectExpr(node as ObjectLiteral, env);
 
 		// Handle expressions
-		// case 'MemberExpr':
-		// 	return evalMemberExpr(env, null, node as MemberExpr);
+		case 'MemberExpr':
+			return evalMemberExpr(env, null, node as MemberExpr);
 
-		// case 'CallExpr':
-		// 	return evalCallExpr(node as CallExpr, env);
+		case 'CallExpr':
+			return evalCallExpr(node as CallExpr, env);
 
 		case 'BinaryExpr':
 			return evalBinaryExpr(node as BinaryExpr, env);
@@ -99,7 +99,7 @@ export function evaluate(
 				new GSError(
 					'RuntimeError',
 					`AST Node not implemented; "${node.kind}" has not been implemented into GigaScript yet`,
-					`${sourceFile}:unknown:unknown`
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
 				)
 			);
 			process.exit(1);

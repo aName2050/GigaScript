@@ -6,3 +6,15 @@ func add(a, b) {
 }
 
 print(add(1, 2))
+
+const obj = {
+    x: 32,
+    string,
+    complex: {
+        foo: "bar"
+    }
+};
+
+print(obj.x)
+print(obj.string)
+print(obj.complex.foo)

@@ -267,6 +267,8 @@ export function evalMemberExpr(
 	if (expr) {
 		const Var = env.lookupOrModifyObject(expr);
 
+		console.log(expr);
+
 		return Var;
 	} else if (node) {
 		const Var = env.lookupOrModifyObject(
