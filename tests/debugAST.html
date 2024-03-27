@@ -65,6 +65,7 @@
 				'click',
 				function () {
 					container.innerHTML = '';
+					txtarea.value = '';
 				},
 				false
 			);
@@ -81,7 +82,7 @@
 						html += closeGroup + '</li>';
 					} else {
 						html += '<li>';
-						html += `${node}: ${keyValue}`;
+						html += `${node}: "${keyValue}"`;
 						html += '</li>';
 					}
 				}
