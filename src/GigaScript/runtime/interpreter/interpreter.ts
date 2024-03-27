@@ -2,7 +2,10 @@ import { sourceFile } from '../../../index';
 import { AssignmentExpr, UnaryExpr } from '../../ast/assignments.ast';
 import { Program, STATEMENT } from '../../ast/ast';
 import { BinaryExpr } from '../../ast/binop.ast';
-import { FuncDeclaration, VarDeclaration } from '../../ast/declarations.ast';
+import {
+	FunctionDeclaration,
+	VariableDeclaration,
+} from '../../ast/declarations.ast';
 import { CallExpr, MemberExpr } from '../../ast/expressions.ast';
 import {
 	Identifier,
@@ -21,7 +24,6 @@ import {
 	evalIdentifier,
 	evalMemberExpr,
 	evalObjectExpr,
-	evalUnaryExpr,
 } from './eval/expressions';
 import {
 	evalFuncDeclaration,
@@ -62,21 +64,18 @@ export function evaluate(
 		case 'Identifier':
 			return evalIdentifier(node as Identifier, env);
 
-		case 'ObjectLiteral':
-			return evalObjectExpr(node as ObjectLiteral, env);
+		// case 'ObjectLiteral':
+		// 	return evalObjectExpr(node as ObjectLiteral, env);
 
 		// Handle expressions
-		case 'MemberExpr':
-			return evalMemberExpr(env, null, node as MemberExpr);
+		// case 'MemberExpr':
+		// 	return evalMemberExpr(env, null, node as MemberExpr);
 
-		case 'CallExpr':
-			return evalCallExpr(node as CallExpr, env);
+		// case 'CallExpr':
+		// 	return evalCallExpr(node as CallExpr, env);
 
 		case 'BinaryExpr':
 			return evalBinaryExpr(node as BinaryExpr, env);
-
-		case 'UnaryExpr':
-			return evalUnaryExpr(node as UnaryExpr, env);
 
 		case 'AssignmentExpr':
 			return evalAssignment(node as AssignmentExpr, env);
@@ -85,11 +84,11 @@ export function evaluate(
 		case 'Program':
 			return evalProgram(node as Program, env);
 
-		case 'VarDeclaration':
-			return evalVarDeclaration(node as VarDeclaration, env);
+		case 'VariableDeclaration':
+			return evalVarDeclaration(node as VariableDeclaration, env);
 
-		case 'FuncDeclaration':
-			return evalFuncDeclaration(node as FuncDeclaration, env);
+		case 'FunctionDeclaration':
+			return evalFuncDeclaration(node as FunctionDeclaration, env);
 
 		case 'ReturnStatement':
 			return evalReturnStatement(node as ReturnStatement, env);

@@ -75,11 +75,12 @@ function runFile(filename: string, location: string) {
 		// Run GigaScript code
 		parser.tokenizeSource(file);
 		const program: Program = parser.generateAST();
-		if (ASTOnly) {
-			console.log(JSON.stringify(program));
-		}
-		// const res = evaluate(program, env);
-		// return res;
+
+		if (ASTOnly) return console.log(JSON.stringify(program));
+
+		const res = evaluate(program, env);
+
+		return res;
 	} else if (filename.endsWith('.gsx')) {
 		// Run GigaScript-X code
 		throw 'Not implemented';

@@ -1,4 +1,4 @@
-import { STATEMENT } from '../ast/ast';
+import { CodeBlockNode, STATEMENT } from '../ast/ast';
 import Environment from './env';
 
 export type DataType =
@@ -74,7 +74,7 @@ export interface FuncVal extends Value<'function', Function> {
 	name: string;
 	params: Array<string>;
 	decEnv: Environment;
-	body: Array<STATEMENT>;
+	body: CodeBlockNode;
 }
 
 export const DataConstructors = {

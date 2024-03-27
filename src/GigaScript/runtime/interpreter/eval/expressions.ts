@@ -321,7 +321,7 @@ export function evalCallExpr(
 
 		let result: Value<DataType, any> = DataConstructors.UNDEFINED();
 
-		for (const stmt of func.body) {
+		for (const stmt of func.body.body) {
 			if (stmt.kind == 'ReturnStatement') {
 				result = evaluate(stmt, scope);
 				break;
@@ -359,60 +359,4 @@ export function evalObjectExpr(
 	}
 
 	return object;
-}
-
-export function evalUnaryExpr(
-	expr: UnaryExpr,
-	env: Environment
-): Value<DataType, any> {
-	if (expr.AsgOp == '++') {
-		const oldValue = getValue(env.lookupVar(expr.assigne.symbol));
-		if (typeof oldValue != 'number') {
-			console.log(
-				new GSError(
-					'EvalError',
-					'Can not use unary operator "++" on non-number value',
-					`${sourceFile}:unknown:unknown`
-				)
-			);
-			process.exit(1);
-		}
-
-		const newValue = oldValue + 1;
-		env.assignVar(expr.assigne.symbol, DataConstructors.NUMBER(newValue));
-
-		return DataConstructors.NUMBER(newValue);
-	} else if (expr.AsgOp == '--') {
-		const oldValue = getValue(env.lookupVar(expr.assigne.symbol));
-		if (typeof oldValue != 'number') {
-			console.log(
-				new GSError(
-					'EvalError',
-					'Can not use unary operator "--" on non-number value',
-					`${sourceFile}:unknown:unknown`
-				)
-			);
-			process.exit(1);
-		}
-
-		const newValue = oldValue - 1;
-		env.assignVar(expr.assigne.symbol, DataConstructors.NUMBER(newValue));
-
-		return DataConstructors.NUMBER(newValue);
-	} else if (expr.AsgOp == '~') {
-		const value = env.lookupVar(expr.assigne.symbol) as Value<
-			'number',
-			number
-		>;
-		return DataConstructors.NUMBER(~value);
-	} else {
-		console.log(
-			new GSError(
-				'EvalError',
-				`Unknown unary operator "${expr.AsgOp}"`,
-				`${sourceFile}:unknown:unknown`
-			)
-		);
-		process.exit(1);
-	}
 }

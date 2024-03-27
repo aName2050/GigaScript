@@ -12,6 +12,7 @@ import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../ast/declarations.ast';
+import { CallExpr } from '../ast/expressions.ast';
 import { Identifier, NumberLiteral, StringLiteral } from '../ast/literals.ast';
 import { ReturnStatement } from '../ast/statements.ast';
 import { tokenize } from '../lexer/tokenizer';
@@ -315,10 +316,11 @@ export default class Parser {
 		return this.parseAsgExpr();
 	}
 
-	/**
-	 * Expressions parsed in Order of Precedence (_OPC)
-	 * See lexer/types.ts for more info
-	 */
+	//
+	// Expressions parsed in Order of Precedence (_OPC)
+	//
+	// See lexer/types.ts for more info
+	//
 
 	private parseAsgExpr(): EXPRESSION {
 		const lhs = this.parseMultiplicativeExpr();
@@ -375,6 +377,60 @@ export default class Parser {
 		}
 
 		return lhs;
+	}
+
+	// [OTHER]
+
+	//
+	// Any other operation that has the "_OPC.None" property
+	//
+
+	private parseCallMemberExpr(): EXPRESSION {
+		const member = this.parseCallMemberExpr();
+
+		if (this.current().type == NodeType.OpenParen) {
+			return this.parseCallExpr(member);
+		}
+
+		return member;
+	}
+
+	private parseCallExpr(caller: EXPRESSION): EXPRESSION {
+		const args = this.parseArgs();
+		let callExpr: EXPRESSION = {
+			kind: 'CallExpr',
+			caller,
+			args,
+			start: caller.start,
+			end: args[args.length - 1].end,
+		} as CallExpr;
+
+		if (this.current().type == NodeType.OpenParen)
+			callExpr = this.parseCallExpr(callExpr);
+
+		return callExpr;
+	}
+
+	private parseMemberExpr(): EXPRESSION {
+		let object = this.parsePrimaryExpression();
+
+		while (
+			this.current().type == NodeType.Dot ||
+			this.current().type == NodeType.OpenBracket
+		) {
+			const op = this.advance();
+			let property: EXPRESSION;
+			let computed: boolean;
+
+			if (op.type == NodeType.Dot) {
+				computed = false;
+				property = this.parsePrimaryExpression();
+
+				if (property.kind != 'Identifier') {
+					// con;
+				}
+			}
+		}
 	}
 
 	// Handles everything else

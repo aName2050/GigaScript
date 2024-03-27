@@ -1,5 +1,8 @@
 import { Program } from '../../../ast/ast';
-import { FuncDeclaration, VarDeclaration } from '../../../ast/declarations.ast';
+import {
+	FunctionDeclaration,
+	VariableDeclaration,
+} from '../../../ast/declarations.ast';
 import { ReturnStatement } from '../../../ast/statements.ast';
 import Environment from '../../env';
 import { DataConstructors, DataType, FuncVal, Value } from '../../types';
@@ -19,7 +22,7 @@ export function evalProgram(
 }
 
 export function evalVarDeclaration(
-	declaration: VarDeclaration,
+	declaration: VariableDeclaration,
 	env: Environment
 ): Value<DataType, any> {
 	const value = declaration.value
@@ -30,7 +33,7 @@ export function evalVarDeclaration(
 }
 
 export function evalFuncDeclaration(
-	declaration: FuncDeclaration,
+	declaration: FunctionDeclaration,
 	env: Environment
 ): Value<DataType, Function> {
 	const func = {
