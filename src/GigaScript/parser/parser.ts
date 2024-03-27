@@ -614,11 +614,11 @@ export default class Parser {
 					symbol: this.advance().value,
 					start: {
 						Line: token.__GSC._POS.start.Line,
-						Column: token.__GSC._POS.end.Column,
+						Column: token.__GSC._POS.start.Column,
 					},
 					end: {
 						Line: token.__GSC._POS.end.Line,
-						Column: token.__GSC._POS.start.Column,
+						Column: token.__GSC._POS.end.Column,
 					},
 				} as Identifier;
 
