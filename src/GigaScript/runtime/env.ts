@@ -106,16 +106,35 @@ export default class Environment {
 
 	public lookupOrModifyObject(
 		expr: MemberExpr,
-		value?: Value<DataType, any>,
-		property?: Identifier
+		value?: Value<DataType, any>
 	): Value<DataType, any> {
+		if (expr.object.kind == 'MemberExpr') {
+			const object = this.lookupOrModifyObject(
+				expr.object as MemberExpr,
+				value
+			);
+
+			return (object as ObjectValue).properties.get(
+				expr.property.symbol
+			)!;
+		}
+
+		const varName = (expr.object as Identifier).symbol;
+		const env = this.resolve(varName);
+
+		let object = env.variables.get(varName);
+
+		return (object as ObjectValue).properties.get(expr.property.symbol)!;
+
+		// console.log('expr:', expr);
 		// if (expr.object.kind === 'MemberExpr') {
-		// 	console.log('complex object!');
-		// 	return this.lookupOrModifyObject(
+		// 	const object = this.lookupOrModifyObject(
 		// 		expr.object as MemberExpr,
 		// 		value,
 		// 		expr.property as Identifier
 		// 	);
+		// 	console.log('obj:', object);
+		// 	return DataConstructors.NULL();
 		// }
 
 		// const varName = (expr.object as Identifier).symbol;
@@ -133,6 +152,5 @@ export default class Environment {
 		// if (currProp) oldVal = oldVal.properties.get(currProp) as ObjectValue;
 
 		// return oldVal;
-		return DataConstructors.NULL();
 	}
 }
