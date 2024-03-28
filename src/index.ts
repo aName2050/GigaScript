@@ -28,7 +28,7 @@ argParser.add_argument('-v', '--version', {
 });
 argParser.add_argument('-f', '--file', {
 	metavar: 'FILE',
-	type: 'string',
+	type: 'str',
 	help: 'the file to run',
 });
 argParser.add_argument('--useCUDA', {
