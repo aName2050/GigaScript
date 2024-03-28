@@ -34,12 +34,12 @@ argParser.add_argument('-f', '--file', {
 argParser.add_argument('--useCUDA', {
 	// action: 'enableCUDA',
 	help: 'enable CUDA for tokenization. Requires NVIDIA GPU with CUDA Cores.',
-	type: 'bool',
+	type: Boolean,
 });
 argParser.add_argument('--ASTOnly', {
 	// action: 'disableEvaluation'
 	help: 'disables evaluation and only outputs the AST for debugging purposes.',
-	type: 'bool',
+	type: Boolean,
 });
 
 const CLIArgs: CLIArguments = argParser.parse_args();
