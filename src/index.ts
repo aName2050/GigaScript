@@ -27,16 +27,17 @@ argParser.add_argument('-v', '--version', {
 	help: 'GigaScript Runtime version',
 });
 argParser.add_argument('-f', '--file', {
-	// action: 'fileInput',
-	help: '-f <file> OR --file <file>  Specify the file you want to run',
+	metavar: 'FILE',
+	type: 'string',
+	help: 'the file to run',
 });
 argParser.add_argument('--useCUDA', {
 	// action: 'enableCUDA',
-	help: '--useCUDA <true | false>  Enables CUDA for tokenization. Requires NVIDIA GPU with CUDA Cores.',
+	help: 'enable CUDA for tokenization. Requires NVIDIA GPU with CUDA Cores.',
 });
 argParser.add_argument('--ASTOnly', {
 	// action: 'disableEvaluation'
-	help: '--ASTOnly <true | false>  Disables evaluation and only outputs the AST for debugging purposes.',
+	help: 'disables evaluation and only outputs the AST for debugging purposes.',
 });
 
 const CLIArgs: CLIArguments = argParser.parse_args();
@@ -51,8 +52,8 @@ const srcFileLocStr: string | undefined = file ? path.resolve(file) : undefined;
 export { CLIArgs, srcFileLocStr as sourceFile, useCUDA };
 
 const REPL = {
-	parser: undefined,
-	env: undefined,
+	parser: new Parser(),
+	env: createGlobalScope(process.cwd()),
 	v: 'v1',
 };
 
@@ -98,6 +99,10 @@ function handle(
 	callback: any
 ): void {
 	// handle REPL
+	REPL.parser.tokenizeSource(uIn);
+	const script = REPL.parser.generateAST();
+
+	evaluate(script, REPL.env);
 
 	callback();
 }
