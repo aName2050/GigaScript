@@ -5,7 +5,7 @@ const obj = {
     complex: {
         foo: "bar",
         more: {
-            advanced: 'hello'
+            advanced: 'cool'
         }
     }
 };

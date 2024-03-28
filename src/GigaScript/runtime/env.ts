@@ -122,35 +122,8 @@ export default class Environment {
 		const varName = (expr.object as Identifier).symbol;
 		const env = this.resolve(varName);
 
-		let object = env.variables.get(varName);
+		let object = env.variables.get(varName) as ObjectValue;
 
-		return (object as ObjectValue).properties.get(expr.property.symbol)!;
-
-		// console.log('expr:', expr);
-		// if (expr.object.kind === 'MemberExpr') {
-		// 	const object = this.lookupOrModifyObject(
-		// 		expr.object as MemberExpr,
-		// 		value,
-		// 		expr.property as Identifier
-		// 	);
-		// 	console.log('obj:', object);
-		// 	return DataConstructors.NULL();
-		// }
-
-		// const varName = (expr.object as Identifier).symbol;
-		// const env = this.resolve(varName);
-
-		// let oldVal = env.variables.get(varName) as ObjectValue;
-
-		// const prop = property
-		// 	? property.symbol
-		// 	: (expr.property as Identifier).symbol;
-		// const currProp = (expr.property as Identifier).symbol;
-
-		// if (value) oldVal.properties.set(prop, value);
-
-		// if (currProp) oldVal = oldVal.properties.get(currProp) as ObjectValue;
-
-		// return oldVal;
+		return object;
 	}
 }

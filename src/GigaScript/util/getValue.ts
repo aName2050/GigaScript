@@ -9,7 +9,7 @@ import {
 export function getValue(
 	value: Value<DataType, any>
 ): number | boolean | null | undefined | string | object | Array<any> {
-	switch (value.type) {
+	switch (value?.type) {
 		case 'number':
 			return (value as Value<'number', number>).value;
 		case 'string':
