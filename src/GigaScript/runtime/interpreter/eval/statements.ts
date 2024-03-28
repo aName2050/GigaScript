@@ -1,9 +1,13 @@
-import { Program } from '../../../ast/ast';
+import { CodeBlockNode, Program } from '../../../ast/ast';
 import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../../../ast/declarations.ast';
-import { ReturnStatement } from '../../../ast/statements.ast';
+import {
+	ReturnStatement,
+	ThrowStatement,
+	TryCatchStatement,
+} from '../../../ast/statements.ast';
 import Environment from '../../env';
 import { DataConstructors, DataType, FuncVal, Value } from '../../types';
 import { evaluate } from '../interpreter';
@@ -54,4 +58,51 @@ export function evalReturnStatement(
 	const value = evaluate(statement.value, env);
 
 	return value;
+}
+
+export function evalTryCatchStatement(
+	statement: TryCatchStatement,
+	env: Environment
+): Value<DataType, any> {
+	const tryEnv = new Environment(env.cwd, env);
+	const catchEnv = new Environment(env.cwd, env);
+
+	try {
+		return evalCodeBlock(statement.tryBody, tryEnv, false);
+	} catch (e) {
+		catchEnv.delcareVar(
+			statement.errorIdentifier,
+			DataConstructors.STRING(String(e)),
+			true
+		);
+		return evalCodeBlock(statement.catchBody, catchEnv, false);
+	}
+}
+
+export function evalThrowStatement(
+	statement: ThrowStatement,
+	env: Environment
+): Value<'null', null> {
+	const message = evaluate(statement.message, env);
+
+	throw message.value;
+}
+
+export function evalCodeBlock(
+	body: CodeBlockNode,
+	env: Environment,
+	createNewEnv = true
+): Value<DataType, any> {
+	let scope: Environment;
+
+	if (createNewEnv) scope = new Environment(env.cwd, env);
+	else scope = env;
+
+	let res: Value<DataType, any> = DataConstructors.NULL();
+
+	for (const stmt of body.body) {
+		res = evaluate(stmt, scope);
+	}
+
+	return res;
 }

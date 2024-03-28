@@ -20,7 +20,11 @@ import {
 	Property,
 	StringLiteral,
 } from '../ast/literals.ast';
-import { ReturnStatement, TryCatchStatement } from '../ast/statements.ast';
+import {
+	ReturnStatement,
+	ThrowStatement,
+	TryCatchStatement,
+} from '../ast/statements.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
 import { Token, getTokenByTypeEnum } from '../tokens';
@@ -143,6 +147,9 @@ export default class Parser {
 				return this.parseFunctionDeclaration();
 			case NodeType.Return:
 				return this.parseReturnStatement();
+
+			case NodeType.Throw:
+				return this.parseThrowStatement();
 
 			default:
 				return this.parseExpr();
@@ -291,6 +298,18 @@ export default class Parser {
 			start: returnTokenPos.start,
 			end: semicolonTokenPos.end,
 		} as ReturnStatement;
+	}
+
+	private parseThrowStatement(): STATEMENT {
+		const throwTokenPos = this.advance().__GSC._POS;
+		const message = this.parseExpr();
+
+		return {
+			kind: 'ThrowStatement',
+			message,
+			start: throwTokenPos.start,
+			end: message.end,
+		} as ThrowStatement;
 	}
 
 	// [FUNCTIONS.ARGUMENTS/PARAMETERS]

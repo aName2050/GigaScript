@@ -11,3 +11,8 @@ export interface TryCatchStatement extends STATEMENT {
 	catchBody: CodeBlockNode;
 	errorIdentifier: string;
 }
+
+export interface ThrowStatement extends STATEMENT {
+	kind: 'ThrowStatement';
+	message: EXPRESSION;
+}

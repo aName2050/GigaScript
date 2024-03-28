@@ -21,6 +21,8 @@ print(obj.complex.foo)
 
 try {
     print("hello world!")
+    throw 'test'
 } catch (e) {
+    print('an error was caught!')
     print(e)
 }

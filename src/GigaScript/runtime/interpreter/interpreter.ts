@@ -13,7 +13,11 @@ import {
 	ObjectLiteral,
 	StringLiteral,
 } from '../../ast/literals.ast';
-import { ReturnStatement } from '../../ast/statements.ast';
+import {
+	ReturnStatement,
+	ThrowStatement,
+	TryCatchStatement,
+} from '../../ast/statements.ast';
 import { GSError } from '../../util/gserror';
 import Environment from '../env';
 import { DataType, Value } from '../types';
@@ -30,6 +34,8 @@ import {
 	evalProgram,
 	evalReturnStatement,
 	evalVarDeclaration,
+	evalTryCatchStatement,
+	evalThrowStatement,
 } from './eval/statements';
 
 export function evaluate(
@@ -92,6 +98,12 @@ export function evaluate(
 
 		case 'ReturnStatement':
 			return evalReturnStatement(node as ReturnStatement, env);
+
+		case 'TryCatchStatement':
+			return evalTryCatchStatement(node as TryCatchStatement, env);
+
+		case 'ThrowStatement':
+			return evalThrowStatement(node as ThrowStatement, env);
 
 		// Handle non implemented types
 		default:
