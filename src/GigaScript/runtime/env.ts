@@ -2,7 +2,7 @@ import { Value, DataConstructors, DataType, ObjectValue } from './types';
 import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
-import { Identifier } from '../ast/literals.ast';
+import { Identifier, ObjectLiteral } from '../ast/literals.ast';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
@@ -109,27 +109,30 @@ export default class Environment {
 		value?: Value<DataType, any>,
 		property?: Identifier
 	): Value<DataType, any> {
-		if (expr.object.kind === 'MemberExpr')
-			return this.lookupOrModifyObject(
-				expr.object as MemberExpr,
-				value,
-				expr.property as Identifier
-			);
+		// if (expr.object.kind === 'MemberExpr') {
+		// 	console.log('complex object!');
+		// 	return this.lookupOrModifyObject(
+		// 		expr.object as MemberExpr,
+		// 		value,
+		// 		expr.property as Identifier
+		// 	);
+		// }
 
-		const varName = (expr.object as Identifier).symbol;
-		const env = this.resolve(varName);
+		// const varName = (expr.object as Identifier).symbol;
+		// const env = this.resolve(varName);
 
-		let oldVal = env.variables.get(varName) as ObjectValue;
+		// let oldVal = env.variables.get(varName) as ObjectValue;
 
-		const prop = property
-			? property.symbol
-			: (expr.property as Identifier).symbol;
-		const currProp = (expr.property as Identifier).symbol;
+		// const prop = property
+		// 	? property.symbol
+		// 	: (expr.property as Identifier).symbol;
+		// const currProp = (expr.property as Identifier).symbol;
 
-		if (value) oldVal.properties.set(prop, value);
+		// if (value) oldVal.properties.set(prop, value);
 
-		if (currProp) oldVal = oldVal.properties.get(currProp) as ObjectValue;
+		// if (currProp) oldVal = oldVal.properties.get(currProp) as ObjectValue;
 
-		return oldVal;
+		// return oldVal;
+		return DataConstructors.NULL();
 	}
 }
