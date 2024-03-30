@@ -265,14 +265,11 @@ export function evalMemberExpr(
 	expr?: MemberExpr | null
 ): Value<DataType, any> {
 	if (expr) {
-		const Var = env.lookupOrModifyObject(expr);
+		const Var = env.lookupObject(expr);
 
 		return Var;
 	} else if (node) {
-		const Var = env.lookupOrModifyObject(
-			node.assigne as MemberExpr,
-			evaluate(node.value, env)
-		);
+		const Var = env.lookupObject(node.assigne as MemberExpr);
 
 		return Var;
 	} else {

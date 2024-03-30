@@ -104,15 +104,9 @@ export default class Environment {
 
 	// Objects
 
-	public lookupOrModifyObject(
-		expr: MemberExpr,
-		value?: Value<DataType, any>
-	): Value<DataType, any> {
+	public lookupObject(expr: MemberExpr): Value<DataType, any> {
 		if (expr.object.kind == 'MemberExpr') {
-			const object = this.lookupOrModifyObject(
-				expr.object as MemberExpr,
-				value
-			);
+			const object = this.lookupObject(expr.object as MemberExpr);
 
 			return (object as ObjectValue).properties.get(
 				expr.property.symbol
@@ -124,6 +118,6 @@ export default class Environment {
 
 		let object = env.variables.get(varName) as ObjectValue;
 
-		return object;
+		return object.properties.get(expr.property.symbol)!;
 	}
 }
