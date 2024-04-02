@@ -271,6 +271,10 @@ export function evalMemberExpr(
 	} else if (node) {
 		const Var = env.lookupObject(node.assigne as MemberExpr);
 
+		console.log('asgExpr ------ ');
+		console.log(node);
+		console.log(Var);
+
 		return Var;
 	} else {
 		console.log(
