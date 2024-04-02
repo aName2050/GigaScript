@@ -10,9 +10,7 @@ const obj = {
     }
 };
 
-print(obj.x)
-print(obj.complex.foo)
-print(obj.complex.more.advanced)
+print(obj)
 
 print()
 print('MODIFIED:')
@@ -20,8 +18,9 @@ print()
 
 obj.x = 64
 obj.complex.foo = "foo"
-obj.complex.more.word = "hello world!"
+obj.complex.more = { test: "hello" }
 
-print(obj.x)
-print(obj.complex.foo)
-print(obj.complex.more.word)
+print(obj)
+
+print(obj.foo)
+print(obj.more.test)

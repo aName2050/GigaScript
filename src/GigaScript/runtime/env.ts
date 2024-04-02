@@ -3,6 +3,7 @@ import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
 import { Identifier } from '../ast/literals.ast';
+import { evaluate } from './interpreter/interpreter';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
@@ -105,6 +106,14 @@ export default class Environment {
 		if (expr.object.kind == 'MemberExpr') {
 			const value = this.lookupObjectValue(expr.object as MemberExpr);
 
+			if (value == undefined) {
+				throw `Property "${
+					expr.property.symbol
+				}" does't exist on object "${
+					(expr.object as Identifier).symbol
+				}"`;
+			}
+
 			if (value.type == 'object')
 				return (value as GSObject).properties.get(
 					expr.property.symbol
@@ -120,14 +129,21 @@ export default class Environment {
 		return object.properties.get(expr.property.symbol)!;
 	}
 
+	// FIXME:
+	// obj.complex.more = { test: "hello" }
+	// results in { test: "hello" } being added to the base objects properties map instead of the "complex" property's properties map
 	public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
-			const obj = this.modifyObject(
-				expr.object as MemberExpr,
-				newValue
-			) as GSObject;
+			let value = this.modifyObject(expr.object as MemberExpr, newValue);
 
-			return obj;
+			if (value?.type == 'object')
+				(value as GSObject).properties.set(
+					expr.property.symbol,
+					newValue
+				);
+			else value = newValue;
+
+			return value;
 		}
 
 		const object = this.resolve(
