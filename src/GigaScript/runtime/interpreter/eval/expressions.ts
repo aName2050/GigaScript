@@ -265,15 +265,14 @@ export function evalMemberExpr(
 	expr?: MemberExpr | null
 ): Value<DataType, any> {
 	if (expr) {
-		const Var = env.lookupObject(expr);
+		const Var = env.lookupObjectValue(expr);
 
 		return Var;
 	} else if (node) {
-		const Var = env.lookupObject(node.assigne as MemberExpr);
-
-		console.log('asgExpr ------ ');
-		console.log(node);
-		console.log(Var);
+		const Var = env.modifyObject(
+			node.assigne as MemberExpr,
+			evaluate(node.value, env)
+		);
 
 		return Var;
 	} else {
@@ -317,7 +316,7 @@ export function evalCallExpr(
 			}
 
 			const varName = func.params[i];
-			scope.delcareVar(varName, args[i], false);
+			scope.declareVar(varName, args[i], false);
 		}
 
 		let result: Value<DataType, any> = DataConstructors.UNDEFINED();

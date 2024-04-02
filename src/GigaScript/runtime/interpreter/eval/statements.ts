@@ -33,7 +33,7 @@ export function evalVarDeclaration(
 		? evaluate(declaration.value, env)
 		: DataConstructors.UNDEFINED();
 
-	return env.delcareVar(declaration.identifier, value, declaration.constant);
+	return env.declareVar(declaration.identifier, value, declaration.constant);
 }
 
 export function evalFuncDeclaration(
@@ -48,7 +48,7 @@ export function evalFuncDeclaration(
 		decEnv: env,
 	} as FuncVal;
 
-	return env.delcareVar(declaration.name, func, true);
+	return env.declareVar(declaration.name, func, true);
 }
 
 export function evalReturnStatement(
@@ -70,7 +70,7 @@ export function evalTryCatchStatement(
 	try {
 		return evalCodeBlock(statement.tryBody, tryEnv, false);
 	} catch (e) {
-		catchEnv.delcareVar(
+		catchEnv.declareVar(
 			statement.errorIdentifier,
 			DataConstructors.STRING(String(e)),
 			true

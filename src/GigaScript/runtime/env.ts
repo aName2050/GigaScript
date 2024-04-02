@@ -1,42 +1,42 @@
-import { Value, DataConstructors, DataType, ObjectValue } from './types';
+import { DataConstructors, GSAny, GSObject } from './types';
 import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
-import { Identifier, ObjectLiteral } from '../ast/literals.ast';
+import { Identifier } from '../ast/literals.ast';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
 
 	// Native values
-	env.delcareVar('true', NativeValues.True, true);
-	env.delcareVar('false', NativeValues.False, true);
-	env.delcareVar('null', NativeValues.Null, true);
-	env.delcareVar('undefined', NativeValues.Undefined, true);
+	env.declareVar('true', NativeValues.True, true);
+	env.declareVar('false', NativeValues.False, true);
+	env.declareVar('null', NativeValues.Null, true);
+	env.declareVar('undefined', NativeValues.Undefined, true);
 
 	// Native variables
-	env.delcareVar('error', NativeValues.Error, true);
+	env.declareVar('error', NativeValues.Error, true);
 
 	// Native functions
-	env.delcareVar('print', NativeFunctions.print, true);
-	env.delcareVar(
+	env.declareVar('print', NativeFunctions.print, true);
+	env.declareVar(
 		'generateTimestamp',
 		NativeFunctions.generateTimestamp,
 		true
 	);
-	env.delcareVar('math', NativeFunctions.math, true);
-	env.delcareVar('formatString', NativeFunctions.formatString, true);
+	env.declareVar('math', NativeFunctions.math, true);
+	env.declareVar('formatString', NativeFunctions.formatString, true);
 
 	return env;
 }
 
 export default class Environment {
 	private parent?: Environment;
-	private variables: Map<string, Value<DataType, any>>;
+	private variables: Map<string, GSAny>;
 	private constants: Set<string>;
 	// TODO: implement classes
 	// private classes: Map<string, Class>;
 	public cwd: string;
-	public Exports: Map<string, Value<DataType, any>>;
+	public Exports: Map<string, GSAny>;
 
 	constructor(currentWorkingDirectory: string, parentEnv?: Environment) {
 		this.parent = parentEnv;
@@ -49,22 +49,22 @@ export default class Environment {
 		this.cwd = currentWorkingDirectory;
 	}
 
-	public addExport(identifier: string, value: Value<DataType, any>): void {
+	public addExport(identifier: string, value: GSAny): void {
 		this.Exports.set(identifier, value);
 		return;
 	}
 
-	public get exports(): Map<string, Value<DataType, any>> {
+	public get exports(): Map<string, GSAny> {
 		return this.Exports;
 	}
 
 	// VARIABLES
 
-	public delcareVar(
+	public declareVar(
 		identifier: string,
-		value: Value<DataType, any>,
+		value: GSAny,
 		isConstant: boolean
-	): Value<DataType, any> {
+	): GSAny {
 		if (this.variables.has(identifier))
 			throw `Cannot redeclare variable "${identifier}"`;
 
@@ -75,10 +75,7 @@ export default class Environment {
 		return value;
 	}
 
-	public assignVar(
-		identifer: string,
-		value: Value<DataType, any>
-	): Value<DataType, any> {
+	public assignVar(identifer: string, value: GSAny): GSAny {
 		const env = this.resolve(identifer);
 
 		if (env.constants.has(identifer))
@@ -89,9 +86,9 @@ export default class Environment {
 		return value;
 	}
 
-	public lookupVar(identifer: string): Value<DataType, any> {
+	public lookupVar(identifer: string): GSAny {
 		const env = this.resolve(identifer);
-		return env.variables.get(identifer) as Value<DataType, any>;
+		return env.variables.get(identifer) as GSAny;
 	}
 
 	public resolve(identifer: string): Environment {
@@ -104,20 +101,41 @@ export default class Environment {
 
 	// Objects
 
-	public lookupObject(expr: MemberExpr): Value<DataType, any> {
+	public lookupObjectValue(expr: MemberExpr): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
-			const object = this.lookupObject(expr.object as MemberExpr);
+			const value = this.lookupObjectValue(expr.object as MemberExpr);
 
-			return (object as ObjectValue).properties.get(
-				expr.property.symbol
-			)!;
+			if (value.type == 'object')
+				return (value as GSObject).properties.get(
+					expr.property.symbol
+				)!;
+			else return value;
 		}
 
 		const varName = (expr.object as Identifier).symbol;
 		const env = this.resolve(varName);
 
-		let object = env.variables.get(varName) as ObjectValue;
+		let object = env.variables.get(varName) as GSObject;
 
 		return object.properties.get(expr.property.symbol)!;
+	}
+
+	public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
+		if (expr.object.kind == 'MemberExpr') {
+			const obj = this.modifyObject(
+				expr.object as MemberExpr,
+				newValue
+			) as GSObject;
+
+			return obj;
+		}
+
+		const object = this.resolve(
+			(expr.object as Identifier).symbol
+		).variables.get((expr.object as Identifier).symbol) as GSObject;
+
+		object.properties.set(expr.property.symbol, newValue);
+
+		return object;
 	}
 }

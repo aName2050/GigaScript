@@ -567,7 +567,7 @@ export default class Parser {
 			caller,
 			args,
 			start: caller.start,
-			end: args[args.length - 1].end,
+			end: args[args.length - 1]?.end || caller.end,
 		} as CallExpr;
 
 		if (this.current().type == NodeType.OpenParen)
