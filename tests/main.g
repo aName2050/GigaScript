@@ -10,17 +10,16 @@ const obj = {
     }
 };
 
-print(obj)
+print('unmodified', obj)
 
 print()
 print('MODIFIED:')
 print()
 
 obj.x = 64
-obj.complex.foo = "foo"
-obj.complex.more = { test: "hello" }
+obj.string = "changed!?"
 
-print(obj)
+obj.complex.foo = 'foo'
 
-print(obj.foo)
-print(obj.more.test)
+print('modified', obj)
+

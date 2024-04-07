@@ -269,10 +269,12 @@ export function evalMemberExpr(
 
 		return Var;
 	} else if (node) {
-		const Var = env.modifyObject(
-			node.assigne as MemberExpr,
-			evaluate(node.value, env)
-		);
+		const Var =
+			// env.lookupObjectValue(node.assigne as MemberExpr);
+			env.modifyObject(
+				node.assigne as MemberExpr,
+				evaluate(node.value, env)
+			);
 
 		return Var;
 	} else {

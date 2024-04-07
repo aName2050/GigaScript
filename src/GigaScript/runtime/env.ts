@@ -126,7 +126,14 @@ export default class Environment {
 
 		let object = env.variables.get(varName) as GSObject;
 
-		return object.properties.get(expr.property.symbol)!;
+		const prop = object.properties.get(expr.property.symbol);
+
+		if (!prop)
+			throw `Property ${expr.property.symbol} does not exist on object "${
+				(expr.object as Identifier).symbol
+			}"`;
+
+		return prop;
 	}
 
 	// FIXME:
@@ -134,16 +141,7 @@ export default class Environment {
 	// results in { test: "hello" } being added to the base objects properties map instead of the "complex" property's properties map
 	public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
-			let value = this.modifyObject(expr.object as MemberExpr, newValue);
-
-			if (value?.type == 'object')
-				(value as GSObject).properties.set(
-					expr.property.symbol,
-					newValue
-				);
-			else value = newValue;
-
-			return value;
+			let obj = expr.object;
 		}
 
 		const object = this.resolve(
