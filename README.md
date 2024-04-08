@@ -1,3 +1,5 @@
+[![CodeQL](https://github.com/aName2050/GigaScript/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/aName2050/GigaScript/actions/workflows/github-code-scanning/codeql)
+
 A programming language written in TypeScript, with two forms of syntax, one based on JavaScript/TypeScript and one based on Gen Z slang.
 
 # GigaScript
