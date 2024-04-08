@@ -21,5 +21,7 @@ obj.string = "changed!?"
 
 obj.complex.foo = 'foo'
 
+obj.complex.more = { different: "this is different" }
+
 print('modified', obj)
 

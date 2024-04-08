@@ -136,20 +136,60 @@ export default class Environment {
 		return prop;
 	}
 
-	// FIXME:
-	// obj.complex.more = { test: "hello" }
-	// results in { test: "hello" } being added to the base objects properties map instead of the "complex" property's properties map
 	public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
-			let obj = expr.object;
+			let obj = this.getObject(expr.object as MemberExpr);
+
+			if (obj.type == 'object') {
+				(obj as GSObject).properties.set(
+					expr.property.symbol,
+					newValue
+				);
+			}
+
+			return obj;
 		}
 
-		const object = this.resolve(
-			(expr.object as Identifier).symbol
-		).variables.get((expr.object as Identifier).symbol) as GSObject;
+		const objectIdentifer = (expr.object as Identifier).symbol;
+		const env = this.resolve(objectIdentifer);
+
+		const object = env.variables.get(objectIdentifer) as GSObject;
 
 		object.properties.set(expr.property.symbol, newValue);
 
 		return object;
+	}
+
+	private getObject(expr: MemberExpr): GSAny {
+		if (expr.object.kind == 'MemberExpr') {
+			const value = this.lookupObjectValue(expr.object as MemberExpr);
+
+			if (value == undefined) {
+				throw `Property "${
+					expr.property.symbol
+				}" does't exist on object "${
+					(expr.object as Identifier).symbol
+				}"`;
+			}
+
+			if (value.type == 'object')
+				return (value as GSObject).properties.get(
+					expr.property.symbol
+				)!;
+		}
+
+		const varName = (expr.object as Identifier).symbol;
+		const env = this.resolve(varName);
+
+		let object = env.variables.get(varName) as GSObject;
+
+		const prop = object.properties.get(expr.property.symbol);
+
+		if (!prop)
+			throw `Property ${expr.property.symbol} does not exist on object "${
+				(expr.object as Identifier).symbol
+			}"`;
+
+		return prop;
 	}
 }
