@@ -4,7 +4,7 @@
 	"description": "A simple programming language based on TypeScript and Gen-Z slang.",
 	"main": "./src/index.ts",
 	"scripts": {
-		"init": "chmod +x /workspaces/GigaScript/.bin && export PATH=\"/workspaces/GigaScript/.bin:$PATH\""
+		"init": "ts-node ./scripts/init.ts"
 	},
 	"author": "Bardia Shafaee (aName2050)",
 	"license": "MIT",
