@@ -12,8 +12,6 @@ import { Program } from './GigaScript/ast/ast';
 import { CLIArguments } from './GigaScript/types';
 import { createGlobalScope } from './GigaScript/runtime/env';
 import { evaluate } from './GigaScript/runtime/interpreter/interpreter';
-// import interpretor
-// import env
 
 const argParser = new ArgumentParser({
 	description: 'GigaScript Runtime CLI',
@@ -30,12 +28,10 @@ argParser.add_argument('-f', '--file', {
 	help: 'the file to run',
 });
 argParser.add_argument('--useCUDA', {
-	// action: 'enableCUDA',
 	help: 'enable CUDA(R) for tokenization. Requires NVIDIA(R) GPU with CUDA(R) Cores.',
 	action: 'store_true',
 });
 argParser.add_argument('--ASTOnly', {
-	// action: 'disableEvaluation'
 	help: 'disables evaluation and only outputs the AST for debugging purposes.',
 	action: 'store_true',
 });
