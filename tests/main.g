@@ -21,7 +21,8 @@ obj.string = "changed!?"
 
 obj.complex.foo = 'foo'
 
-obj.complex.more = { different: "this is different" }
+obj.complex.more = { different: "this is different" }\
+obj.complex.doesNotExist = "this exists now!"
 
 print('modified', obj)
 
