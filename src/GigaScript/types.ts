@@ -6,6 +6,7 @@
 
 export interface CLIArguments {
 	file: string;
-	useCUDA: boolean;
-	ASTOnly: boolean;
+	useCUDA: boolean | undefined;
+	ASTOnly: boolean | undefined;
+	debug: boolean | undefined;
 }

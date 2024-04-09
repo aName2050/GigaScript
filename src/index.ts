@@ -12,8 +12,6 @@ import { Program } from './GigaScript/ast/ast';
 import { CLIArguments } from './GigaScript/types';
 import { createGlobalScope } from './GigaScript/runtime/env';
 import { evaluate } from './GigaScript/runtime/interpreter/interpreter';
-import { getTokenByTypeEnum } from './GigaScript/tokens';
-import { NodeType } from './GigaScript/nodes';
 // import interpretor
 // import env
 
@@ -28,24 +26,37 @@ argParser.add_argument('-v', '--version', {
 });
 argParser.add_argument('-f', '--file', {
 	metavar: 'FILE',
-	type: 'str',
+	type: String,
 	help: 'the file to run',
 });
 argParser.add_argument('--useCUDA', {
 	// action: 'enableCUDA',
-	help: 'enable CUDA for tokenization. Requires NVIDIA GPU with CUDA Cores.',
-	type: Boolean,
+	help: 'enable CUDA(R) for tokenization. Requires NVIDIA(R) GPU with CUDA(R) Cores.',
+	action: 'store_true',
 });
 argParser.add_argument('--ASTOnly', {
 	// action: 'disableEvaluation'
 	help: 'disables evaluation and only outputs the AST for debugging purposes.',
-	type: Boolean,
+	action: 'store_true',
+});
+argParser.add_argument('-d', '--debug', {
+	help: 'enables debug mode',
+	action: 'store_true',
 });
 
 const CLIArgs: CLIArguments = argParser.parse_args();
 const file: string | undefined = CLIArgs.file;
 const useCUDA: boolean = CLIArgs.useCUDA || false;
 const ASTOnly: boolean = CLIArgs.ASTOnly || false;
+const debug: boolean = CLIArgs.debug || false;
+
+if (debug) {
+	console.log('GS.DEBUGGER: GigaScript Debugger v1');
+}
+
+if (useCUDA) {
+	throw 'Tokenization using NVIDIA(R) CUDA(R) Cores';
+}
 
 const fileLocation: string = file ? path.parse(file).dir : '';
 
@@ -76,12 +87,48 @@ function runFile(filename: string, location: string) {
 
 	if (filename.endsWith('.g')) {
 		// Run GigaScript code
+		const runtimeStart = Date.now();
+		const tokenizeStart = Date.now();
+
 		parser.tokenizeSource(file);
+
+		if (debug)
+			console.log(
+				`GS.DEBUGGER: source tokenized in ${
+					Date.now() - tokenizeStart
+				}ms`
+			);
+
+		const parseStart = Date.now();
+
 		const program: Program = parser.generateAST();
 
-		if (ASTOnly) return console.log(JSON.stringify(program));
+		if (debug)
+			console.log(
+				`GS.DEBUGGER: tokens parsed in ${Date.now() - parseStart}ms`
+			);
+
+		if (ASTOnly) {
+			if (debug)
+				console.log(
+					`GS.DEBUGGER: GigaScript ran in ${
+						Date.now() - runtimeStart
+					}ms`
+				);
+			return console.log(JSON.stringify(program));
+		}
+
+		const evalStart = Date.now();
 
 		const res = evaluate(program, env);
+		if (debug)
+			console.log(
+				`GS.DEBUGGER: AST evaluated in ${Date.now() - evalStart}ms`
+			);
+		if (debug)
+			console.log(
+				`GS.DEBUGGER: GigaScript ran in ${Date.now() - runtimeStart}ms`
+			);
 
 		return res;
 	} else if (filename.endsWith('.gsx')) {
