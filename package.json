@@ -4,7 +4,7 @@
 	"description": "A simple programming language based on TypeScript and Gen-Z slang.",
 	"main": "./src/index.ts",
 	"scripts": {
-		"init": "ts-node ./scripts/init.ts"
+		"init": "bash ./scripts/init.sh"
 	},
 	"author": "Bardia Shafaee (aName2050)",
 	"license": "MIT",
