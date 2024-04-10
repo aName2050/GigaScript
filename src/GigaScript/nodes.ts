@@ -37,14 +37,16 @@ export enum NodeType {
 	// { CLASSES }
 	/** Class declaration */
 	Class,
+	/** Class constructor */
+	Constructor,
 	/** Private method/property */
 	Private,
 	/** Public method/property */
 	Public,
+	/** Static method/property */
+	Static,
 	/** New Class */
 	New,
-	/** Class constructor */
-	Constructor,
 
 	// { IF/ELSE STATEMENTS }
 	/** If statement */

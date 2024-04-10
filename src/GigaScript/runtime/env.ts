@@ -4,6 +4,7 @@ import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
 import { Identifier } from '../ast/literals.ast';
 import { evaluate } from './interpreter/interpreter';
+import { Class } from '../types';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
@@ -16,6 +17,7 @@ export function createGlobalScope(cwd: string): Environment {
 
 	// Native variables
 	env.declareVar('error', NativeValues.Error, true);
+	env.declareVar('this', DataConstructors.UNDEFINED(), true);
 
 	// Native functions
 	env.declareVar('print', NativeFunctions.print, true);
@@ -34,8 +36,7 @@ export default class Environment {
 	private parent?: Environment;
 	private variables: Map<string, GSAny>;
 	private constants: Set<string>;
-	// TODO: implement classes
-	// private classes: Map<string, Class>;
+	private classes: Map<string, Class>;
 	public cwd: string;
 	public Exports: Map<string, GSAny>;
 
@@ -45,7 +46,7 @@ export default class Environment {
 		this.variables = new Map();
 		this.constants = new Set();
 		this.Exports = new Map();
-		// this.classes = new Map();
+		this.classes = new Map();
 
 		this.cwd = currentWorkingDirectory;
 	}
@@ -100,7 +101,7 @@ export default class Environment {
 		return this.parent.resolve(identifer);
 	}
 
-	// Objects
+	// OBJECTS
 
 	public lookupObjectValue(expr: MemberExpr): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
@@ -192,4 +193,8 @@ export default class Environment {
 
 		return prop;
 	}
+
+	// CLASSES
+
+	// TODO:
 }

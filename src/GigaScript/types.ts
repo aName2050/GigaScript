@@ -10,3 +10,9 @@ export interface CLIArguments {
 	ASTOnly: boolean | undefined;
 	debug: boolean | undefined;
 }
+
+export interface Class {
+	name: string;
+	properties: Array<string>;
+	methods: Array<string>;
+}

@@ -1,28 +1,32 @@
-let string = "hello!";
-const obj = {
-    x: 32,
-    string,
-    complex: {
-        foo: "bar",
-        more: {
-            advanced: 'cool'
-        }
+class TestClass {
+    private privateProp = "this is a private prop";
+    public publicProp = "this is a public prop";
+
+    private static constPrivateProp = "this is a constant (static) private prop";
+    public static constPrivateProp = "this is a constant (static) public prop";
+
+    public definedLater;
+
+    constructor(value) {
+        this.definedLater = value
     }
-};
 
-print('unmodified', obj)
+    public publicMethod() {
+        print("this is a public method")
+    }
 
-print()
-print('MODIFIED:')
-print()
+    private privateMethod() {
+        print("this is a private method")
+    }
+}
 
-obj.x = 64
-obj.string = "changed!?"
+const test = new TestClass("this value was defined later!");
 
-obj.complex.foo = 'foo'
+print('this should result in an error:', test.privateProp)
+print('this should result in an error:', test.constPrivateProp)
+print('this should result in an error:')
+test.privateMethod()
 
-obj.complex.more = { different: "this is different" }
-obj.complex.doesNotExist = "this exists now!"
-
-print('modified', obj)
-
+print(test.publicProp)
+print(test.constPublicProp)
+test.publicMethod()

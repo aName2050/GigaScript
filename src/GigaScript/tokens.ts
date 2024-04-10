@@ -49,14 +49,18 @@ export enum TokenID {
 	// { CLASSES }
 	/** Class declaration */
 	Class,
+	/** Class constructor */
+	Constructor,
 	/** Private method/property */
 	Private,
 	/** Public method/property */
 	Public,
+	/** Static method/property */
+	Static,
 	/** New Class */
 	New,
-	/** Class constructor */
-	Constructor,
+	/** See https://en.wikipedia.org/wiki/This_(computer_programming) */
+	_This,
 
 	// { IF/ELSE STATEMENTS }
 	/** If statement */
@@ -283,16 +287,20 @@ setTokenData(TokenID.Let, NodeType.Let, 'let', OpPrec.None);
 setTokenData(TokenID.Const, NodeType.Const, 'const', OpPrec.None);
 setTokenData(TokenID.Func, NodeType.Func, 'func', OpPrec.None);
 setTokenData(TokenID.Return, NodeType.Return, 'return', OpPrec.None);
+
 setTokenData(TokenID.Class, NodeType.Class, 'class', OpPrec.None);
-setTokenData(TokenID.Private, NodeType.Private, 'private', OpPrec.None);
-setTokenData(TokenID.Public, NodeType.Public, 'public', OpPrec.None);
-setTokenData(TokenID.New, NodeType.New, 'new', OpPrec.None);
 setTokenData(
 	TokenID.Constructor,
 	NodeType.Constructor,
 	'constructor',
 	OpPrec.None
 );
+setTokenData(TokenID.Private, NodeType.Private, 'private', OpPrec.None);
+setTokenData(TokenID.Public, NodeType.Public, 'public', OpPrec.None);
+setTokenData(TokenID.Static, NodeType.Static, 'static', OpPrec.None);
+setTokenData(TokenID.New, NodeType.New, 'new', OpPrec.None);
+setTokenData(TokenID._This, NodeType.Identifier, 'this', OpPrec.None);
+
 setTokenData(TokenID.If, NodeType.If, 'if', OpPrec.None);
 setTokenData(TokenID.Else, NodeType.Else, 'else', OpPrec.None);
 setTokenData(TokenID.While, NodeType.While, 'while', OpPrec.None);

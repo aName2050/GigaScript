@@ -6,6 +6,10 @@ export type ASTNodeType =
 	| 'ReturnStatement'
 	| 'TryCatchStatement'
 	| 'ThrowStatement'
+	| 'ClassDeclaration'
+	| 'ConstructorStatement'
+	| 'ClassMethod'
+	| 'ClassProperty'
 	| 'CodeBlockNode'
 	| 'EOF'
 	// Expressions
@@ -15,6 +19,7 @@ export type ASTNodeType =
 	| 'BitwiseExpr'
 	| 'CallExpr'
 	| 'MemberExpr'
+	| 'ClassNewInstanceExpr'
 	// Literals
 	| 'StringLiteral'
 	| 'NumberLiteral'
