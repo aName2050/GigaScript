@@ -6,6 +6,9 @@ const execSync = promisify(exec);
 async function init() {
 	// Get absolute path to gigascript
 	const REALPATH = await execSync('realpath -s ./.bin');
+
+	console.log(REALPATH.stderr || 'REALPATH completed with no errors');
+
 	// Give executable permission to gigascript
 	const CHMOD = await execSync(`chmod +x ${REALPATH.stdout}`);
 
@@ -25,3 +28,5 @@ async function init() {
 
 	console.log(GSV.stdout);
 }
+
+init();
