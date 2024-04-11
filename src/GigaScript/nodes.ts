@@ -4,8 +4,6 @@
  * Token structures associated with the specific token IDs
  */
 
-import { Token, TokenID } from './tokens';
-
 /**
  * GigaScript Node Types
  *
