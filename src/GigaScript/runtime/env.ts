@@ -37,7 +37,7 @@ export default class Environment {
 	private constants: Set<string>;
 	private classes: Map<string, Class>;
 	public cwd: string;
-	public Exports: Map<string, GSAny>;
+	private Exports: Map<string, GSAny>;
 
 	constructor(currentWorkingDirectory: string, parentEnv?: Environment) {
 		this.parent = parentEnv;

@@ -1,5 +1,5 @@
 import { sourceFile } from '../../../index';
-import { AssignmentExpr, UnaryExpr } from '../../ast/assignments.ast';
+import { AssignmentExpr } from '../../ast/assignments.ast';
 import { Program, STATEMENT } from '../../ast/ast';
 import { BinaryExpr } from '../../ast/binop.ast';
 import {
@@ -13,6 +13,7 @@ import {
 	ObjectLiteral,
 	StringLiteral,
 } from '../../ast/literals.ast';
+import { ExportStatement, ImportStatement } from '../../ast/module.ast';
 import {
 	ReturnStatement,
 	ThrowStatement,
@@ -20,7 +21,7 @@ import {
 } from '../../ast/statements.ast';
 import { GSError } from '../../util/gserror';
 import Environment from '../env';
-import { DataType, Value } from '../types';
+import { DataType, GSAny, GSNumber, GSString, Value } from '../types';
 import {
 	evalAssignment,
 	evalBinaryExpr,
@@ -36,12 +37,11 @@ import {
 	evalVarDeclaration,
 	evalTryCatchStatement,
 	evalThrowStatement,
+	evalExportStatement,
+	evalImportStatement,
 } from './eval/statements';
 
-export function evaluate(
-	node: STATEMENT,
-	env: Environment
-): Value<DataType, any> {
+export function evaluate(node: STATEMENT, env: Environment): GSAny {
 	if (!node || !node.kind) {
 		console.log(
 			new GSError(
@@ -59,13 +59,13 @@ export function evaluate(
 			return {
 				type: 'number',
 				value: (node as NumberLiteral).value,
-			} as Value<'number', number>;
+			} as GSNumber;
 
 		case 'StringLiteral':
 			return {
 				type: 'string',
 				value: (node as StringLiteral).value,
-			} as Value<'string', string>;
+			} as GSString;
 
 		case 'Identifier':
 			return evalIdentifier(node as Identifier, env);
@@ -104,6 +104,11 @@ export function evaluate(
 
 		case 'ThrowStatement':
 			return evalThrowStatement(node as ThrowStatement, env);
+
+		case 'ImportStatement':
+			return evalImportStatement(node as ImportStatement, env);
+		case 'ExportStatement':
+			return evalExportStatement(node as ExportStatement, env);
 
 		// Handle non implemented types
 		default:

@@ -1,16 +1,23 @@
+import path from 'node:path';
 import { CodeBlockNode, Program } from '../../../ast/ast';
 import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../../../ast/declarations.ast';
+import { ExportStatement, ImportStatement } from '../../../ast/module.ast';
 import {
 	ReturnStatement,
 	ThrowStatement,
 	TryCatchStatement,
 } from '../../../ast/statements.ast';
-import Environment from '../../env';
-import { DataConstructors, DataType, FuncVal, Value } from '../../types';
+import Environment, { createGlobalScope } from '../../env';
+import { DataConstructors, DataType, FuncVal, GSAny, Value } from '../../types';
 import { evaluate } from '../interpreter';
+import Parser from '../../../parser/parser';
+import * as fs from 'node:fs';
+import { Identifier } from '../../../ast/literals.ast';
+import { GSError } from '../../../util/gserror';
+import { sourceFile } from '../../../..';
 
 export function evalProgram(
 	program: Program,
@@ -105,4 +112,69 @@ export function evalCodeBlock(
 	}
 
 	return res;
+}
+
+export function evalImportStatement(
+	node: ImportStatement,
+	env: Environment
+): GSAny {
+	const fileLocation = path.resolve(`${env.cwd}/${node.source}`);
+
+	const imports = Array.from(node.imports);
+
+	// Run imported file to extract any exported values
+	const parser = new Parser();
+	const externalEnv = createGlobalScope(path.dirname(fileLocation));
+
+	const fileContent = fs.readFileSync(fileLocation, { encoding: 'utf-8' });
+
+	if (fileLocation.endsWith('.g')) {
+		parser.tokenizeSource(fileContent);
+		const program: Program = parser.generateAST();
+		evaluate(program, externalEnv);
+
+		const exports = Array.from(externalEnv.exports);
+
+		for (let i = 0; i < exports.length; i++) {
+			for (let j = 0; j < imports.length; j++) {
+				if (exports[i][0] == imports[j][0]) {
+					const identifier = imports[j][1] as string;
+					const value = exports[i][1] as GSAny;
+					env.declareVar(identifier, value, true);
+				}
+			}
+		}
+	} else if (fileLocation.endsWith('.gsx')) {
+		throw 'Not implemented';
+	} else {
+		throw `Unsupported file type "${path.extname(fileLocation)}`;
+	}
+
+	return DataConstructors.NULL();
+}
+
+export function evalExportStatement(
+	node: ExportStatement,
+	env: Environment
+): GSAny {
+	const exportedValue = evaluate(node.value, env);
+
+	if (node.value.kind == 'VariableDeclaration') {
+		env.addExport(
+			(node.value as VariableDeclaration).identifier,
+			exportedValue
+		);
+	} else if (node.value.kind == 'FunctionDeclaration') {
+		env.addExport((node.value as FunctionDeclaration).name, exportedValue);
+	} else if (node.value.kind == 'Identifier') {
+		env.addExport((node.value as Identifier).symbol, exportedValue);
+	} else {
+		throw new GSError(
+			'RuntimeError',
+			`ExportError: cannot export type "${node.value.kind}"`,
+			`${sourceFile}:${node.start.Line}:${node.start.Column}`
+		);
+	}
+
+	return DataConstructors.NULL();
 }
