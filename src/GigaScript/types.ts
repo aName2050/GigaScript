@@ -4,6 +4,8 @@
  * GigaScript typings
  */
 
+import { ClassMethod, ClassProperty, ConstructorStatement } from './ast/class.ast';
+
 export interface CLIArguments {
 	file: string;
 	useCUDA: boolean | undefined;
@@ -11,8 +13,8 @@ export interface CLIArguments {
 	debug: boolean | undefined;
 }
 
-export interface Class {
-	name: string;
-	properties: Array<string>;
-	methods: Array<string>;
+export interface ClassBody {
+	properties: Array<ClassProperty>;
+	methods: Array<ClassMethod>;
+	constructor: ConstructorStatement | undefined;
 }

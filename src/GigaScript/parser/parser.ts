@@ -9,6 +9,12 @@ import {
 } from '../ast/ast';
 import { BinaryExpr } from '../ast/binop.ast';
 import {
+	ClassDeclaration,
+	ClassMethod,
+	ClassProperty,
+	ConstructorStatement,
+} from '../ast/class.ast';
+import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../ast/declarations.ast';
@@ -29,6 +35,7 @@ import {
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
 import { Token, getTokenByTypeEnum } from '../tokens';
+import { ClassBody } from '../types';
 import { getErrorLocation } from '../util/getErrLoc';
 import { ParseError } from '../util/parseError';
 
@@ -151,6 +158,9 @@ export default class Parser {
 				return this.parseImportStatement();
 			case NodeType.Export:
 				return this.parseExportStatement();
+
+			case NodeType.Class:
+				return this.parseClassDeclaration();
 
 			case NodeType.Throw:
 				return this.parseThrowStatement();
@@ -398,6 +408,204 @@ export default class Parser {
 			start: exportTokenPos.start,
 			end: value.end,
 		} as ExportStatement;
+	}
+
+	private parseClassDeclaration(): STATEMENT {
+		const classTokenPos = this.advance().__GSC._POS;
+
+		const name = this.expect(
+			NodeType.Identifier,
+			'following class keyword'
+		).value;
+
+		this.expect(NodeType.OpenBrace, 'following class identifier');
+
+		const Class = this.parseClassBody();
+
+		const endPos = this.expect(NodeType.CloseBrace, 'following class body')
+			.__GSC._POS;
+
+		return {
+			kind: 'ClassDeclaration',
+			name,
+			properties: Class.properties,
+			methods: Class.methods,
+			constructor: Class.constructor,
+			start: classTokenPos.start,
+			end: endPos.end,
+		} as ClassDeclaration;
+	}
+
+	private parseClassBody(): ClassBody {
+		const properties: Array<ClassProperty> = new Array<ClassProperty>();
+		const methods: Array<ClassMethod> = new Array<ClassMethod>();
+		let constructor: ConstructorStatement | undefined = undefined;
+
+		// loop through body of class
+		while (this.notEOF() && this.current().type != NodeType.CloseBrace) {
+			if (
+				this.current().type == NodeType.Public ||
+				this.current().type == NodeType.Private
+			) {
+				const startPos = this.current().__GSC._POS;
+				const isPublic = this.advance().type == NodeType.Public;
+				let isStatic: boolean = false;
+
+				if (this.current().type == NodeType.Static) {
+					this.advance();
+					isStatic = true;
+				}
+
+				const identifier = this.expect(
+					NodeType.Identifier,
+					`following ${
+						isStatic ? 'static' : isPublic ? 'public' : 'private'
+					} keyword`
+				).value;
+
+				if (this.current().type == NodeType.Semicolon) {
+					// undefined property
+					const endPos = this.advance().__GSC._POS;
+
+					const prop = {
+						kind: 'ClassProperty',
+						identifier,
+						static: isStatic,
+						public: isPublic,
+						start: startPos.start,
+						end: endPos.end,
+					} as ClassProperty;
+
+					this.expect(
+						NodeType.Semicolon,
+						'following property declaration'
+					);
+
+					properties.push(prop);
+				} else if (this.current().type == NodeType.Equals) {
+					// defined property
+					this.advance();
+
+					const value = this.parseExpr();
+
+					const prop = {
+						kind: 'ClassProperty',
+						identifier,
+						public: isPublic,
+						static: isStatic,
+						value,
+						start: startPos.start,
+						end: value.end,
+					} as ClassProperty;
+
+					this.expect(
+						NodeType.Semicolon,
+						'following property declarations'
+					);
+
+					properties.push(prop);
+				} else if (this.current().type == NodeType.OpenParen) {
+					// method
+					const args = this.parseArgs();
+					const params: Array<string> = [];
+
+					for (const arg of args) {
+						if (arg.kind !== 'Identifier') {
+							console.log(arg);
+							console.log(
+								new ParseError(
+									'Expected parameter to be of type string',
+									`${sourceFile}:${getErrorLocation(
+										this.current()
+									)}`
+								)
+							);
+							process.exit(1);
+						}
+
+						params.push((arg as Identifier).symbol);
+					}
+
+					const body: CodeBlockNode = this.parseCodeBlock();
+
+					const method = {
+						kind: 'ClassMethod',
+						name: identifier,
+						public: isPublic,
+						params,
+						body,
+						start: startPos.start,
+						end: body.end,
+					} as ClassMethod;
+
+					methods.push(method);
+				} else {
+					console.log(
+						new ParseError(
+							`Unexpected token following ${
+								isStatic
+									? 'static'
+									: isPublic
+									? 'public'
+									: 'private'
+							} keyword`,
+							`${sourceFile}:${getErrorLocation(this.current())}`
+						)
+					);
+					process.exit(1);
+				}
+			} else if (this.current().type == NodeType.Constructor) {
+				constructor =
+					this.parseConstructorStatement() as ConstructorStatement;
+			} else {
+				console.log(
+					new ParseError(
+						`Expected "public", "private", or "constructor" keywords, instead saw "${
+							this.current().value
+						}"`,
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					)
+				);
+			}
+		}
+
+		return {
+			constructor,
+			properties,
+			methods,
+		} as ClassBody;
+	}
+
+	private parseConstructorStatement(): STATEMENT {
+		const constructorTokenPos = this.advance().__GSC._POS;
+
+		const args = this.parseArgs();
+		const params: Array<string> = [];
+
+		for (const arg of args) {
+			if (arg.kind !== 'Identifier') {
+				console.log(arg);
+				console.log(
+					new ParseError(
+						'Expected parameter to be of type string',
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					)
+				);
+				process.exit(1);
+			}
+
+			params.push((arg as Identifier).symbol);
+		}
+
+		const body = this.parseCodeBlock();
+
+		return {
+			kind: 'ConstructorStatement',
+			params,
+			body,
+			start: constructorTokenPos.start,
+			end: body.end,
+		} as ConstructorStatement;
 	}
 
 	// [EXPRESSIONS]

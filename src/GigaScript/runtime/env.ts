@@ -3,7 +3,7 @@ import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
 import { Identifier } from '../ast/literals.ast';
-import { Class } from '../types';
+import { ClassBody } from '../types';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
@@ -35,7 +35,7 @@ export default class Environment {
 	private parent?: Environment;
 	private variables: Map<string, GSAny>;
 	private constants: Set<string>;
-	private classes: Map<string, Class>;
+	private classes: Map<string, ClassBody>;
 	public cwd: string;
 	private Exports: Map<string, GSAny>;
 
