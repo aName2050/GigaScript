@@ -20,6 +20,7 @@ import {
 	Property,
 	StringLiteral,
 } from '../ast/literals.ast';
+import { ExportStatement, ImportStatement } from '../ast/module.ast';
 import {
 	ReturnStatement,
 	ThrowStatement,
@@ -120,9 +121,7 @@ export default class Parser {
 			console.log(
 				new ParseError(
 					'Uncaught: Missing EndOfFile <EOF> token',
-					`${sourceFile}:${this.current().__GSC._POS.start.Line}:${
-						this.current().__GSC._POS.start.Column
-					}`
+					`${sourceFile}:${getErrorLocation(this.current())}`
 				)
 			);
 			process.exit(1);
@@ -262,9 +261,7 @@ export default class Parser {
 				console.log(
 					new ParseError(
 						'Expected arguments to be identifiers',
-						`${sourceFile}:${
-							this.current().__GSC._POS.start.Line
-						}:${this.current().__GSC._POS.start.Column}`
+						`${sourceFile}:${getErrorLocation(this.current())}`
 					)
 				);
 				process.exit(1);
@@ -342,7 +339,6 @@ export default class Parser {
 	}
 
 	private parseImportStatement(): STATEMENT {
-		// TODO: finish implementation
 		const importTokenPos = this.advance().__GSC._POS;
 
 		this.expect(NodeType.OpenBrace, 'following import keyword');
@@ -373,13 +369,35 @@ export default class Parser {
 			} else if (this.current().type == NodeType.Comma) this.advance(); // advance past comma
 		}
 
-		return {} as STATEMENT;
+		this.expect(NodeType.CloseBrace, 'following imports');
+
+		this.expect(NodeType.From, 'in import statement');
+
+		const source = this.expect(
+			NodeType.String,
+			'containing the file to import'
+		);
+
+		return {
+			kind: 'ImportStatement',
+			imports,
+			source: source.value,
+			start: importTokenPos.start,
+			end: source.__GSC._POS.end,
+		} as ImportStatement;
 	}
 
 	private parseExportStatement(): STATEMENT {
-		// TODO:
-		// placeholder
-		return {} as STATEMENT;
+		const exportTokenPos = this.advance().__GSC._POS;
+
+		const value = this.parseStatement();
+
+		return {
+			kind: 'ExportStatement',
+			value,
+			start: exportTokenPos.start,
+			end: value.end,
+		} as ExportStatement;
 	}
 
 	// [EXPRESSIONS]
@@ -518,7 +536,7 @@ export default class Parser {
 			console.log(
 				new ParseError(
 					'"Catch" statements can only have one argument, containing the error variable',
-					`${sourceFile}:${catchTokenPos.__GSC._POS.start.Line}:${catchTokenPos.__GSC._POS.start.Column}`
+					`${sourceFile}:${getErrorLocation(catchTokenPos)}`
 				)
 			);
 		}
@@ -529,9 +547,7 @@ export default class Parser {
 				console.log(
 					new ParseError(
 						'Expected arguments to be identifiers',
-						`${sourceFile}:${
-							this.current().__GSC._POS.start.Line
-						}:${this.current().__GSC._POS.start.Column}`
+						`${sourceFile}:${getErrorLocation(this.current())}`
 					)
 				);
 				process.exit(1);
@@ -728,9 +744,9 @@ export default class Parser {
 						`Uncaught: Unexpected token "${
 							getTokenByTypeEnum(this.current().type)?.value
 						}"`,
-						`${sourceFile || 'GSREPL'}:${
-							this.current().__GSC._POS.start.Line
-						}:${this.current().__GSC._POS.start.Column}`
+						`${sourceFile || 'GSREPL'}:${getErrorLocation(
+							this.current()
+						)}`
 					)
 				);
 				process.exit(1);

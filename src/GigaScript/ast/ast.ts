@@ -10,6 +10,8 @@ export type ASTNodeType =
 	| 'ConstructorStatement'
 	| 'ClassMethod'
 	| 'ClassProperty'
+	| 'ImportStatement'
+	| 'ExportStatement'
 	| 'CodeBlockNode'
 	| 'EOF'
 	// Expressions
