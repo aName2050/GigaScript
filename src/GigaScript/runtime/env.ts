@@ -3,7 +3,6 @@ import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
 import { Identifier } from '../ast/literals.ast';
-import { evaluate } from './interpreter/interpreter';
 import { Class } from '../types';
 
 export function createGlobalScope(cwd: string): Environment {
