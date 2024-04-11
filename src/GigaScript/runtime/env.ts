@@ -88,14 +88,6 @@ export default class Environment {
 		value: GSAny,
 		overrideConstant = false
 	): GSAny {
-		if (identifer == 'this') {
-			if (this.constants.has(identifer) && !overrideConstant)
-				throw `Can not reassign "${identifer}" because it is a cosntant`;
-
-			this.variables.set(identifer, value);
-
-			return value;
-		}
 		const env = this.resolve(identifer);
 
 		if (env.constants.has(identifer) && !overrideConstant)
@@ -107,11 +99,6 @@ export default class Environment {
 	}
 
 	public lookupVar(identifer: string): GSAny {
-		if (identifer == 'this') {
-			// "this" should resolve its value for the current environment only
-			// it should not resolve to parent environments
-			return this.variables.get(identifer) as GSAny;
-		}
 		const env = this.resolve(identifer);
 		return env.variables.get(identifer) as GSAny;
 	}
@@ -146,8 +133,8 @@ export default class Environment {
 		}
 
 		const varName = (expr.object as Identifier).symbol;
-		const env =
-			varName == 'this' ? (this as Environment) : this.resolve(varName);
+		const env = this.resolve(varName);
+		// varName == 'this' ? (this as Environment) : this.resolve(varName);
 
 		let object = env.variables.get(varName) as GSObject;
 
@@ -284,7 +271,58 @@ export default class Environment {
 			obj.properties.set('constructor', constructorFunc);
 		}
 
-		classEnv.assignVar('this', obj, true);
+		return {
+			type: 'class',
+			name,
+			classEnv,
+			instance: obj,
+		} as ClassVal;
+	}
+
+	public getAllClassMethodsAndProperties(name: string): ClassVal {
+		const Class = this.classes.get(name);
+		if (!Class) throw `RuntimeError: class "${name}" does not exist`;
+
+		const { properties, methods, constructor } = Class;
+
+		const obj = {
+			type: 'object',
+			properties: new Map<string, GSAny>(),
+		} as GSObject;
+
+		properties.forEach(prop => {
+			const propVal = prop.value
+				? evaluate(prop.value as STATEMENT, this as Environment)
+				: DataConstructors.UNDEFINED();
+
+			obj.properties.set(prop.identifier, propVal);
+		});
+
+		const classEnv = new Environment(this.cwd, this as Environment);
+
+		methods.forEach(method => {
+			const func = {
+				type: 'function',
+				name: method.name,
+				params: method.params,
+				decEnv: classEnv,
+				body: method.body,
+			} as FuncVal;
+
+			obj.properties.set(method.name, func);
+		});
+
+		if (constructor) {
+			const constructorFunc = {
+				type: 'function',
+				name: 'constructor',
+				params: constructor.params,
+				body: constructor.body,
+				decEnv: classEnv,
+			} as FuncVal;
+
+			obj.properties.set('constructor', constructorFunc);
+		}
 
 		return {
 			type: 'class',

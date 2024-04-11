@@ -349,7 +349,11 @@ export function evalNewClassInstanceExpr(
 		classEnv as Environment
 	);
 
-	env.assignVar('this', classObj.instance, true);
+	const localClassObj = env.getAllClassMethodsAndProperties(
+		expr.name
+	).instance;
+
+	classEnv.assignVar('this', localClassObj, true);
 
 	// eval constructor statement
 	if (expr.args.length != constructor.params.length)

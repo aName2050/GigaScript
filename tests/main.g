@@ -18,17 +18,20 @@ class TestClass {
     private privateMethod() {
         print("this is a private method")
     }
+
+    public dump(text) {
+        print(text)
+        print(this)
+    }
 }
 
 const test = new TestClass("this value was defined later!");
-
-"print('this should result in an error:', test.privateProp)"
-"print('this should result in an error:', test.constPrivateProp)"
-"print('this should result in an error:')"
-"test.privateMethod()"
 
 print(test.publicProp)
 print(test.constPublicProp)
 test.publicMethod()
 
+print('outside class')
 print(this)
+
+test.dump('inside class')
