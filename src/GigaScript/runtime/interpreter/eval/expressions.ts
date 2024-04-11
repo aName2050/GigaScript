@@ -1,48 +1,57 @@
 import { sourceFile } from '../../../../index';
-import { AssignmentExpr, UnaryExpr } from '../../../ast/assignments.ast';
+import { AssignmentExpr } from '../../../ast/assignments.ast';
 import { BinaryExpr } from '../../../ast/binop.ast';
 import { BitwiseExpr } from '../../../ast/bitwise.ast';
+import { ClassNewInstanceExpr } from '../../../ast/class.ast';
 import { CallExpr, MemberExpr } from '../../../ast/expressions.ast';
 import {
 	Identifier,
-	NumberLiteral,
 	ObjectLiteral,
+	StringLiteral,
 } from '../../../ast/literals.ast';
 import { getValue } from '../../../util/getValue';
 import { GSError } from '../../../util/gserror';
 import Environment from '../../env';
 import {
 	DataConstructors,
-	DataType,
 	FuncVal,
+	GSAny,
+	GSArray,
+	GSBoolean,
+	GSNull,
+	GSNumber,
+	GSObject,
+	GSString,
+	GSUndefined,
 	NativeFnVal,
 	ObjectValue,
 	Value,
 } from '../../types';
 import { evaluate } from '../interpreter';
+import { evalCodeBlock } from './statements';
 
 export function evalNumericBinaryExpr(
-	lhs: Value<DataType, any>,
-	rhs: Value<DataType, any>,
+	lhs: GSAny,
+	rhs: GSAny,
 	op: string
-): Value<DataType, any> {
+): GSAny {
 	if (op === '!=') {
 		return equals(lhs, rhs, false);
 	} else if (op === '==') {
 		return equals(lhs, rhs, true);
 	} else if (op === '&&') {
-		const blhs = lhs as Value<'boolean', boolean>;
-		const brhs = rhs as Value<'boolean', boolean>;
+		const blhs = lhs as GSBoolean;
+		const brhs = rhs as GSBoolean;
 
 		return DataConstructors.BOOLEAN(blhs.value && brhs.value);
 	} else if (op === '||') {
-		const blhs = lhs as Value<'boolean', boolean>;
-		const brhs = rhs as Value<'boolean', boolean>;
+		const blhs = lhs as GSBoolean;
+		const brhs = rhs as GSBoolean;
 
 		return DataConstructors.BOOLEAN(blhs.value || brhs.value);
 	} else if (lhs.type === 'number' && rhs.type === 'number') {
-		const nlhs = lhs as Value<'number', number>;
-		const nrhs = rhs as Value<'number', number>;
+		const nlhs = lhs as GSNumber;
+		const nrhs = rhs as GSNumber;
 
 		switch (op) {
 			case '+':
@@ -81,30 +90,20 @@ export function evalNumericBinaryExpr(
 	}
 }
 
-export function evalBinaryExpr(
-	binop: BinaryExpr,
-	env: Environment
-): Value<DataType, any> {
+export function evalBinaryExpr(binop: BinaryExpr, env: Environment): GSAny {
 	const lhs = evaluate(binop.lhs, env);
 	const rhs = evaluate(binop.rhs, env);
 
-	return evalNumericBinaryExpr(
-		lhs as Value<DataType, any>,
-		rhs as Value<DataType, any>,
-		binop.op
-	);
+	return evalNumericBinaryExpr(lhs as GSAny, rhs as GSAny, binop.op);
 }
 
-export function evalBitwiseExpr(
-	expr: BitwiseExpr,
-	env: Environment
-): Value<DataType, any> {
+export function evalBitwiseExpr(expr: BitwiseExpr, env: Environment): GSAny {
 	const lhs = evaluate(expr.lhs, env);
 	const rhs = evaluate(expr.rhs, env);
 
 	if (typeof getValue(lhs) == 'number') {
-		const nlhs = lhs as Value<'number', number>;
-		const nrhs = rhs as Value<'number', number>;
+		const nlhs = lhs as GSNumber;
+		const nrhs = rhs as GSNumber;
 
 		switch (expr.op) {
 			case '&':
@@ -142,11 +141,7 @@ export function evalBitwiseExpr(
 	}
 }
 
-function equals(
-	lhs: Value<DataType, any>,
-	rhs: Value<DataType, any>,
-	strict: boolean
-): Value<DataType, any> {
+function equals(lhs: GSAny, rhs: GSAny, strict: boolean): GSAny {
 	const compare = strict
 		? (a: any, b: any) => a === b
 		: (a: any, b: any) => a !== b;
@@ -154,42 +149,30 @@ function equals(
 	switch (lhs.type) {
 		case 'boolean':
 			return DataConstructors.BOOLEAN(
-				compare(
-					(lhs as Value<'boolean', boolean>).value,
-					(rhs as Value<'boolean', boolean>).value
-				)
+				compare((lhs as GSBoolean).value, (rhs as GSBoolean).value)
 			);
 
 		case 'number':
 			return DataConstructors.BOOLEAN(
-				compare(
-					(lhs as Value<'number', number>).value,
-					(rhs as Value<'number', number>).value
-				)
+				compare((lhs as GSNumber).value, (rhs as GSNumber).value)
 			);
 
 		case 'string':
 			return DataConstructors.BOOLEAN(
-				compare(
-					(lhs as Value<'string', string>).value,
-					(rhs as Value<'string', string>).value
-				)
+				compare((lhs as GSString).value, (rhs as GSString).value)
 			);
 
 		case 'undefined':
 			return DataConstructors.BOOLEAN(
 				compare(
-					(lhs as Value<'undefined', undefined>).value,
+					(lhs as GSUndefined).value,
 					(rhs as Value<'undefined', undefined>).value
 				)
 			);
 
 		case 'null':
 			return DataConstructors.BOOLEAN(
-				compare(
-					(lhs as Value<'null', null>).value,
-					(rhs as Value<'null', null>).value
-				)
+				compare((lhs as GSNull).value, (rhs as GSNull).value)
 			);
 
 		case 'object':
@@ -202,10 +185,7 @@ function equals(
 
 		case 'array':
 			return DataConstructors.BOOLEAN(
-				compare(
-					(lhs as Value<'array', Array<any>>).value,
-					(rhs as Value<'array', Array<any>>).value
-				)
+				compare((lhs as GSArray).value, (rhs as GSArray).value)
 			);
 
 		case 'function':
@@ -233,15 +213,12 @@ function equals(
 export function evalIdentifier(
 	identifier: Identifier,
 	env: Environment
-): Value<DataType, any> {
+): GSAny {
 	const val = env.lookupVar(identifier.symbol);
 	return val;
 }
 
-export function evalAssignment(
-	node: AssignmentExpr,
-	env: Environment
-): Value<DataType, any> {
+export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 	if (node.assigne.kind === 'MemberExpr') return evalMemberExpr(env, node);
 	if (node.assigne.kind !== 'Identifier') {
 		console.log(
@@ -263,7 +240,7 @@ export function evalMemberExpr(
 	env: Environment,
 	node?: AssignmentExpr | null,
 	expr?: MemberExpr | null
-): Value<DataType, any> {
+): GSAny {
 	if (expr) {
 		const Var = env.lookupObjectValue(expr);
 
@@ -289,10 +266,7 @@ export function evalMemberExpr(
 	}
 }
 
-export function evalCallExpr(
-	expr: CallExpr,
-	env: Environment
-): Value<DataType, any> {
+export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 	const args = expr.args.map(arg => evaluate(arg, env));
 	const fn = evaluate(expr.caller, env);
 
@@ -321,7 +295,7 @@ export function evalCallExpr(
 			scope.declareVar(varName, args[i], false);
 		}
 
-		let result: Value<DataType, any> = DataConstructors.UNDEFINED();
+		let result: GSAny = DataConstructors.UNDEFINED();
 
 		for (const stmt of func.body.body) {
 			if (stmt.kind == 'ReturnStatement') {
@@ -347,10 +321,7 @@ export function evalCallExpr(
 	process.exit(1);
 }
 
-export function evalObjectExpr(
-	obj: ObjectLiteral,
-	env: Environment
-): Value<DataType, any> {
+export function evalObjectExpr(obj: ObjectLiteral, env: Environment): GSAny {
 	const object = { type: 'object', properties: new Map() } as ObjectValue;
 
 	for (const { key, value } of obj.properties) {
@@ -361,4 +332,38 @@ export function evalObjectExpr(
 	}
 
 	return object;
+}
+
+export function evalNewClassInstanceExpr(
+	expr: ClassNewInstanceExpr,
+	env: Environment
+): GSObject {
+	const classObj = env.getClassAsObjectLiteral(expr.name);
+
+	const constructor = classObj.instance.properties.get(
+		'constructor'
+	) as FuncVal;
+	const classEnv = constructor.decEnv;
+	const constructorEnv = new Environment(
+		classEnv.cwd,
+		classEnv as Environment
+	);
+
+	env.assignVar('this', classObj.instance, true);
+
+	// eval constructor statement
+	if (expr.args.length != constructor.params.length)
+		throw `RuntimeError: constructor expected ${constructor.params.length} arguments, instead got ${expr.args.length}`;
+
+	constructor.params.forEach((param, i) => {
+		constructorEnv.declareVar(
+			param,
+			evaluate(expr.args[i], constructorEnv),
+			false
+		);
+	});
+
+	evalCodeBlock(constructor.body, constructorEnv, false);
+
+	return classObj.instance;
 }

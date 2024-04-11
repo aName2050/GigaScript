@@ -11,6 +11,7 @@ import { BinaryExpr } from '../ast/binop.ast';
 import {
 	ClassDeclaration,
 	ClassMethod,
+	ClassNewInstanceExpr,
 	ClassProperty,
 	ConstructorStatement,
 } from '../ast/class.ast';
@@ -449,8 +450,8 @@ export default class Parser {
 			) {
 				const startPos = this.current().__GSC._POS;
 				const isPublic = this.advance().type == NodeType.Public;
-				let isStatic: boolean = false;
 
+				let isStatic: boolean = false;
 				if (this.current().type == NodeType.Static) {
 					this.advance();
 					isStatic = true;
@@ -465,7 +466,10 @@ export default class Parser {
 
 				if (this.current().type == NodeType.Semicolon) {
 					// undefined property
-					const endPos = this.advance().__GSC._POS;
+					const endPos = this.expect(
+						NodeType.Semicolon,
+						'following property declaration'
+					).__GSC._POS;
 
 					const prop = {
 						kind: 'ClassProperty',
@@ -475,11 +479,6 @@ export default class Parser {
 						start: startPos.start,
 						end: endPos.end,
 					} as ClassProperty;
-
-					this.expect(
-						NodeType.Semicolon,
-						'following property declaration'
-					);
 
 					properties.push(prop);
 				} else if (this.current().type == NodeType.Equals) {
@@ -847,7 +846,7 @@ export default class Parser {
 	}
 
 	private parseMemberExpr(): EXPRESSION {
-		let object = this.parsePrimaryExpression();
+		let object = this.parseNewClassInstanceExpr();
 
 		while (
 			this.current().type == NodeType.Dot ||
@@ -860,7 +859,7 @@ export default class Parser {
 			if (op.type == NodeType.Dot) {
 				// non-computed values, like "foo.bar"
 				computed = false;
-				property = this.parsePrimaryExpression();
+				property = this.parseNewClassInstanceExpr();
 
 				if (property.kind != 'Identifier') {
 					console.log(
@@ -890,6 +889,29 @@ export default class Parser {
 		}
 
 		return object;
+	}
+
+	private parseNewClassInstanceExpr(): EXPRESSION {
+		if (this.current().type == NodeType.New) {
+			const newTokenPos = this.advance().__GSC._POS;
+
+			const name = this.expect(
+				NodeType.Identifier,
+				'following "new" keyword'
+			);
+
+			const args = this.parseArgs();
+
+			return {
+				kind: 'ClassNewInstanceExpr',
+				name: name.value,
+				args,
+				start: newTokenPos.start,
+				end: args[args.length - 1].end || name.__GSC._POS.end,
+			} as ClassNewInstanceExpr;
+		}
+
+		return this.parsePrimaryExpression();
 	}
 
 	// Handles everything else

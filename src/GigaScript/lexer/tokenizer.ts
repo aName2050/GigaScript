@@ -478,13 +478,12 @@ export function tokenize(source: string): Token[] {
 				case "'":
 				case '"':
 					let str = '';
-					src.shift(); // move past opening doubleQuotes/singleQuotes
+					const expectedClosingQuoteType = src.shift(); // move past opening doubleQuotes/singleQuotes
 					col++;
 
 					while (
 						src.length > 0 &&
-						src[0] !== '"' &&
-						src[0] !== "'" &&
+						src[0] !== expectedClosingQuoteType &&
 						!isEOL(src[0]) &&
 						src.length != 0
 					) {

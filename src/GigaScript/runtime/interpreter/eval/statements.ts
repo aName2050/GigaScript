@@ -18,6 +18,7 @@ import * as fs from 'node:fs';
 import { Identifier } from '../../../ast/literals.ast';
 import { GSError } from '../../../util/gserror';
 import { sourceFile } from '../../../..';
+import { ClassDeclaration } from '../../../ast/class.ast';
 
 export function evalProgram(
 	program: Program,
@@ -175,6 +176,20 @@ export function evalExportStatement(
 			`${sourceFile}:${node.start.Line}:${node.start.Column}`
 		);
 	}
+
+	return DataConstructors.NULL();
+}
+
+export function evalClassDeclaration(
+	node: ClassDeclaration,
+	env: Environment
+): GSAny {
+	env.declareClass(
+		node.name,
+		node.properties,
+		node.methods,
+		node.constructor
+	);
 
 	return DataConstructors.NULL();
 }

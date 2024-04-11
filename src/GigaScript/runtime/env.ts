@@ -1,9 +1,16 @@
-import { DataConstructors, GSAny, GSObject } from './types';
+import { ClassVal, DataConstructors, FuncVal, GSAny, GSObject } from './types';
 import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
 import { Identifier } from '../ast/literals.ast';
 import { ClassBody } from '../types';
+import {
+	ClassMethod,
+	ClassProperty,
+	ConstructorStatement,
+} from '../ast/class.ast';
+import { evaluate } from './interpreter/interpreter';
+import { STATEMENT } from '../ast/ast';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
@@ -76,10 +83,22 @@ export default class Environment {
 		return value;
 	}
 
-	public assignVar(identifer: string, value: GSAny): GSAny {
+	public assignVar(
+		identifer: string,
+		value: GSAny,
+		overrideConstant = false
+	): GSAny {
+		if (identifer == 'this') {
+			if (this.constants.has(identifer) && !overrideConstant)
+				throw `Can not reassign "${identifer}" because it is a cosntant`;
+
+			this.variables.set(identifer, value);
+
+			return value;
+		}
 		const env = this.resolve(identifer);
 
-		if (env.constants.has(identifer))
+		if (env.constants.has(identifer) && !overrideConstant)
 			throw `Can not reassign "${identifer}" because it is a cosntant`;
 
 		env.variables.set(identifer, value);
@@ -88,6 +107,11 @@ export default class Environment {
 	}
 
 	public lookupVar(identifer: string): GSAny {
+		if (identifer == 'this') {
+			// "this" should resolve its value for the current environment only
+			// it should not resolve to parent environments
+			return this.variables.get(identifer) as GSAny;
+		}
 		const env = this.resolve(identifer);
 		return env.variables.get(identifer) as GSAny;
 	}
@@ -122,7 +146,8 @@ export default class Environment {
 		}
 
 		const varName = (expr.object as Identifier).symbol;
-		const env = this.resolve(varName);
+		const env =
+			varName == 'this' ? (this as Environment) : this.resolve(varName);
 
 		let object = env.variables.get(varName) as GSObject;
 
@@ -195,5 +220,77 @@ export default class Environment {
 
 	// CLASSES
 
-	// TODO:
+	public declareClass(
+		name: string,
+		properties: Array<ClassProperty>,
+		methods: Array<ClassMethod>,
+		constructor?: ConstructorStatement
+	): GSAny {
+		this.classes.set(name, {
+			properties,
+			methods,
+			constructor,
+		} as ClassBody);
+
+		return DataConstructors.NULL();
+	}
+
+	public getClassAsObjectLiteral(name: string): ClassVal {
+		const Class = this.classes.get(name);
+		if (!Class) throw `RuntimeError: class "${name}" does not exist`;
+
+		const { properties, methods, constructor } = Class;
+
+		const obj = {
+			type: 'object',
+			properties: new Map<string, GSAny>(),
+		} as GSObject;
+
+		properties.forEach(prop => {
+			if (prop.public) {
+				const propVal = prop.value
+					? evaluate(prop.value as STATEMENT, this as Environment)
+					: DataConstructors.UNDEFINED();
+
+				obj.properties.set(prop.identifier, propVal);
+			}
+		});
+
+		const classEnv = new Environment(this.cwd, this as Environment);
+
+		methods.forEach(method => {
+			if (method.public) {
+				const func = {
+					type: 'function',
+					name: method.name,
+					params: method.params,
+					decEnv: classEnv,
+					body: method.body,
+				} as FuncVal;
+
+				obj.properties.set(method.name, func);
+			}
+		});
+
+		if (constructor) {
+			const constructorFunc = {
+				type: 'function',
+				name: 'constructor',
+				params: constructor.params,
+				body: constructor.body,
+				decEnv: classEnv,
+			} as FuncVal;
+
+			obj.properties.set('constructor', constructorFunc);
+		}
+
+		classEnv.assignVar('this', obj, true);
+
+		return {
+			type: 'class',
+			name,
+			classEnv,
+			instance: obj,
+		} as ClassVal;
+	}
 }

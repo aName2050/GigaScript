@@ -3,7 +3,7 @@ class TestClass {
     public publicProp = "this is a public prop";
 
     private static constPrivateProp = "this is a constant (static) private prop";
-    public static constPrivateProp = "this is a constant (static) public prop";
+    public static constPublicProp = "this is a constant (static) public prop";
 
     public definedLater;
 
@@ -22,11 +22,13 @@ class TestClass {
 
 const test = new TestClass("this value was defined later!");
 
-print('this should result in an error:', test.privateProp)
-print('this should result in an error:', test.constPrivateProp)
-print('this should result in an error:')
-test.privateMethod()
+"print('this should result in an error:', test.privateProp)"
+"print('this should result in an error:', test.constPrivateProp)"
+"print('this should result in an error:')"
+"test.privateMethod()"
 
 print(test.publicProp)
 print(test.constPublicProp)
 test.publicMethod()
+
+print(this)

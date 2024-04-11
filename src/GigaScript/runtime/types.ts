@@ -10,7 +10,8 @@ export type DataType =
 	| 'object'
 	| 'array'
 	| 'nativeFn'
-	| 'function';
+	| 'function'
+	| 'class';
 
 export interface Value<DataType, Type> {
 	type: DataType;
@@ -87,6 +88,13 @@ export interface FuncVal extends Value<'function', undefined> {
 	params: Array<string>;
 	decEnv: Environment;
 	body: CodeBlockNode;
+}
+
+export interface ClassVal extends Value<'class', undefined> {
+	type: 'class';
+	name: string;
+	classEnv: Environment;
+	instance: GSObject;
 }
 
 export const DataConstructors = {

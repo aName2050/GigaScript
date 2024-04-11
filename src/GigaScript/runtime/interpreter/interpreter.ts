@@ -2,6 +2,7 @@ import { sourceFile } from '../../../index';
 import { AssignmentExpr } from '../../ast/assignments.ast';
 import { Program, STATEMENT } from '../../ast/ast';
 import { BinaryExpr } from '../../ast/binop.ast';
+import { ClassDeclaration, ClassNewInstanceExpr } from '../../ast/class.ast';
 import {
 	FunctionDeclaration,
 	VariableDeclaration,
@@ -21,7 +22,7 @@ import {
 } from '../../ast/statements.ast';
 import { GSError } from '../../util/gserror';
 import Environment from '../env';
-import { DataType, GSAny, GSNumber, GSString, Value } from '../types';
+import { GSAny, GSNumber, GSString } from '../types';
 import {
 	evalAssignment,
 	evalBinaryExpr,
@@ -29,6 +30,7 @@ import {
 	evalIdentifier,
 	evalMemberExpr,
 	evalObjectExpr,
+	evalNewClassInstanceExpr,
 } from './eval/expressions';
 import {
 	evalFuncDeclaration,
@@ -39,6 +41,7 @@ import {
 	evalThrowStatement,
 	evalExportStatement,
 	evalImportStatement,
+	evalClassDeclaration,
 } from './eval/statements';
 
 export function evaluate(node: STATEMENT, env: Environment): GSAny {
@@ -86,9 +89,15 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 		case 'AssignmentExpr':
 			return evalAssignment(node as AssignmentExpr, env);
 
+		case 'ClassNewInstanceExpr':
+			return evalNewClassInstanceExpr(node as ClassNewInstanceExpr, env);
+
 		// Handle statements
 		case 'Program':
 			return evalProgram(node as Program, env);
+
+		case 'ClassDeclaration':
+			return evalClassDeclaration(node as ClassDeclaration, env);
 
 		case 'VariableDeclaration':
 			return evalVarDeclaration(node as VariableDeclaration, env);
