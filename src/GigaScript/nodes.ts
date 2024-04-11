@@ -69,6 +69,8 @@ export enum NodeType {
 	Export,
 	/** From statement */
 	From,
+	/** As statement */
+	As,
 
 	// { SPECIAL }
 	/** Throw exception statement */

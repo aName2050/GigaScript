@@ -85,6 +85,8 @@ export enum TokenID {
 	Export,
 	/** From statement */
 	From,
+	/** As statement */
+	As,
 
 	// { SPECIAL }
 	/** Throw exception statement */
@@ -303,14 +305,19 @@ setTokenData(TokenID._This, NodeType.Identifier, 'this', OpPrec.None);
 
 setTokenData(TokenID.If, NodeType.If, 'if', OpPrec.None);
 setTokenData(TokenID.Else, NodeType.Else, 'else', OpPrec.None);
+
 setTokenData(TokenID.While, NodeType.While, 'while', OpPrec.None);
 setTokenData(TokenID.For, NodeType.For, 'for', OpPrec.None);
 setTokenData(TokenID.Continue, NodeType.Continue, 'continue', OpPrec.None);
 setTokenData(TokenID.Break, NodeType.Break, 'break', OpPrec.None);
+
 setTokenData(TokenID.Import, NodeType.Import, 'import', OpPrec.None);
 setTokenData(TokenID.Export, NodeType.Export, 'export', OpPrec.None);
 setTokenData(TokenID.From, NodeType.From, 'from', OpPrec.None);
+setTokenData(TokenID.As, NodeType.As, 'as', OpPrec.Assignment);
+
 setTokenData(TokenID.Throw, NodeType.Throw, 'throw', OpPrec.None);
+
 setTokenData(TokenID.Try, NodeType.Try, 'try', OpPrec.None);
 setTokenData(TokenID.Catch, NodeType.Catch, 'catch', OpPrec.None);
 

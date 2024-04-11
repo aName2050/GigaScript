@@ -148,6 +148,11 @@ export default class Parser {
 			case NodeType.Return:
 				return this.parseReturnStatement();
 
+			case NodeType.Import:
+				return this.parseImportStatement();
+			case NodeType.Export:
+				return this.parseExportStatement();
+
 			case NodeType.Throw:
 				return this.parseThrowStatement();
 
@@ -282,6 +287,30 @@ export default class Parser {
 		return func;
 	}
 
+	// [FUNCTIONS.ARGUMENTS/PARAMETERS]
+	private parseArgs(): Array<EXPRESSION> {
+		this.expect(NodeType.OpenParen, 'before parameter list');
+
+		const args =
+			this.current().type == NodeType.CloseParen
+				? []
+				: this.parseArgumentsList();
+
+		this.expect(NodeType.CloseParen, 'after parameters list');
+
+		return args;
+	}
+
+	private parseArgumentsList(): Array<EXPRESSION> {
+		const args = [this.parseExpr()];
+
+		while (this.current().type == NodeType.Comma && this.advance()) {
+			args.push(this.parseExpr());
+		}
+
+		return args;
+	}
+
 	private parseReturnStatement(): STATEMENT {
 		const returnTokenPos = this.advance().__GSC._POS;
 
@@ -312,28 +341,45 @@ export default class Parser {
 		} as ThrowStatement;
 	}
 
-	// [FUNCTIONS.ARGUMENTS/PARAMETERS]
-	private parseArgs(): Array<EXPRESSION> {
-		this.expect(NodeType.OpenParen, 'before parameter list');
+	private parseImportStatement(): STATEMENT {
+		// TODO: finish implementation
+		const importTokenPos = this.advance().__GSC._POS;
 
-		const args =
-			this.current().type == NodeType.CloseParen
-				? []
-				: this.parseArgumentsList();
+		this.expect(NodeType.OpenBrace, 'following import keyword');
 
-		this.expect(NodeType.CloseParen, 'after parameters list');
+		/**
+		 * <ExportOriginalIdentifer, AliasIdentifier>
+		 */
+		const imports = new Map<string, string>();
 
-		return args;
-	}
+		while (this.notEOF() && this.current().type != NodeType.CloseBrace) {
+			if (this.current().type == NodeType.Identifier) {
+				if (this.next().type == NodeType.As) {
+					// this advances past the Identifier (checked with this.current()),
+					// then advances past the "as" keyword (checked with this.next()),
+					// then advances past the alias Identifer
 
-	private parseArgumentsList(): Array<EXPRESSION> {
-		const args = [this.parseExpr()];
-
-		while (this.current().type == NodeType.Comma && this.advance()) {
-			args.push(this.parseExpr());
+					const exportedIdent = this.advance().value;
+					this.advance(); // advance past "as"
+					const aliasIdent = this.expect(
+						NodeType.Identifier,
+						'following "as" keyword'
+					).value;
+					imports.set(exportedIdent, aliasIdent);
+				} else {
+					const exportedIdent = this.advance().value;
+					imports.set(exportedIdent, exportedIdent);
+				}
+			} else if (this.current().type == NodeType.Comma) this.advance(); // advance past comma
 		}
 
-		return args;
+		return {} as STATEMENT;
+	}
+
+	private parseExportStatement(): STATEMENT {
+		// TODO:
+		// placeholder
+		return {} as STATEMENT;
 	}
 
 	// [EXPRESSIONS]
