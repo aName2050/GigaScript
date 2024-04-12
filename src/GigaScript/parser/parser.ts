@@ -639,6 +639,11 @@ export default class Parser {
 			test,
 			body,
 			alt,
+			start: ifTokenPos.start,
+			end:
+				(alt as Array<STATEMENT>)[0]?.end ||
+				(alt as CodeBlockNode)?.end ||
+				body.end,
 		} as IfStatement;
 	}
 
@@ -844,6 +849,8 @@ export default class Parser {
 				lhs,
 				rhs,
 				op,
+				start: lhs.start,
+				end: rhs.end,
 			} as BinaryExpr;
 		}
 
