@@ -12,6 +12,7 @@ export type ASTNodeType =
 	| 'ClassProperty'
 	| 'ImportStatement'
 	| 'ExportStatement'
+	| 'IfStatement'
 	| 'CodeBlockNode'
 	| 'EOF'
 	// Expressions

@@ -1,40 +1,17 @@
-class TestClass {
-    private privateProp = "this is a private prop";
-    public publicProp = "this is a public prop";
+const condition = true;
 
-    private static constPrivateProp = "this is a constant (static) private prop";
-    public static constPublicProp = "this is a constant (static) public prop";
-
-    public definedLater;
-
-    constructor(value) {
-        this.definedLater = value
-    }
-
-    public publicMethod() {
-        print("this is a public method")
-    }
-
-    private privateMethod() {
-        print("this is a private method")
-    }
-
-    public dump(text) {
-        print(text)
-        print(this)
-    }
+if(condition == true) {
+    print("true!")
+} else {
+    print("false!")
 }
 
-const test = new TestClass("this value was defined later!");
+const string = "test";
 
-print(test.publicProp)
-print(test.constPublicProp)
-test.publicMethod()
-
-test.dump('inside class')
-
-print('outside class')
-print(this)
-
-this = 'test'
-print(this)
+if (string == "test1") {
+    print("string=test1")
+} else if (string == "test") {
+    print("string=test")
+} else {
+    print("unknown")
+}

@@ -15,6 +15,7 @@ import {
 	ClassProperty,
 	ConstructorStatement,
 } from '../ast/class.ast';
+import { IfStatement } from '../ast/conditionals.ast';
 import {
 	FunctionDeclaration,
 	VariableDeclaration,
@@ -162,6 +163,9 @@ export default class Parser {
 
 			case NodeType.Class:
 				return this.parseClassDeclaration();
+
+			case NodeType.If:
+				return this.parseIfStatement();
 
 			case NodeType.Throw:
 				return this.parseThrowStatement();
@@ -607,6 +611,37 @@ export default class Parser {
 		} as ConstructorStatement;
 	}
 
+	private parseIfStatement(): STATEMENT {
+		const ifTokenPos = this.advance().__GSC._POS;
+
+		this.expect(NodeType.OpenParen, 'following "if" statement');
+
+		const test = this.parseExpr();
+
+		this.expect(NodeType.CloseParen, 'following expression');
+
+		const body = this.parseCodeBlock();
+
+		let alt: Array<STATEMENT> | CodeBlockNode = [];
+
+		if (this.current().type == NodeType.Else) {
+			this.advance();
+
+			if (this.current().type == NodeType.If) {
+				alt = [this.parseIfStatement()];
+			} else {
+				alt = this.parseCodeBlock();
+			}
+		}
+
+		return {
+			kind: 'IfStatement',
+			test,
+			body,
+			alt,
+		} as IfStatement;
+	}
+
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
 		return this.parseAsgExpr();
@@ -725,7 +760,7 @@ export default class Parser {
 
 	private parseTryCatchExpr(): EXPRESSION {
 		if (this.current().type != NodeType.Try)
-			return this.parseMultiplicativeExpr();
+			return this.parseEqualityExpr();
 
 		const tryTokenPos = this.advance().__GSC._POS;
 
@@ -774,6 +809,48 @@ export default class Parser {
 			end: catchBody.end,
 		} as TryCatchStatement;
 	}
+
+	// private parseLogOr(): EXPRESSION {
+	// 	let lhs = this.parseEqualityExpr();
+
+	// 	while (this.current().value == '&&') {
+	// 		const op = this.advance().value;
+	// 		const rhs = this.parseLogAnd();
+	// 		lhs = {
+	// 			kind: 'BinaryExpr',
+	// 			lhs,
+	// 			rhs,
+	// 			op,
+	// 		} as BinaryExpr;
+	// 	}
+
+	// 	return lhs;
+	// }
+
+	// TODO: LOG_AND
+
+	// TODO: BITWISE_OR
+	// TODO: BITWISE_XOR
+	// TODO: BITWISE_AND
+
+	private parseEqualityExpr(): EXPRESSION {
+		let lhs = this.parseMultiplicativeExpr();
+
+		while (['!=', '==', '<=', '>='].includes(this.current().value)) {
+			const op = this.advance().value;
+			const rhs = this.parseEqualityExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	// TODO: BITWISE_SHIFT
 
 	private parseMultiplicativeExpr(): EXPRESSION {
 		let lhs = this.parseAdditiveExpr();
