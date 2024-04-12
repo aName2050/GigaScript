@@ -11,7 +11,13 @@ import {
 	TryCatchStatement,
 } from '../../../ast/statements.ast';
 import Environment, { createGlobalScope } from '../../env';
-import { DataConstructors, DataType, FuncVal, GSAny, Value } from '../../types';
+import {
+	DataConstructors,
+	FuncVal,
+	GSAny,
+	GSFunction,
+	GSNull,
+} from '../../types';
 import { evaluate } from '../interpreter';
 import Parser from '../../../parser/parser';
 import * as fs from 'node:fs';
@@ -19,12 +25,10 @@ import { Identifier } from '../../../ast/literals.ast';
 import { GSError } from '../../../util/gserror';
 import { sourceFile } from '../../../..';
 import { ClassDeclaration } from '../../../ast/class.ast';
+import { IfStatement } from '../../../ast/conditionals.ast';
 
-export function evalProgram(
-	program: Program,
-	env: Environment
-): Value<DataType, any> {
-	let lastEvaluated: Value<DataType, any> = DataConstructors.NULL();
+export function evalProgram(program: Program, env: Environment): GSAny {
+	let lastEvaluated: GSAny = DataConstructors.NULL();
 
 	for (const statement of program.body) {
 		lastEvaluated = evaluate(statement, env);
@@ -36,7 +40,7 @@ export function evalProgram(
 export function evalVarDeclaration(
 	declaration: VariableDeclaration,
 	env: Environment
-): Value<DataType, any> {
+): GSAny {
 	const value = declaration.value
 		? evaluate(declaration.value, env)
 		: DataConstructors.UNDEFINED();
@@ -47,7 +51,7 @@ export function evalVarDeclaration(
 export function evalFuncDeclaration(
 	declaration: FunctionDeclaration,
 	env: Environment
-): Value<DataType, Function> {
+): GSFunction {
 	const func = {
 		type: 'function',
 		name: declaration.name,
@@ -56,13 +60,13 @@ export function evalFuncDeclaration(
 		decEnv: env,
 	} as FuncVal;
 
-	return env.declareVar(declaration.name, func, true);
+	return env.declareVar(declaration.name, func, true) as GSFunction;
 }
 
 export function evalReturnStatement(
 	statement: ReturnStatement,
 	env: Environment
-): Value<DataType, any> {
+): GSAny {
 	const value = evaluate(statement.value, env);
 
 	return value;
@@ -71,7 +75,7 @@ export function evalReturnStatement(
 export function evalTryCatchStatement(
 	statement: TryCatchStatement,
 	env: Environment
-): Value<DataType, any> {
+): GSAny {
 	const tryEnv = new Environment(env.cwd, env);
 	const catchEnv = new Environment(env.cwd, env);
 
@@ -90,7 +94,7 @@ export function evalTryCatchStatement(
 export function evalThrowStatement(
 	statement: ThrowStatement,
 	env: Environment
-): Value<'null', null> {
+): GSNull {
 	const message = evaluate(statement.message, env);
 
 	throw message.value;
@@ -100,13 +104,13 @@ export function evalCodeBlock(
 	body: CodeBlockNode,
 	env: Environment,
 	createNewEnv = true
-): Value<DataType, any> {
+): GSAny {
 	let scope: Environment;
 
 	if (createNewEnv) scope = new Environment(env.cwd, env);
 	else scope = env;
 
-	let res: Value<DataType, any> = DataConstructors.NULL();
+	let res: GSAny = DataConstructors.NULL();
 
 	for (const stmt of body.body) {
 		res = evaluate(stmt, scope);
@@ -191,5 +195,10 @@ export function evalClassDeclaration(
 		node.constructor
 	);
 
+	return DataConstructors.NULL();
+}
+
+export function evalIfStatement(node: IfStatement, env: Environment): GSAny {
+	// TODO:
 	return DataConstructors.NULL();
 }

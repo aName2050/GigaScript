@@ -3,6 +3,7 @@ import { AssignmentExpr } from '../../ast/assignments.ast';
 import { Program, STATEMENT } from '../../ast/ast';
 import { BinaryExpr } from '../../ast/binop.ast';
 import { ClassDeclaration, ClassNewInstanceExpr } from '../../ast/class.ast';
+import { IfStatement } from '../../ast/conditionals.ast';
 import {
 	FunctionDeclaration,
 	VariableDeclaration,
@@ -42,6 +43,7 @@ import {
 	evalExportStatement,
 	evalImportStatement,
 	evalClassDeclaration,
+	evalIfStatement,
 } from './eval/statements';
 
 export function evaluate(node: STATEMENT, env: Environment): GSAny {
@@ -118,6 +120,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 			return evalImportStatement(node as ImportStatement, env);
 		case 'ExportStatement':
 			return evalExportStatement(node as ExportStatement, env);
+
+		case 'IfStatement':
+			return evalIfStatement(node as IfStatement, env);
 
 		// Handle non implemented types
 		default:

@@ -15,3 +15,5 @@ if (string == "test1") {
 } else {
     print("unknown")
 }
+
+throw 'test error'
