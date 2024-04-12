@@ -31,7 +31,10 @@ print(test.publicProp)
 print(test.constPublicProp)
 test.publicMethod()
 
+test.dump('inside class')
+
 print('outside class')
 print(this)
 
-test.dump('inside class')
+this = 'test'
+print(this)

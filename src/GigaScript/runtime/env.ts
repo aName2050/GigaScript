@@ -23,7 +23,6 @@ export function createGlobalScope(cwd: string): Environment {
 
 	// Native variables
 	env.declareVar('error', NativeValues.Error, true);
-	env.declareVar('this', DataConstructors.UNDEFINED(), true);
 
 	// Native functions
 	env.declareVar('print', NativeFunctions.print, true);
@@ -88,6 +87,10 @@ export default class Environment {
 		value: GSAny,
 		overrideConstant = false
 	): GSAny {
+		if (identifer == 'this' && !this.parent && !overrideConstant) {
+			throw 'RuntimeError: Cannot assign values to "this" keyword';
+		}
+
 		const env = this.resolve(identifer);
 
 		if (env.constants.has(identifer) && !overrideConstant)
@@ -98,9 +101,13 @@ export default class Environment {
 		return value;
 	}
 
-	public lookupVar(identifer: string): GSAny {
-		const env = this.resolve(identifer);
-		return env.variables.get(identifer) as GSAny;
+	public lookupVar(identifier: string): GSAny {
+		if (identifier == 'this' && !this.parent) {
+			return DataConstructors.UNDEFINED();
+		}
+
+		const env = this.resolve(identifier);
+		return env.variables.get(identifier) as GSAny;
 	}
 
 	public resolve(identifer: string): Environment {

@@ -907,7 +907,7 @@ export default class Parser {
 				name: name.value,
 				args,
 				start: newTokenPos.start,
-				end: args[args.length - 1].end || name.__GSC._POS.end,
+				end: args[args.length - 1]?.end || name.__GSC._POS.end,
 			} as ClassNewInstanceExpr;
 		}
 
