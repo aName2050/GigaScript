@@ -27,6 +27,7 @@ import { GSError } from '../../../util/gserror';
 import { sourceFile } from '../../../..';
 import { ClassDeclaration } from '../../../ast/class.ast';
 import { IfStatement } from '../../../ast/conditionals.ast';
+import { ModuleNames } from '../../../native/modules';
 
 export function evalProgram(program: Program, env: Environment): GSAny {
 	let lastEvaluated: GSAny = DataConstructors.NULL();
@@ -124,6 +125,12 @@ export function evalImportStatement(
 	node: ImportStatement,
 	env: Environment
 ): GSAny {
+	if (ModuleNames.includes(node.source)) {
+		// builtin gigascript module
+
+		return DataConstructors.NULL();
+	}
+
 	const fileLocation = path.resolve(`${env.cwd}/${node.source}`);
 
 	const imports = Array.from(node.imports);

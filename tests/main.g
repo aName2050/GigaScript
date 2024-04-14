@@ -1,3 +1,3 @@
-print('this is a newline\'const x=32; ngap!')
+import { eval } from 'gigascript'
 
-print(x)
+eval('print("hello world! (from eval function!)")')
