@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { CodeBlockNode, Program } from '../../../ast/ast';
+import { CodeBlockNode, Program, STATEMENT } from '../../../ast/ast';
 import {
 	FunctionDeclaration,
 	VariableDeclaration,
@@ -15,6 +15,7 @@ import {
 	DataConstructors,
 	FuncVal,
 	GSAny,
+	GSBoolean,
 	GSFunction,
 	GSNull,
 } from '../../types';
@@ -199,6 +200,13 @@ export function evalClassDeclaration(
 }
 
 export function evalIfStatement(node: IfStatement, env: Environment): GSAny {
-	// TODO:
-	return DataConstructors.NULL();
+	const testExpr = evaluate(node.test, env);
+
+	if ((testExpr as GSBoolean).value === true) {
+		return evalCodeBlock(node.body, env);
+	} else if (node.alt) {
+		return evalCodeBlock(node.alt, env);
+	} else {
+		return DataConstructors.NULL();
+	}
 }

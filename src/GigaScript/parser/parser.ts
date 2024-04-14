@@ -622,13 +622,19 @@ export default class Parser {
 
 		const body = this.parseCodeBlock();
 
-		let alt: Array<STATEMENT> | CodeBlockNode = [];
+		let alt: CodeBlockNode = {} as CodeBlockNode;
 
 		if (this.current().type == NodeType.Else) {
 			this.advance();
 
 			if (this.current().type == NodeType.If) {
-				alt = [this.parseIfStatement()];
+				const altBody = this.parseIfStatement();
+				alt = {
+					kind: 'CodeBlockNode',
+					body: [altBody],
+					start: body.start,
+					end: body.end,
+				} as CodeBlockNode;
 			} else {
 				alt = this.parseCodeBlock();
 			}
@@ -640,10 +646,7 @@ export default class Parser {
 			body,
 			alt,
 			start: ifTokenPos.start,
-			end:
-				(alt as Array<STATEMENT>)[0]?.end ||
-				(alt as CodeBlockNode)?.end ||
-				body.end,
+			end: body.end,
 		} as IfStatement;
 	}
 

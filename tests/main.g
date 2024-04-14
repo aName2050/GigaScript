@@ -1,4 +1,4 @@
-const condition = true;
+const condition = undefined;
 
 if(condition == true) {
     print("true!")
@@ -6,14 +6,14 @@ if(condition == true) {
     print("false!")
 }
 
-const string = "test";
+const string = "9";
 
 if (string == "test1") {
     print("string=test1")
 } else if (string == "test") {
     print("string=test")
+} else if (string == "test2") {
+    print("string=test2")
 } else {
-    print("unknown")
+    print("???")
 }
-
-throw 'test error'
