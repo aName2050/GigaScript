@@ -1,9 +1,3 @@
-/**
- * tokens.ts
- *
- * All available tokens in GigaScript
- */
-
 import { OpPrec } from './lexer/types';
 import { NodeType } from './nodes';
 

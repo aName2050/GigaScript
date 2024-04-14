@@ -1,9 +1,3 @@
-/**
- * tokenizer.ts
- *
- * Tokenizes inputted GigaScript code for parsing
- */
-
 import { TokenID, Token, Tokens, getTokenByValue } from '../tokens';
 import { NodeType } from '../nodes';
 import { createToken, isAlpha, isEOL, isInt, isWhitespace } from './util';

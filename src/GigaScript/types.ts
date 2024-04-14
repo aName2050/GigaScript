@@ -1,10 +1,8 @@
-/**
- * types.ts
- *
- * GigaScript typings
- */
-
-import { ClassMethod, ClassProperty, ConstructorStatement } from './ast/class.ast';
+import {
+	ClassMethod,
+	ClassProperty,
+	ConstructorStatement,
+} from './ast/class.ast';
 
 export interface CLIArguments {
 	file: string;

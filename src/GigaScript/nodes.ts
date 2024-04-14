@@ -1,10 +1,4 @@
 /**
- * nodes.ts
- *
- * Token structures associated with the specific token IDs
- */
-
-/**
  * GigaScript Node Types
  *
  * @readonly
