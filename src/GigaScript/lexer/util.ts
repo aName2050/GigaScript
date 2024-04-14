@@ -88,3 +88,50 @@ export function isWhitespace(str: string): boolean {
 export function isEOL(str: string): boolean {
 	return str == '\n';
 }
+
+/**
+ *
+ * @param str The string to test
+ * @returns Whether the string is a valid escape character
+ */
+export function isValidEscapeChar(str: string): boolean {
+	const validChars = ['n', 't', '\\', '"', "'"];
+	return validChars.includes(str);
+}
+
+/**
+ *
+ * @param escSeq The raw escape sequence to handle
+ * @returns The string literal with properly handled escape sequences
+ */
+export function handleEscSeq(str: string): string {
+	const escChars: Record<string, string> = {
+		'\\n': '\n',
+		'\\t': '\t',
+		'\\\\': '\\',
+		'\\"': '"',
+		"\\'": "'",
+	};
+
+	let output: string[] = [];
+	let i = 0;
+
+	while (i < str.length) {
+		if (str[i] === '\\') {
+			const escSeq = str.slice(i, i + 2);
+
+			if (escChars[escSeq]) {
+				output.push(escChars[escSeq]);
+				i += 2;
+			} else {
+				output.push(str[i]);
+				i += 1;
+			}
+		} else {
+			output.push(str[i]);
+			i += 1;
+		}
+	}
+
+	return output.join('');
+}

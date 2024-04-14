@@ -1,6 +1,14 @@
 import { TokenID, Token, Tokens, getTokenByValue } from '../tokens';
 import { NodeType } from '../nodes';
-import { createToken, isAlpha, isEOL, isInt, isWhitespace } from './util';
+import {
+	createToken,
+	handleEscSeq,
+	isAlpha,
+	isEOL,
+	isInt,
+	isValidEscapeChar,
+	isWhitespace,
+} from './util';
 import { OpPrec } from './types';
 import { GSError } from '../util/gserror';
 import { sourceFile } from '../../index';
@@ -472,17 +480,36 @@ export function tokenize(source: string): Token[] {
 				case "'":
 				case '"':
 					let str = '';
-					const expectedClosingQuoteType = src.shift(); // move past opening doubleQuotes/singleQuotes
+					const quoteType = src.shift(); // move past opening doubleQuotes/singleQuotes
 					col++;
 
 					while (
 						src.length > 0 &&
-						src[0] !== expectedClosingQuoteType &&
+						src[0] !== quoteType &&
 						!isEOL(src[0]) &&
 						src.length != 0
 					) {
-						str += src.shift();
-						col++;
+						if (src[0] === '\\') {
+							src.shift(); // skip past backslash (escape character)
+							col++;
+
+							let escSeq = '\\';
+
+							while (src.length > 0 && !isEOL(src[0])) {
+								const nextChar = src.shift()!;
+								col++;
+								escSeq += nextChar;
+
+								if (!isValidEscapeChar(nextChar)) {
+									break;
+								}
+							}
+
+							str += handleEscSeq(escSeq);
+						} else {
+							str += src.shift();
+							col++;
+						}
 					}
 
 					if (isEOL(src[0]) || src.length == 0) {
@@ -609,9 +636,9 @@ export function tokenize(source: string): Token[] {
 						console.error(
 							new GSError(
 								`LexerError`,
-								` Unknown character: UNICODE-${curr.charCodeAt(
+								`Unknown character: UNICODE-${curr.charCodeAt(
 									0
-								)} ${curr}`,
+								)} "${curr}"`,
 								`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
 									tokenPos.Col
 								}`

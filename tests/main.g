@@ -1,1 +1,3 @@
-print('this is a newline\nlook at this one line gap!')
+print('this is a newline\'const x=32; ngap!')
+
+print(x)
