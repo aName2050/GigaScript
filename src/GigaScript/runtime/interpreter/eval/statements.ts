@@ -126,9 +126,20 @@ export function evalImportStatement(
 	env: Environment
 ): GSAny {
 	if (ModuleNames.includes(node.source)) {
-		const module = Modules.get(node.source);
+		const module = Modules.get(node.source)!;
 
-		console.log(module);
+		const imports = Array.from(node.imports);
+		const exports = Array.from(module);
+
+		for (let i = 0; i < exports.length; i++) {
+			for (let j = 0; j < imports.length; j++) {
+				if (exports[i][0] == imports[j][0]) {
+					const identifier = imports[j][1] as string;
+					const value = exports[i][1] as GSAny;
+					env.declareVar(identifier, value, true);
+				}
+			}
+		}
 
 		return DataConstructors.NULL();
 	}

@@ -1,10 +1,4 @@
-import {
-	DataType,
-	FuncVal,
-	NativeFnVal,
-	ObjectValue,
-	Value,
-} from '../runtime/types';
+import { DataType, FuncVal, GSObject, Value } from '../runtime/types';
 
 export function getValue(
 	value: Value<DataType, any>
@@ -22,7 +16,7 @@ export function getValue(
 			return (value as Value<'undefined', undefined>).value;
 		case 'object':
 			let obj: { [key: string]: any } = {};
-			const aObj = value as ObjectValue;
+			const aObj = value as GSObject;
 			aObj.properties.forEach((val, key) => {
 				obj[key] = getValue(val);
 			});

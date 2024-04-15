@@ -1,3 +1,3 @@
-import { eval } from 'gigascript'
+const arr = [1, 2, "3"];
 
-eval('print("hello world! (from eval function!)")')
+print(arr)

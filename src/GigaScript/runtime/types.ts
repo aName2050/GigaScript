@@ -37,20 +37,20 @@ export interface GSFunction extends FuncVal {}
 
 export interface GSAny extends Value<DataType, any> {}
 
-function NULL(): Value<'null', null> {
-	return { type: 'null', value: null } as Value<'null', null>;
+function NULL(): GSNull {
+	return { type: 'null', value: null } as GSNull;
 }
 
-function NUMBER(n = 0): Value<'number', number> {
-	return { type: 'number', value: n } as Value<'number', number>;
+function NUMBER(n = 0): GSNumber {
+	return { type: 'number', value: n } as GSNumber;
 }
 
-function STRING(str: string): Value<'string', string> {
-	return { type: 'string', value: str } as Value<'string', string>;
+function STRING(str: string): GSString {
+	return { type: 'string', value: str } as GSString;
 }
 
-function BOOLEAN(b = false): Value<'boolean', boolean> {
-	return { type: 'boolean', value: b } as Value<'boolean', boolean>;
+function BOOLEAN(b = false): GSBoolean {
+	return { type: 'boolean', value: b } as GSBoolean;
 }
 
 export interface ObjectValue extends Value<'object', object> {
@@ -58,9 +58,7 @@ export interface ObjectValue extends Value<'object', object> {
 	properties: Map<string, GSAny>;
 }
 
-function OBJECT(
-	obj: Map<string, Value<DataType, any>>
-): Value<'object', object> {
+function OBJECT(obj: Map<string, Value<DataType, any>>): GSObject {
 	return { type: 'object', properties: obj } as GSObject;
 }
 
@@ -68,10 +66,7 @@ function ARRAY(arr: Array<Value<DataType, any>>): GSArray {
 	return { type: 'array', value: arr } as GSArray;
 }
 
-export type FunctionCall = (
-	args: Array<GSAny>,
-	env: Environment
-) => Value<DataType, any>;
+export type FunctionCall = (args: Array<GSAny>, env: Environment) => GSAny;
 
 export interface NativeFnVal extends Value<'nativeFn', undefined> {
 	type: 'nativeFn';
