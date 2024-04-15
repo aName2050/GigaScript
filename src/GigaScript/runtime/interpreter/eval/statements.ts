@@ -211,7 +211,7 @@ export function evalIfStatement(node: IfStatement, env: Environment): GSAny {
 
 	if ((testExpr as GSBoolean).value === true) {
 		return evalCodeBlock(node.body, env);
-	} else if (node.alt) {
+	} else if (node.alt?.body) {
 		return evalCodeBlock(node.alt, env);
 	} else {
 		return DataConstructors.NULL();

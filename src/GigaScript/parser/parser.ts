@@ -767,8 +767,7 @@ export default class Parser {
 	}
 
 	private parseTryCatchExpr(): EXPRESSION {
-		if (this.current().type != NodeType.Try)
-			return this.parseEqualityExpr();
+		if (this.current().type != NodeType.Try) return this.parseLogOr();
 
 		const tryTokenPos = this.advance().__GSC._POS;
 
@@ -818,24 +817,39 @@ export default class Parser {
 		} as TryCatchStatement;
 	}
 
-	// private parseLogOr(): EXPRESSION {
-	// 	let lhs = this.parseEqualityExpr();
+	private parseLogOr(): EXPRESSION {
+		let lhs = this.parseLogAnd();
 
-	// 	while (this.current().value == '&&') {
-	// 		const op = this.advance().value;
-	// 		const rhs = this.parseLogAnd();
-	// 		lhs = {
-	// 			kind: 'BinaryExpr',
-	// 			lhs,
-	// 			rhs,
-	// 			op,
-	// 		} as BinaryExpr;
-	// 	}
+		while (this.current().value == '||') {
+			const op = this.advance().value;
+			const rhs = this.parseLogAnd();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
 
-	// 	return lhs;
-	// }
+		return lhs;
+	}
 
-	// TODO: LOG_AND
+	private parseLogAnd(): EXPRESSION {
+		let lhs = this.parseEqualityExpr();
+
+		while (this.current().value == '&&') {
+			const op = this.advance().value;
+			const rhs = this.parseEqualityExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
 
 	// TODO: BITWISE_OR
 	// TODO: BITWISE_XOR
