@@ -22,6 +22,7 @@ import {
 } from '../ast/declarations.ast';
 import { CallExpr, MemberExpr } from '../ast/expressions.ast';
 import {
+	ArrayLiteral,
 	Identifier,
 	NumberLiteral,
 	ObjectLiteral,
@@ -767,7 +768,7 @@ export default class Parser {
 	}
 
 	private parseTryCatchExpr(): EXPRESSION {
-		if (this.current().type != NodeType.Try) return this.parseLogOr();
+		if (this.current().type != NodeType.Try) return this.parseArrayExpr();
 
 		const tryTokenPos = this.advance().__GSC._POS;
 
@@ -815,6 +816,25 @@ export default class Parser {
 			start: tryTokenPos.start,
 			end: catchBody.end,
 		} as TryCatchStatement;
+	}
+
+	private parseArrayExpr(): EXPRESSION {
+		if (this.current().type != NodeType.OpenBracket) {
+			return this.parseLogOr();
+		}
+
+		const arrayPos = this.advance().__GSC._POS;
+		const elements: ArrayLiteral['elements'] = [];
+
+		while (this.notEOF() && this.current().type != NodeType.CloseBracket) {
+			if (this.current().type == NodeType.Comma) this.advance(); // continue past commas
+			// TODO:
+		}
+
+		return {
+			kind: 'ArrayLiteral',
+			elements,
+		} as ArrayLiteral;
 	}
 
 	private parseLogOr(): EXPRESSION {
