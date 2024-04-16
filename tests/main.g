@@ -1,3 +1,2 @@
-const arr = [1, 2, "3", {x: 32}, undefined, null, true, false];
-
-print(arr)
+const y = 64;
+print([1, 2, "hello", null, undefined, true, false, { x: 32 }, y, [5, 6, 7]])
