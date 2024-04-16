@@ -1,3 +1,4 @@
-import { cpus } from 'os'
+import { readFile } from 'fs'
 
-print(cpus())
+const file = readFile('./tmp.g.txt');
+print(file)

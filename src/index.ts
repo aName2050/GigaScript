@@ -77,7 +77,7 @@ if (file && fileLocation) {
 
 function runFile(filename: string, location: string) {
 	const parser = new Parser();
-	const env = createGlobalScope(fileLocation);
+	const env = createGlobalScope(location);
 
 	let file = fs.readFileSync(filename, { encoding: 'utf-8' });
 

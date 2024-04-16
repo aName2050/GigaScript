@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { Program } from '../ast/ast';
 import Parser from '../parser/parser';
 import { createGlobalScope } from '../runtime/env';
@@ -10,6 +11,8 @@ import {
 } from '../runtime/types';
 
 import * as OS from 'node:os';
+import path from 'node:path';
+import { getValue } from '../util/getValue';
 
 export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs'];
 
@@ -108,4 +111,18 @@ export const Modules: Map<string, Map<string, GSNativeFn>> = new Map()
 					return DataConstructors.ARRAY(processors);
 				})
 			)
+	)
+	.set(
+		'fs',
+		new Map().set(
+			'readFile',
+			DataConstructors.NATIVEFN((args, scope) => {
+				const file = (args[0] as GSString).value;
+
+				const filePath = path.resolve(`${scope.cwd}/${file}`);
+				const out = readFileSync(filePath, { encoding: 'utf-8' });
+
+				return DataConstructors.STRING(out);
+			})
+		)
 	);
