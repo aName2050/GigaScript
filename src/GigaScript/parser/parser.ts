@@ -1,12 +1,6 @@
 import { sourceFile } from '../..';
 import { AssignmentExpr } from '../ast/assignments.ast';
-import {
-	CodeBlockNode,
-	EXPRESSION,
-	EndOfFileNode,
-	Program,
-	STATEMENT,
-} from '../ast/ast';
+import { CodeBlockNode, EXPRESSION, Program, STATEMENT } from '../ast/ast';
 import { BinaryExpr } from '../ast/binop.ast';
 import {
 	ClassDeclaration,
@@ -28,6 +22,7 @@ import {
 	ObjectLiteral,
 	Property,
 	StringLiteral,
+	ArrayElement,
 } from '../ast/literals.ast';
 import { ExportStatement, ImportStatement } from '../ast/module.ast';
 import {
@@ -824,16 +819,39 @@ export default class Parser {
 		}
 
 		const arrayPos = this.advance().__GSC._POS;
-		const elements: ArrayLiteral['elements'] = [];
+		const elements: Array<ArrayElement['elements']> = [];
 
 		while (this.notEOF() && this.current().type != NodeType.CloseBracket) {
 			if (this.current().type == NodeType.Comma) this.advance(); // continue past commas
-			// TODO:
+			const value = this.parseExpr();
+			if (
+				[
+					'StringLiteral',
+					'NumberLiteral',
+					'ObjectLiteral',
+					'ArrayLiteral',
+					'Identifier',
+				].includes(value.kind)
+			) {
+				elements.push(value as ArrayElement['elements']);
+			} else {
+				console.log(
+					new ParseError(
+						`Invalid expression in array, "${value.kind}" is not allowed in arrays`,
+						`${sourceFile}${getErrorLocation(this.current())}`
+					)
+				);
+				process.exit(1);
+			}
 		}
+
+		const end = this.expect(NodeType.CloseBracket, 'at end of array');
 
 		return {
 			kind: 'ArrayLiteral',
 			elements,
+			start: arrayPos.start,
+			end: end.__GSC._POS.end,
 		} as ArrayLiteral;
 	}
 

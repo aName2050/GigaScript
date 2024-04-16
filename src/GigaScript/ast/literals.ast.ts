@@ -9,8 +9,8 @@ export interface Identifier extends EXPRESSION {
 }
 
 export interface Literal extends EXPRESSION {
-	kind: 'StringLiteral' | 'NumberLiteral';
-	value: any;
+	kind: 'NumberLiteral' | 'StringLiteral';
+	value: number | string;
 }
 
 /**
@@ -54,5 +54,14 @@ export interface ObjectLiteral extends EXPRESSION {
  */
 export interface ArrayLiteral extends EXPRESSION {
 	kind: 'ArrayLiteral';
-	elements: Array<Literal | ObjectLiteral | ArrayLiteral>;
+	elements: Array<ArrayElement['elements']>;
+}
+
+export interface ArrayElement {
+	elements:
+		| StringLiteral
+		| NumberLiteral
+		| ObjectLiteral
+		| ArrayLiteral
+		| Identifier;
 }
