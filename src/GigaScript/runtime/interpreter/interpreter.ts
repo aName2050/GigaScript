@@ -10,6 +10,7 @@ import {
 } from '../../ast/declarations.ast';
 import { CallExpr, MemberExpr } from '../../ast/expressions.ast';
 import {
+	ArrayLiteral,
 	Identifier,
 	NumberLiteral,
 	ObjectLiteral,
@@ -32,6 +33,7 @@ import {
 	evalMemberExpr,
 	evalObjectExpr,
 	evalNewClassInstanceExpr,
+	evalArrayExpr,
 } from './eval/expressions';
 import {
 	evalFuncDeclaration,
@@ -77,6 +79,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'ObjectLiteral':
 			return evalObjectExpr(node as ObjectLiteral, env);
+
+		case 'ArrayLiteral':
+			return evalArrayExpr(node as ArrayLiteral, env);
 
 		// Handle expressions
 		case 'MemberExpr':

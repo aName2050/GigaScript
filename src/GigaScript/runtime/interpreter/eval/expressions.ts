@@ -5,6 +5,7 @@ import { BitwiseExpr } from '../../../ast/bitwise.ast';
 import { ClassNewInstanceExpr } from '../../../ast/class.ast';
 import { CallExpr, MemberExpr } from '../../../ast/expressions.ast';
 import {
+	ArrayLiteral,
 	Identifier,
 	ObjectLiteral,
 	StringLiteral,
@@ -372,4 +373,12 @@ export function evalNewClassInstanceExpr(
 	evalCodeBlock(constructor.body, constructorEnv, false);
 
 	return classObj.instance;
+}
+
+export function evalArrayExpr(array: ArrayLiteral, env: Environment): GSArray {
+	const elements: Array<any> = new Array<any>();
+
+	// TODO:
+
+	return { type: 'array', value: elements } as GSArray;
 }
