@@ -7,12 +7,14 @@ GigaScript has two file types: **.g** and **.gsx**. Each have their own version 
 ### .g
 | Version | Status             |
 | ------- | ------------------ |
-| v1.0.0   | NOT RELEASED      |
+| v2.0.0  | NOT RELEASED       |
+| v1.0.0  | RELEASED           |
 
 ### .gsx
 | Version | Status             |
 | ------- | ------------------ |
-| v1.0.0   | NOT RELEASED      |
+| v2.0.0  | NOT RELEASED       |
+| v1.0.0  | RELEASED           |
 
 ## Reporting a Vulnerability
 
