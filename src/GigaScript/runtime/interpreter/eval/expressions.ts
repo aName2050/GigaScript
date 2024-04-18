@@ -11,6 +11,7 @@ import {
 	ObjectLiteral,
 	StringLiteral,
 } from '../../../ast/literals.ast';
+import { UnaryExpr } from '../../../ast/unary.ast';
 import { getValue } from '../../../util/getValue';
 import { GSError } from '../../../util/gserror';
 import Environment from '../../env';
@@ -387,4 +388,63 @@ export function evalArrayExpr(
 	}
 
 	return array;
+}
+
+export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
+	const op = node.operator;
+	const assigne = evaluate(node.assigne, env);
+
+	if (op == '++') {
+		if (assigne.type == 'number') {
+			assigne.value++;
+			return assigne;
+		} else {
+			console.log(
+				new GSError(
+					'EvalError',
+					'Cannot use unary operator "++" on a non-number type',
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+				)
+			);
+		}
+	} else if (op == '--') {
+		if (assigne.type == 'number') {
+			assigne.value--;
+			return assigne;
+		} else {
+			console.log(
+				new GSError(
+					'EvalError',
+					'Cannot use unary operator "--" on a non-number type',
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+				)
+			);
+			process.exit(1);
+		}
+	} else if (op == '~') {
+		if (assigne.type == 'number') {
+			// Bitwise Op
+			return DataConstructors.NUMBER(~assigne.value);
+		} else {
+			console.log(
+				new GSError(
+					'EvalError',
+					'Cannot use unary operator "~" on a non-number type',
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+				)
+			);
+			process.exit(1);
+		}
+	} else {
+		console.log(
+			new GSError(
+				'RuntimeError',
+				`Unknown operator "${op}"`,
+				`${sourceFile}:${node.start.Line}:${node.start.Column}`
+			)
+		);
+		process.exit(1);
+	}
+
+	return DataConstructors.NULL();
 }

@@ -28,6 +28,7 @@ import {
 	ThrowStatement,
 	TryCatchStatement,
 } from '../../ast/statements.ast';
+import { UnaryExpr } from '../../ast/unary.ast';
 import { GSError } from '../../util/gserror';
 import Environment from '../env';
 import { GSAny, GSNumber, GSString } from '../types';
@@ -40,6 +41,7 @@ import {
 	evalObjectExpr,
 	evalNewClassInstanceExpr,
 	evalArrayExpr,
+	evalUnaryExpr,
 } from './eval/expressions';
 import {
 	evalFuncDeclaration,
@@ -108,6 +110,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'ClassNewInstanceExpr':
 			return evalNewClassInstanceExpr(node as ClassNewInstanceExpr, env);
+
+		case 'UnaryExpr':
+			return evalUnaryExpr(node as UnaryExpr, env);
 
 		// Handle statements
 		case 'Program':
