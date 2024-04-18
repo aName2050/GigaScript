@@ -9,5 +9,6 @@ export interface BitwiseExpr extends EXPRESSION {
 	kind: 'BitwiseExpr';
 	lhs: EXPRESSION;
 	rhs: EXPRESSION;
-	op: '&' | '|' | '^' | '~' | '<<' | '>>' | '>>>';
+	// bitwise op "~" (NOT operator) handle as unary expr
+	op: '&' | '|' | '^' | '<<' | '>>' | '>>>';
 }

@@ -83,7 +83,7 @@ export function evalNumericBinaryExpr(
 					new GSError(
 						'RuntimeError',
 						`unknown operator "${op}" in operation ${lhs.value} ${op} ${rhs.value}`,
-						`${sourceFile}:unknown:unknown`
+						`${sourceFile}`
 					)
 				);
 				process.exit(1);
@@ -127,7 +127,7 @@ export function evalBitwiseExpr(expr: BitwiseExpr, env: Environment): GSAny {
 					new GSError(
 						'EvalError',
 						`Unknown bitwise operator "${expr.op}"`,
-						`${sourceFile}:unknown:unknown`
+						`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 					)
 				);
 				process.exit(1);
@@ -137,7 +137,7 @@ export function evalBitwiseExpr(expr: BitwiseExpr, env: Environment): GSAny {
 			new GSError(
 				'EvalError',
 				'Bitwise operations can only be used on numbers',
-				`${sourceFile}:unknown:unknown`
+				`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 			)
 		);
 		return DataConstructors.UNDEFINED();
@@ -206,7 +206,7 @@ function equals(lhs: GSAny, rhs: GSAny, strict: boolean): GSAny {
 				new GSError(
 					'RuntimeError',
 					`Unknown type in comparison: LHS: ${lhs}, RHS: ${rhs}`,
-					`${sourceFile}:unknown:unknown`
+					`${sourceFile}`
 				)
 			);
 			process.exit(1);
@@ -228,7 +228,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 			new GSError(
 				'EvalError',
 				`Invalid LHS expression: ${JSON.stringify(node.assigne)}`,
-				`${sourceFile}:unknown:unknown`
+				`${sourceFile}:${node.start.Line}:${node.start.Column}`
 			)
 		);
 		process.exit(1);
@@ -261,8 +261,8 @@ export function evalMemberExpr(
 		console.log(
 			new GSError(
 				'EvalError',
-				'A member expression cannot be evaluated with a member or assignment expression.',
-				`${sourceFile}:unknown:unknown`
+				'A member expression cannot be evaluated without a member or assignment expression.',
+				`${sourceFile}`
 			)
 		);
 		process.exit(1);
@@ -288,7 +288,7 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 					new GSError(
 						'EvalError',
 						'Paramters list and arguments list lengths do not match',
-						`${sourceFile}:unknown:unknown`
+						`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 					)
 				);
 				process.exit(1);
@@ -318,7 +318,7 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 			`Can not call a value that is not a function: ${JSON.stringify(
 				fn
 			)}`,
-			`${sourceFile}:unknown:unknown`
+			`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 		)
 	);
 	process.exit(1);

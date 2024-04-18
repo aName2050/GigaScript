@@ -2,6 +2,7 @@ import { sourceFile } from '../../../index';
 import { AssignmentExpr } from '../../ast/assignments.ast';
 import { Program, STATEMENT } from '../../ast/ast';
 import { BinaryExpr } from '../../ast/binop.ast';
+import { BitwiseExpr } from '../../ast/bitwise.ast';
 import { ClassDeclaration, ClassNewInstanceExpr } from '../../ast/class.ast';
 import { IfStatement } from '../../ast/conditionals.ast';
 import {
@@ -42,6 +43,7 @@ import {
 	evalNewClassInstanceExpr,
 	evalArrayExpr,
 	evalUnaryExpr,
+	evalBitwiseExpr,
 } from './eval/expressions';
 import {
 	evalFuncDeclaration,
@@ -113,6 +115,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'UnaryExpr':
 			return evalUnaryExpr(node as UnaryExpr, env);
+
+		case 'BitwiseExpr':
+			return evalBitwiseExpr(node as BitwiseExpr, env);
 
 		// Handle statements
 		case 'Program':

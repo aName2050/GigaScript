@@ -2,6 +2,7 @@ import { sourceFile } from '../..';
 import { AssignmentExpr } from '../ast/assignments.ast';
 import { CodeBlockNode, EXPRESSION, Program, STATEMENT } from '../ast/ast';
 import { BinaryExpr } from '../ast/binop.ast';
+import { BitwiseExpr } from '../ast/bitwise.ast';
 import {
 	ClassDeclaration,
 	ClassMethod,
@@ -958,6 +959,8 @@ export default class Parser {
 				lhs,
 				rhs,
 				op,
+				start: lhs.start,
+				end: rhs.end,
 			} as BinaryExpr;
 		}
 
@@ -965,7 +968,7 @@ export default class Parser {
 	}
 
 	private parseLogAnd(): EXPRESSION {
-		let lhs = this.parseEqualityExpr();
+		let lhs = this.parseBitwiseOR();
 
 		while (this.current().value == '&&') {
 			const op = this.advance().value;
@@ -975,15 +978,70 @@ export default class Parser {
 				lhs,
 				rhs,
 				op,
+				start: lhs.start,
+				end: rhs.end,
 			} as BinaryExpr;
 		}
 
 		return lhs;
 	}
 
-	// TODO: BITWISE_OR
-	// TODO: BITWISE_XOR
-	// TODO: BITWISE_AND
+	private parseBitwiseOR(): EXPRESSION {
+		let lhs = this.parseBitwiseXOR();
+
+		while (this.current().value == '|') {
+			const op = this.advance().value;
+			const rhs = this.parseBitwiseOR();
+			lhs = {
+				kind: 'BitwiseExpr',
+				op,
+				lhs,
+				rhs,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseBitwiseXOR(): EXPRESSION {
+		let lhs = this.parseBitwiseAND();
+
+		while (this.current().value == '^') {
+			const op = this.advance().value;
+			const rhs = this.parseBitwiseXOR();
+			lhs = {
+				kind: 'BitwiseExpr',
+				op,
+				rhs,
+				lhs,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseBitwiseAND(): EXPRESSION {
+		let lhs = this.parseEqualityExpr();
+
+		while (this.current().value == '&') {
+			const op = this.advance().value;
+			const rhs = this.parseBitwiseAND();
+			lhs = {
+				kind: 'BitwiseExpr',
+				op,
+				rhs,
+				lhs,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
 
 	private parseEqualityExpr(): EXPRESSION {
 		let lhs = this.parseComparisonExpr();
@@ -1005,7 +1063,7 @@ export default class Parser {
 	}
 
 	private parseComparisonExpr(): EXPRESSION {
-		let lhs = this.parseMultiplicativeExpr();
+		let lhs = this.parseBitwiseSHIFT();
 
 		while (['<', '>'].includes(this.current().value)) {
 			const op = this.advance().value;
@@ -1023,7 +1081,24 @@ export default class Parser {
 		return lhs;
 	}
 
-	// TODO: BITWISE_SHIFT
+	private parseBitwiseSHIFT(): EXPRESSION {
+		let lhs = this.parseMultiplicativeExpr();
+
+		while (['<<', '>>', '>>>'].includes(this.current().value)) {
+			const op = this.advance().value;
+			const rhs = this.parseBitwiseSHIFT();
+			lhs = {
+				kind: 'BitwiseExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
 
 	private parseMultiplicativeExpr(): EXPRESSION {
 		let lhs = this.parseAdditiveExpr();
@@ -1135,6 +1210,8 @@ export default class Parser {
 				object,
 				property,
 				computed,
+				start: object.start,
+				end: property.end,
 			} as MemberExpr;
 		}
 
