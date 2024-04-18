@@ -133,8 +133,6 @@ export enum NodeType {
 	Bitwise_AsgOR,
 	/** Bitwise XOR Equals ( ^= ) */
 	Bitwise_AsgXOR,
-	/** Bitwise NOT Equals ( ~= ) */
-	Bitwise_AsgNOT,
 
 	// Increment/Decrement Operators
 	/** Increment ( ++ ) */

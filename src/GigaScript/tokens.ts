@@ -137,8 +137,6 @@ export enum TokenID {
 	BarEquals,
 	/** Caret Equals ( ^= ) */
 	CaretEquals,
-	/** Tilda Equals ( ~= ) */
-	TildaEquals,
 
 	// Increment/Decrement Operators
 	/** Increment ( ++ ) */
@@ -376,12 +374,6 @@ setTokenData(
 	TokenID.CaretEquals,
 	NodeType.Bitwise_AsgXOR,
 	'^=',
-	OpPrec.Assignment
-);
-setTokenData(
-	TokenID.TildaEquals,
-	NodeType.Bitwise_AsgNOT,
-	'~=',
 	OpPrec.Assignment
 );
 setTokenData(

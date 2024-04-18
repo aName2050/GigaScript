@@ -236,6 +236,9 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 
 	const varName = (node.assigne as Identifier).symbol;
 
+	const op = node.AsgOp;
+	// TODO: add special assignment operators (like +=, -=, &=, etc.)
+
 	return env.assignVar(varName, evaluate(node.value, env));
 }
 

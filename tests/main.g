@@ -1,6 +1,23 @@
-print(1 | 5, 5)
-print(1 ^ 5, 4)
-print(1 & 5, 1)
-print(1 << 5, 32)
-print(1 >> 5, 0)
-print(1 >>> 5, 0)
+let x = 0;
+
+x += 1
+
+print(x, 1)
+
+x -= 1
+
+print(x, 0)
+
+x = 1
+x *= 2
+
+print(x, 2)
+
+x /= 2
+
+print(x, 1)
+
+x = 10
+x %= 2
+
+print(x, 0)

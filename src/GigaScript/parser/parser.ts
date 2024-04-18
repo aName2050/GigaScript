@@ -753,14 +753,29 @@ export default class Parser {
 	private parseAsgExpr(): EXPRESSION {
 		const lhs = this.parseObjectExpr();
 
-		if (this.current().type == NodeType.Equals) {
-			this.advance();
+		if (
+			[
+				'=',
+				'+=',
+				'-=',
+				'*=',
+				'/=',
+				'%=',
+				'<<=',
+				'>>=',
+				'>>>=',
+				'&=',
+				'|=',
+				'^=',
+			].includes(this.current().value)
+		) {
+			const op = this.advance().value;
 			const rhs = this.parseAsgExpr();
 			return {
 				kind: 'AssignmentExpr',
 				value: rhs,
 				assigne: lhs,
-				AsgOp: '=',
+				AsgOp: op,
 				start: lhs.start,
 				end: rhs.end,
 			} as AssignmentExpr;
