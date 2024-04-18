@@ -7,5 +7,5 @@ import { Identifier } from './literals.ast';
 export interface UnaryExpr extends EXPRESSION {
 	kind: 'UnaryExpr';
 	assigne: EXPRESSION;
-	operator: '++' | '--' | '~';
+	operator: '++' | '--' | '~' | '!';
 }

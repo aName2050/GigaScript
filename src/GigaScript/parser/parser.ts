@@ -1165,6 +1165,7 @@ export default class Parser {
 	}
 
 	private parseUnaryExpr(): EXPRESSION {
+		// Post-assigne unary expr (eg. var++)
 		while (['++', '--'].includes(this.next().value)) {
 			const assigne = this.parsePrimaryExpression();
 			const op = this.advance();
@@ -1177,7 +1178,8 @@ export default class Parser {
 			} as UnaryExpr;
 		}
 
-		while (this.current().value == '~') {
+		// Pre-assigne unary expr (eg. !var)
+		while (['~', '!'].includes(this.current().value)) {
 			const op = this.advance();
 			const assigne = this.parsePrimaryExpression();
 			return {

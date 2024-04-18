@@ -27,6 +27,7 @@ export enum OpPrec {
 	 *
 	 *  1. ++
 	 *  2. --
+	 *  3. ~
 	 * */
 	Unary,
 }

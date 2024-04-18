@@ -435,6 +435,8 @@ export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
 			);
 			process.exit(1);
 		}
+	} else if (op == '!') {
+		return DataConstructors.BOOLEAN(!assigne.value);
 	} else {
 		console.log(
 			new GSError(
