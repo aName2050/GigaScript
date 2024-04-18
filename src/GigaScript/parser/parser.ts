@@ -36,6 +36,7 @@ import {
 	ThrowStatement,
 	TryCatchStatement,
 } from '../ast/statements.ast';
+import { UnaryExpr } from '../ast/unary.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
 import { Token, getTokenByTypeEnum } from '../tokens';
@@ -951,7 +952,7 @@ export default class Parser {
 
 		while (this.current().value == '||') {
 			const op = this.advance().value;
-			const rhs = this.parseLogAnd();
+			const rhs = this.parseLogOr();
 			lhs = {
 				kind: 'BinaryExpr',
 				lhs,
@@ -968,7 +969,7 @@ export default class Parser {
 
 		while (this.current().value == '&&') {
 			const op = this.advance().value;
-			const rhs = this.parseEqualityExpr();
+			const rhs = this.parseLogAnd();
 			lhs = {
 				kind: 'BinaryExpr',
 				lhs,
@@ -1158,6 +1159,34 @@ export default class Parser {
 				start: newTokenPos.start,
 				end: args[args.length - 1]?.end || name.__GSC._POS.end,
 			} as ClassNewInstanceExpr;
+		}
+
+		return this.parseUnaryExpr();
+	}
+
+	private parseUnaryExpr(): EXPRESSION {
+		while (['++', '--'].includes(this.next().value)) {
+			const assigne = this.parsePrimaryExpression();
+			const op = this.advance();
+			return {
+				kind: 'UnaryExpr',
+				assigne,
+				operator: op.value,
+				start: assigne.start,
+				end: op.__GSC._POS.end,
+			} as UnaryExpr;
+		}
+
+		while (this.current().value == '~') {
+			const op = this.advance();
+			const assigne = this.parsePrimaryExpression();
+			return {
+				kind: 'UnaryExpr',
+				assigne,
+				operator: op.value,
+				start: op.__GSC._POS.start,
+				end: assigne.end,
+			} as UnaryExpr;
 		}
 
 		return this.parsePrimaryExpression();

@@ -10,12 +10,3 @@ export interface AssignmentExpr extends EXPRESSION {
 	value: EXPRESSION;
 	AsgOp: '&=' | '|=' | '^=' | '<<=' | '>>=' | '>>>=' | '=';
 }
-
-/**
- * Reassigns a value using using only one operand
- */
-export interface UnaryExpr extends EXPRESSION {
-	kind: 'UnaryExpr';
-	assigne: Identifier;
-	operator: '++' | '--' | '~';
-}
