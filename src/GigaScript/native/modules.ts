@@ -12,7 +12,6 @@ import {
 
 import * as OS from 'node:os';
 import path from 'node:path';
-import { getValue } from '../util/getValue';
 
 export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs'];
 
@@ -123,6 +122,20 @@ export const Modules: Map<string, Map<string, GSNativeFn>> = new Map()
 				const out = readFileSync(filePath, { encoding: 'utf-8' });
 
 				return DataConstructors.STRING(out);
+			})
+		)
+	)
+	.set(
+		'path',
+		new Map().set(
+			'resolve',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				let paths: Array<string> = [];
+				args.forEach(arg => {
+					paths.push((arg as GSString).value);
+				});
+
+				return DataConstructors.STRING(path.resolve(...paths));
 			})
 		)
 	);
