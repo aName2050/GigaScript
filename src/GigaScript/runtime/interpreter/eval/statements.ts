@@ -18,6 +18,7 @@ import {
 	GSBoolean,
 	GSFunction,
 	GSNull,
+	GSUndefined,
 } from '../../types';
 import { evaluate } from '../interpreter';
 import Parser from '../../../parser/parser';
@@ -28,6 +29,13 @@ import { sourceFile } from '../../../..';
 import { ClassDeclaration } from '../../../ast/class.ast';
 import { IfStatement } from '../../../ast/conditionals.ast';
 import { ModuleNames, Modules } from '../../../native/modules';
+import {
+	BreakStatement,
+	ContinueStatement,
+	ForStatement,
+	WhileStatement,
+} from '../../../ast/loops.ast';
+import { evalAssignment } from './expressions';
 
 export function evalProgram(program: Program, env: Environment): GSAny {
 	let lastEvaluated: GSAny = DataConstructors.NULL();
@@ -229,4 +237,67 @@ export function evalIfStatement(node: IfStatement, env: Environment): GSAny {
 	} else {
 		return DataConstructors.NULL();
 	}
+}
+
+export function evalForStatement(node: ForStatement, env: Environment): GSNull {
+	env = new Environment(env.cwd, env);
+
+	evalVarDeclaration(node.initializer, env);
+
+	let test = evaluate(node.test, env);
+
+	if ((test as GSBoolean).value !== true) return DataConstructors.NULL(); // expression is false
+
+	do {
+		evalAssignment(node.update, env);
+
+		try {
+			evalCodeBlock(node.body, new Environment(env.cwd, env), false);
+		} catch (e) {
+			if (e == 'GS.NO_ERROR.BREAK_LOOP') break;
+			else if (e == 'GS.NO_ERROR.CONTINUE_LOOP') continue;
+			else throw e;
+		}
+
+		test = evaluate(node.test, env);
+	} while ((test as GSBoolean).value);
+
+	return DataConstructors.NULL();
+}
+
+export function evalWhileStatement(
+	node: WhileStatement,
+	env: Environment
+): GSNull {
+	env = new Environment(env.cwd, env);
+
+	let test = evaluate(node.test, env);
+
+	do {
+		try {
+			evalCodeBlock(node.body, new Environment(env.cwd, env), false);
+		} catch (e) {
+			if (e == 'GS.NO_ERROR.BREAK_LOOP') break;
+			else if (e == 'GS.NO_ERROR.CONTINUE_LOOP') continue;
+			else throw e;
+		}
+
+		test = evaluate(node.test, env);
+	} while ((test as GSBoolean).value);
+
+	return DataConstructors.NULL();
+}
+
+export function evalBreakStatement(
+	_node: BreakStatement,
+	_env: Environment
+): GSUndefined {
+	throw 'GS.NO_ERROR.BREAK_LOOP';
+}
+
+export function evalContinueStatement(
+	_node: ContinueStatement,
+	_env: Environment
+): GSUndefined {
+	throw 'GS.NO_ERROR.CONTINUE_LOOP';
 }

@@ -13,6 +13,10 @@ export type ASTNodeType =
 	| 'ImportStatement'
 	| 'ExportStatement'
 	| 'IfStatement'
+	| 'WhileStatement'
+	| 'ForStatement'
+	| 'BreakStatement'
+	| 'ContinueStatement'
 	| 'CodeBlockNode'
 	| 'EOF'
 	// Expressions

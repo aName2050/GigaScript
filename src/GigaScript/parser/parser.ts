@@ -24,6 +24,12 @@ import {
 	StringLiteral,
 	ArrayElement,
 } from '../ast/literals.ast';
+import {
+	BreakStatement,
+	ContinueStatement,
+	ForStatement,
+	WhileStatement,
+} from '../ast/loops.ast';
 import { ExportStatement, ImportStatement } from '../ast/module.ast';
 import {
 	ReturnStatement,
@@ -165,6 +171,15 @@ export default class Parser {
 
 			case NodeType.Throw:
 				return this.parseThrowStatement();
+
+			case NodeType.For:
+				return this.parseForStatement();
+			case NodeType.While:
+				return this.parseWhileStatement();
+			case NodeType.Break:
+				return this.parseBreakStatement();
+			case NodeType.Continue:
+				return this.parseContinueStatement();
 
 			default:
 				return this.parseExpr();
@@ -646,6 +661,82 @@ export default class Parser {
 		} as IfStatement;
 	}
 
+	private parseForStatement(): STATEMENT {
+		const forTokenPos = this.advance().__GSC._POS;
+
+		this.expect(NodeType.OpenParen, 'following "for" keyword');
+
+		const initializer = this.parseVariableDeclaration();
+		const test = this.parseExpr();
+
+		this.expect(
+			NodeType.Semicolon,
+			'following test expression in for loop'
+		);
+
+		const update = this.parseAsgExpr();
+
+		this.expect(
+			NodeType.CloseParen,
+			'following update expression in for loop'
+		);
+
+		const body = this.parseCodeBlock();
+
+		return {
+			kind: 'ForStatement',
+			initializer,
+			test,
+			update,
+			body,
+			start: forTokenPos.start,
+			end: body.end,
+		} as ForStatement;
+	}
+
+	private parseWhileStatement(): STATEMENT {
+		const whileTokenPos = this.advance().__GSC._POS;
+
+		this.expect(NodeType.OpenParen, 'following "while" keyword');
+
+		const test = this.parseExpr();
+
+		this.expect(
+			NodeType.CloseParen,
+			'following test expression in while loop'
+		);
+
+		const body = this.parseCodeBlock();
+
+		return {
+			kind: 'WhileStatement',
+			test,
+			body,
+			start: whileTokenPos.start,
+			end: body.end,
+		} as WhileStatement;
+	}
+
+	private parseBreakStatement(): STATEMENT {
+		const tokenPos = this.advance().__GSC._POS;
+
+		return {
+			kind: 'BreakStatement',
+			start: tokenPos.start,
+			end: tokenPos.end,
+		} as BreakStatement;
+	}
+
+	private parseContinueStatement(): STATEMENT {
+		const tokenPos = this.advance().__GSC._POS;
+
+		return {
+			kind: 'ContinueStatement',
+			start: tokenPos.start,
+			end: tokenPos.end,
+		} as ContinueStatement;
+	}
+
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
 		return this.parseAsgExpr();
@@ -894,11 +985,30 @@ export default class Parser {
 	// TODO: BITWISE_AND
 
 	private parseEqualityExpr(): EXPRESSION {
-		let lhs = this.parseMultiplicativeExpr();
+		let lhs = this.parseComparisonExpr();
 
 		while (['!=', '==', '<=', '>='].includes(this.current().value)) {
 			const op = this.advance().value;
 			const rhs = this.parseEqualityExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseComparisonExpr(): EXPRESSION {
+		let lhs = this.parseMultiplicativeExpr();
+
+		while (['<', '>'].includes(this.current().value)) {
+			const op = this.advance().value;
+			const rhs = this.parseComparisonExpr();
 			lhs = {
 				kind: 'BinaryExpr',
 				lhs,

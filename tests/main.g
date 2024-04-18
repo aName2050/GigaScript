@@ -1,4 +1,12 @@
-import { readFile } from 'fs'
+const max = 10;
+let i = 0;
 
-const file = readFile('./tmp.g.txt');
-print(file)
+while(i < max) {
+    if(i == 5) {
+        continue
+    }
+
+    print(i, max)
+
+    i = i + 1
+}

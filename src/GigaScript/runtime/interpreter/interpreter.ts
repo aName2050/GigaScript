@@ -16,6 +16,12 @@ import {
 	ObjectLiteral,
 	StringLiteral,
 } from '../../ast/literals.ast';
+import {
+	BreakStatement,
+	ContinueStatement,
+	ForStatement,
+	WhileStatement,
+} from '../../ast/loops.ast';
 import { ExportStatement, ImportStatement } from '../../ast/module.ast';
 import {
 	ReturnStatement,
@@ -46,6 +52,10 @@ import {
 	evalImportStatement,
 	evalClassDeclaration,
 	evalIfStatement,
+	evalForStatement,
+	evalBreakStatement,
+	evalContinueStatement,
+	evalWhileStatement,
 } from './eval/statements';
 
 export function evaluate(node: STATEMENT, env: Environment): GSAny {
@@ -128,6 +138,15 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'IfStatement':
 			return evalIfStatement(node as IfStatement, env);
+
+		case 'ForStatement':
+			return evalForStatement(node as ForStatement, env);
+		case 'WhileStatement':
+			return evalWhileStatement(node as WhileStatement, env);
+		case 'BreakStatement':
+			return evalBreakStatement(node as BreakStatement, env);
+		case 'ContinueStatement':
+			return evalContinueStatement(node as ContinueStatement, env);
 
 		// Handle non implemented types
 		default:
