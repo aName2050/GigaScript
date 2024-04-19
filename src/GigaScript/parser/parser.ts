@@ -946,7 +946,7 @@ export default class Parser {
 				console.log(
 					new ParseError(
 						`Invalid expression in array, "${value.kind}" is not allowed in arrays`,
-						`${sourceFile}${getErrorLocation(this.current())}`
+						`${sourceFile}:${getErrorLocation(this.current())}`
 					)
 				);
 				process.exit(1);
