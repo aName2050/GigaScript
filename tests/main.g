@@ -1,23 +1,10 @@
-let x = 0;
+let x = 2;
 
-x += 1
+print((x += 1), 3)
+print((x -= 1), 2)
+print((x *= 2), 4)
+print((x /= 4), 1)
+print((x %= 2), 1)
 
-print(x, 1)
-
-x -= 1
-
-print(x, 0)
-
-x = 1
-x *= 2
-
-print(x, 2)
-
-x /= 2
-
-print(x, 1)
-
-x = 10
-x %= 2
-
-print(x, 0)
+print((x += "hello"), "1hello")
+print((x -= "2"), "NaN")

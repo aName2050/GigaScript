@@ -5,11 +5,9 @@ import { BitwiseExpr } from '../../../ast/bitwise.ast';
 import { ClassNewInstanceExpr } from '../../../ast/class.ast';
 import { CallExpr, MemberExpr } from '../../../ast/expressions.ast';
 import {
-	ArrayElement,
 	ArrayLiteral,
 	Identifier,
 	ObjectLiteral,
-	StringLiteral,
 } from '../../../ast/literals.ast';
 import { UnaryExpr } from '../../../ast/unary.ast';
 import { getValue } from '../../../util/getValue';
@@ -28,7 +26,6 @@ import {
 	GSUndefined,
 	NativeFnVal,
 	ObjectValue,
-	Value,
 } from '../../types';
 import { evaluate } from '../interpreter';
 import { evalCodeBlock } from './statements';
@@ -167,10 +164,7 @@ function equals(lhs: GSAny, rhs: GSAny, strict: boolean): GSAny {
 
 		case 'undefined':
 			return DataConstructors.BOOLEAN(
-				compare(
-					(lhs as GSUndefined).value,
-					(rhs as Value<'undefined', undefined>).value
-				)
+				compare((lhs as GSUndefined).value, (rhs as GSUndefined).value)
 			);
 
 		case 'null':
@@ -237,9 +231,133 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 	const varName = (node.assigne as Identifier).symbol;
 
 	const op = node.AsgOp;
-	// TODO: add special assignment operators (like +=, -=, &=, etc.)
 
-	return env.assignVar(varName, evaluate(node.value, env));
+	if (op == '=') return env.assignVar(varName, evaluate(node.value, env));
+
+	const value = evaluate(node.value, env);
+	let variable = env.lookupVar(varName);
+	let type: 'number' | 'string' | 'boolean' | 'any';
+
+	// handle type conversion
+	if (value.type == 'number') {
+		variable = DataConstructors.NUMBER(variable.value);
+		type = 'number';
+	} else if (value.type == 'string') {
+		variable = DataConstructors.STRING(variable.value);
+		type = 'string';
+	} else if (value.type == 'boolean') {
+		variable = DataConstructors.BOOLEAN(variable.value);
+		type = 'boolean';
+	} else type = 'any';
+
+	if (type == 'number') {
+		switch (op) {
+			case '+=':
+				return env.assignVar(
+					varName,
+					DataConstructors.NUMBER(
+						env.lookupVar(varName).value +
+							evaluate(node.value, env).value
+					)
+				);
+			case '-=':
+				return env.assignVar(
+					varName,
+					DataConstructors.NUMBER(
+						env.lookupVar(varName).value -
+							evaluate(node.value, env).value
+					)
+				);
+			case '*=':
+				return env.assignVar(
+					varName,
+					DataConstructors.NUMBER(
+						env.lookupVar(varName).value *
+							evaluate(node.value, env).value
+					)
+				);
+			case '/=':
+				return env.assignVar(
+					varName,
+					DataConstructors.NUMBER(
+						env.lookupVar(varName).value /
+							evaluate(node.value, env).value
+					)
+				);
+			case '%=':
+				return env.assignVar(
+					varName,
+					DataConstructors.NUMBER(
+						env.lookupVar(varName).value %
+							evaluate(node.value, env).value
+					)
+				);
+
+			default:
+				throw new GSError(
+					'RuntimeError',
+					`Unknown operator "${op}"`,
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+				);
+		}
+	} else if (type == 'string') {
+		switch (op) {
+			case '+=':
+				return env.assignVar(
+					varName,
+					DataConstructors.STRING(
+						env.lookupVar(varName).value +
+							evaluate(node.value, env).value
+					)
+				);
+			case '-=':
+				return DataConstructors.NUMBER(NaN);
+			case '*=':
+				return DataConstructors.NUMBER(NaN);
+			case '/=':
+				return DataConstructors.NUMBER(NaN);
+			case '%=':
+				return DataConstructors.NUMBER(NaN);
+
+			default:
+				throw new GSError(
+					'RuntimeError',
+					`Unsupported operator "${op}"`,
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+				);
+		}
+	} else if (type == 'boolean') {
+		switch (op) {
+			case '+=':
+				return env.assignVar(
+					varName,
+					DataConstructors.BOOLEAN(
+						env.lookupVar(varName).value +
+							evaluate(node.value, env).value
+					)
+				);
+			case '-=':
+				return DataConstructors.NUMBER(NaN);
+			case '*=':
+				return DataConstructors.NUMBER(NaN);
+			case '/=':
+				return DataConstructors.NUMBER(NaN);
+			case '%=':
+				return DataConstructors.NUMBER(NaN);
+
+			default:
+				throw new GSError(
+					'RuntimeError',
+					`Unknown operator "${op}"`,
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+				);
+		}
+	} else
+		throw new GSError(
+			'RuntimeError',
+			`Type "${type}" cannot be used with special assignment operators. Only types "number", "string", and "boolean" can be used.`,
+			`${sourceFile}:${node.start.Line}:${node.start.Column}`
+		);
 }
 
 export function evalMemberExpr(
