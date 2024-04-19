@@ -13,6 +13,10 @@ import { CLIArguments } from './GigaScript/types';
 import { createGlobalScope } from './GigaScript/runtime/env';
 import { evaluate } from './GigaScript/runtime/interpreter/interpreter';
 
+import { readExternalGSModules } from './GigaScript/externalModules/read';
+
+const installedModules = readExternalGSModules();
+
 const argParser = new ArgumentParser({
 	description: 'GigaScript Runtime CLI',
 });
