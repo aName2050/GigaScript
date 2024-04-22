@@ -17,6 +17,13 @@ import { readExternalGSModules } from './GigaScript/externalModules/read';
 
 const installedModules = readExternalGSModules();
 
+import { Modules, ModuleNames } from './GigaScript/native/modules';
+
+for (const module of installedModules) {
+	Modules.set(module.name, module.exports);
+	ModuleNames.push(module.name);
+}
+
 const argParser = new ArgumentParser({
 	description: 'GigaScript Runtime CLI',
 });

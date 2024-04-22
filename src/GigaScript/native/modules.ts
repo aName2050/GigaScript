@@ -1,21 +1,16 @@
-import { readFileSync } from 'node:fs';
 import { Program } from '../ast/ast';
 import Parser from '../parser/parser';
 import { createGlobalScope } from '../runtime/env';
 import { evaluate } from '../runtime/interpreter/interpreter';
-import {
-	DataConstructors,
-	GSNativeFn,
-	GSObject,
-	GSString,
-} from '../runtime/types';
+import { DataConstructors, GSAny, GSObject, GSString } from '../runtime/types';
 
 import * as OS from 'node:os';
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 
 export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs'];
 
-export const Modules: Map<string, Map<string, GSNativeFn>> = new Map()
+export const Modules: Map<string, Map<string, GSAny>> = new Map()
 	.set(
 		'gigascript',
 		new Map()
