@@ -2,13 +2,21 @@ import { Program } from '../ast/ast';
 import Parser from '../parser/parser';
 import { createGlobalScope } from '../runtime/env';
 import { evaluate } from '../runtime/interpreter/interpreter';
-import { DataConstructors, GSAny, GSObject, GSString } from '../runtime/types';
+import {
+	DataConstructors,
+	GSAny,
+	GSNativeFn,
+	GSNumber,
+	GSObject,
+	GSString,
+} from '../runtime/types';
 
 import * as OS from 'node:os';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
+import * as nodeHTTP from 'node:http';
 
-export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs'];
+export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs', 'node'];
 
 export const Modules: Map<string, Map<string, GSAny>> = new Map()
 	.set(
@@ -131,6 +139,27 @@ export const Modules: Map<string, Map<string, GSAny>> = new Map()
 				});
 
 				return DataConstructors.STRING(path.resolve(...paths));
+			})
+		)
+	)
+	.set(
+		'node',
+		new Map().set(
+			'createLocalServer',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'nativeFn')
+					throw 'RuntimeError: Expected callback function call to "createLocalServer"';
+
+				const callback = args[0] as GSNativeFn;
+				const port = args[1] as GSNumber;
+
+				nodeHTTP
+					.createServer((req, res) => {
+						console.log(req, res);
+					})
+					.listen(port.value);
+
+				return DataConstructors.NULL();
 			})
 		)
 	);

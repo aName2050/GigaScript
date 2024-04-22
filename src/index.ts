@@ -15,14 +15,9 @@ import { evaluate } from './GigaScript/runtime/interpreter/interpreter';
 
 import { readExternalGSModules } from './GigaScript/externalModules/read';
 
-const installedModules = readExternalGSModules();
-
 import { Modules, ModuleNames } from './GigaScript/native/modules';
-
-for (const module of installedModules) {
-	Modules.set(module.name, module.exports);
-	ModuleNames.push(module.name);
-}
+import { DataConstructors, GSAny } from './GigaScript/runtime/types';
+import { GSModule } from './GigaScript/externalModules/types';
 
 const argParser = new ArgumentParser({
 	description: 'GigaScript Runtime CLI',
@@ -50,12 +45,37 @@ argParser.add_argument('-d', '--debug', {
 	help: 'enables debug mode',
 	action: 'store_true',
 });
+argParser.add_argument('-NCE', '--NoCrashOnError', {
+	help: 'disables crash on error',
+	action: 'store_true',
+});
 
 const CLIArgs: CLIArguments = argParser.parse_args();
 const file: string | undefined = CLIArgs.file;
 const useCUDA: boolean = CLIArgs.useCUDA || false;
 const ASTOnly: boolean = CLIArgs.ASTOnly || false;
 const debug: boolean = CLIArgs.debug || false;
+const noCrash: boolean = CLIArgs.noCrash || false;
+
+let installedModules: Array<GSModule> = [];
+
+// installedModules = readExternalGSModules();
+
+if (noCrash) {
+	try {
+		for (const module of installedModules) {
+			Modules.set(module.name, module.exports);
+			ModuleNames.push(module.name);
+		}
+	} catch (e) {
+		console.log(e);
+	}
+} else {
+	for (const module of installedModules) {
+		Modules.set(module.name, module.exports);
+		ModuleNames.push(module.name);
+	}
+}
 
 if (debug) {
 	console.log('GS.DEBUGGER: GigaScript Debugger v1');
@@ -127,7 +147,16 @@ function runFile(filename: string, location: string) {
 
 		const evalStart = Date.now();
 
-		const res = evaluate(program, env);
+		let res: GSAny = DataConstructors.UNDEFINED();
+
+		if (noCrash) {
+			try {
+				res = evaluate(program, env);
+			} catch (e) {
+				console.log(e);
+			}
+		} else res = evaluate(program, env);
+
 		if (debug)
 			console.log(
 				`GS.DEBUGGER: AST evaluated in ${Date.now() - evalStart}ms`
@@ -158,7 +187,13 @@ function handle(
 	REPL.parser.tokenizeSource(uIn);
 	const script = REPL.parser.generateAST();
 
-	evaluate(script, REPL.env);
+	if (noCrash) {
+		try {
+			evaluate(script, REPL.env);
+		} catch (e) {
+			console.log(e);
+		}
+	} else evaluate(script, REPL.env);
 
 	callback();
 }

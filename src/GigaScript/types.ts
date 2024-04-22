@@ -9,6 +9,7 @@ export interface CLIArguments {
 	useCUDA: boolean | undefined;
 	ASTOnly: boolean | undefined;
 	debug: boolean | undefined;
+	noCrash: boolean | undefined;
 }
 
 export interface ClassBody {
