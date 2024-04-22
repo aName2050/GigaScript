@@ -5,7 +5,6 @@ import Parser from '../parser/parser';
 import { Program } from '../ast/ast';
 import { createGlobalScope } from '../runtime/env';
 import { evaluate } from '../runtime/interpreter/interpreter';
-import { GSAny } from '../runtime/types';
 
 export function readExternalGSModules(): Array<GSModule> {
 	const moduleDir = path.join(process.cwd(), '.gsmodules');

@@ -57,9 +57,26 @@ const ASTOnly: boolean = CLIArgs.ASTOnly || false;
 const debug: boolean = CLIArgs.debug || false;
 const noCrash: boolean = CLIArgs.noCrash || false;
 
-let installedModules: Array<GSModule> = [];
+export const GSConfig = {
+	file,
+	useCUDA,
+	ASTOnly,
+	debug,
+	noCrash,
+};
 
-// installedModules = readExternalGSModules();
+let installedModules: Array<GSModule> = [];
+console.log(noCrash);
+if (noCrash) {
+	try {
+		console.log('no crash mode');
+		installedModules = readExternalGSModules();
+	} catch (e) {
+		// console.log(e);
+	}
+} else {
+	installedModules = readExternalGSModules();
+}
 
 if (noCrash) {
 	try {

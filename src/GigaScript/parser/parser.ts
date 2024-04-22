@@ -15,7 +15,11 @@ import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../ast/declarations.ast';
-import { CallExpr, MemberExpr } from '../ast/expressions.ast';
+import {
+	CallExpr,
+	FunctionDeclarationExpr,
+	MemberExpr,
+} from '../ast/expressions.ast';
 import {
 	ArrayLiteral,
 	Identifier,
@@ -741,6 +745,43 @@ export default class Parser {
 
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
+		return this.parseFunctionExpr();
+	}
+
+	// Special Expressions
+	private parseFunctionExpr(): EXPRESSION {
+		if (this.current().type == NodeType.Func) {
+			const start = this.advance().__GSC._POS.start;
+
+			const args = this.parseArgs();
+			const params: Array<string> = [];
+
+			for (const arg of args) {
+				if (arg.kind !== 'Identifier') {
+					console.log(arg);
+					console.log(
+						new ParseError(
+							'Expected arguments to be identifiers',
+							`${sourceFile}:${getErrorLocation(this.current())}`
+						)
+					);
+					process.exit(1);
+				}
+
+				params.push((arg as Identifier).symbol);
+			}
+
+			const body = this.parseCodeBlock();
+
+			return {
+				kind: 'FunctionDeclarationExpr',
+				params,
+				body,
+				start,
+				end: body.end,
+			} as FunctionDeclarationExpr;
+		}
+
 		return this.parseAsgExpr();
 	}
 

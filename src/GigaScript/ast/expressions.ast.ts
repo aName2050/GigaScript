@@ -1,4 +1,4 @@
-import { EXPRESSION } from './ast';
+import { CodeBlockNode, EXPRESSION } from './ast';
 import { Identifier } from './literals.ast';
 
 export interface CallExpr extends EXPRESSION {
@@ -12,4 +12,10 @@ export interface MemberExpr extends EXPRESSION {
 	object: EXPRESSION;
 	property: Identifier;
 	computed: boolean;
+}
+
+export interface FunctionDeclarationExpr extends EXPRESSION {
+	kind: 'FunctionDeclarationExpr';
+	params: Array<string>;
+	body: CodeBlockNode;
 }

@@ -27,6 +27,7 @@ export type ASTNodeType =
 	| 'CallExpr'
 	| 'MemberExpr'
 	| 'ClassNewInstanceExpr'
+	| 'FunctionDeclarationExpr'
 	// Literals
 	| 'StringLiteral'
 	| 'NumberLiteral'
