@@ -9,7 +9,11 @@ import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../../ast/declarations.ast';
-import { CallExpr, MemberExpr } from '../../ast/expressions.ast';
+import {
+	CallExpr,
+	FunctionDeclarationExpr,
+	MemberExpr,
+} from '../../ast/expressions.ast';
 import {
 	ArrayLiteral,
 	Identifier,
@@ -44,6 +48,7 @@ import {
 	evalArrayExpr,
 	evalUnaryExpr,
 	evalBitwiseExpr,
+	evalFuncExpr,
 } from './eval/expressions';
 import {
 	evalFuncDeclaration,
@@ -115,6 +120,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'BitwiseExpr':
 			return evalBitwiseExpr(node as BitwiseExpr, env);
+
+		case 'FunctionDeclarationExpr':
+			return evalFuncExpr(node as FunctionDeclarationExpr, env);
 
 		// Handle statements
 		case 'Program':

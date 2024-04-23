@@ -3,7 +3,11 @@ import { AssignmentExpr } from '../../../ast/assignments.ast';
 import { BinaryExpr } from '../../../ast/binop.ast';
 import { BitwiseExpr } from '../../../ast/bitwise.ast';
 import { ClassNewInstanceExpr } from '../../../ast/class.ast';
-import { CallExpr, MemberExpr } from '../../../ast/expressions.ast';
+import {
+	CallExpr,
+	FunctionDeclarationExpr,
+	MemberExpr,
+} from '../../../ast/expressions.ast';
 import {
 	ArrayLiteral,
 	Identifier,
@@ -19,6 +23,7 @@ import {
 	GSAny,
 	GSArray,
 	GSBoolean,
+	GSFunction,
 	GSNull,
 	GSNumber,
 	GSObject,
@@ -538,4 +543,20 @@ export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
 	}
 
 	return DataConstructors.NULL();
+}
+
+export function evalFuncExpr(
+	expr: FunctionDeclarationExpr,
+	env: Environment
+): GSAny {
+	const func = {
+		type: 'function',
+		// random function identifier for anonymous functions
+		name: `ANONYMOUS_${expr.start.Line * expr.end.Column}`,
+		params: expr.params,
+		body: expr.body,
+		decEnv: env,
+	} as GSFunction;
+
+	return func;
 }
