@@ -17,6 +17,7 @@ import { readFileSync } from 'node:fs';
 import * as nodeHTTP from 'node:http';
 import { GSError } from '../util/gserror';
 import { sourceFile } from '../..';
+import { objectToGSObject } from '../util/objToMap';
 
 export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs', 'node'];
 
@@ -163,11 +164,28 @@ export const Modules: Map<string, Map<string, GSAny>> = new Map()
 							callback.decEnv
 						);
 
+						const REQ = objectToGSObject(req);
+						const RES = objectToGSObject(res);
+
+						if (callback.params.length != 2)
+							throw new GSError(
+								'ModuleError',
+								`Expected 2 parameters in callback function`,
+								`${sourceFile}`
+							);
+
+						funcScope.declareVar('req', REQ, true);
+						funcScope.declareVar('res', RES, true);
+
 						for (const stmt of callback.body.body) {
 							evaluate(stmt, funcScope);
 						}
 					})
 					.listen(port.value);
+
+				console.log(
+					`New HTTP server created and listening on port ${port.value}`
+				);
 
 				return DataConstructors.NULL();
 			})
