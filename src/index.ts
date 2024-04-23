@@ -80,12 +80,12 @@ export const GSConfig = {
 };
 
 let installedModules: Array<GSModule> = [];
-console.log(noCrash);
+
 if (noCrash) {
 	try {
 		installedModules = readExternalGSModules();
 	} catch (e) {
-		console.log(e);
+		if (!silence) console.log(e);
 	}
 } else {
 	installedModules = readExternalGSModules();
@@ -98,7 +98,7 @@ if (noCrash) {
 			ModuleNames.push(module.name);
 		}
 	} catch (e) {
-		console.log(e);
+		if (!silence) console.log(e);
 	}
 } else {
 	for (const module of installedModules) {
@@ -183,7 +183,7 @@ function runFile(filename: string, location: string) {
 			try {
 				res = evaluate(program, env);
 			} catch (e) {
-				console.log(e);
+				if (!silence) console.log(e);
 			}
 		} else res = evaluate(program, env);
 
@@ -221,7 +221,7 @@ function handle(
 		try {
 			evaluate(script, REPL.env);
 		} catch (e) {
-			console.log(e);
+			if (!silence) console.log(e);
 		}
 	} else evaluate(script, REPL.env);
 
