@@ -76,14 +76,11 @@ export function evalNumericBinaryExpr(
 				return DataConstructors.BOOLEAN(nlhs.value > nrhs.value);
 
 			default:
-				console.log(
-					new GSError(
-						'RuntimeError',
-						`unknown operator "${op}" in operation ${lhs.value} ${op} ${rhs.value}`,
-						`${sourceFile}`
-					)
+				throw new GSError(
+					'RuntimeError',
+					`unknown operator "${op}" in operation ${lhs.value} ${op} ${rhs.value}`,
+					`${sourceFile}`
 				);
-				process.exit(1);
 		}
 	} else {
 		return DataConstructors.UNDEFINED();
@@ -120,14 +117,11 @@ export function evalBitwiseExpr(expr: BitwiseExpr, env: Environment): GSAny {
 				return DataConstructors.NUMBER(nlhs.value >>> nrhs.value);
 
 			default:
-				console.log(
-					new GSError(
-						'EvalError',
-						`Unknown bitwise operator "${expr.op}"`,
-						`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
-					)
+				throw new GSError(
+					'EvalError',
+					`Unknown bitwise operator "${expr.op}"`,
+					`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 				);
-				process.exit(1);
 		}
 	} else {
 		console.log(
@@ -196,14 +190,11 @@ function equals(lhs: GSAny, rhs: GSAny, strict: boolean): GSAny {
 			);
 
 		default:
-			console.log(
-				new GSError(
-					'RuntimeError',
-					`Unknown type in comparison: LHS: ${lhs}, RHS: ${rhs}`,
-					`${sourceFile}`
-				)
+			throw new GSError(
+				'RuntimeError',
+				`Unknown type in comparison: LHS: ${lhs}, RHS: ${rhs}`,
+				`${sourceFile}`
 			);
-			process.exit(1);
 	}
 }
 
@@ -218,14 +209,11 @@ export function evalIdentifier(
 export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 	if (node.assigne.kind === 'MemberExpr') return evalMemberExpr(env, node);
 	if (node.assigne.kind !== 'Identifier') {
-		console.log(
-			new GSError(
-				'EvalError',
-				`Invalid LHS expression: ${JSON.stringify(node.assigne)}`,
-				`${sourceFile}:${node.start.Line}:${node.start.Column}`
-			)
+		throw new GSError(
+			'EvalError',
+			`Invalid LHS expression: ${JSON.stringify(node.assigne)}`,
+			`${sourceFile}:${node.start.Line}:${node.start.Column}`
 		);
-		process.exit(1);
 	}
 
 	const varName = (node.assigne as Identifier).symbol;
@@ -379,14 +367,11 @@ export function evalMemberExpr(
 
 		return Var;
 	} else {
-		console.log(
-			new GSError(
-				'EvalError',
-				'A member expression cannot be evaluated without a member or assignment expression.',
-				`${sourceFile}`
-			)
+		throw new GSError(
+			'EvalError',
+			'A member expression cannot be evaluated without a member or assignment expression.',
+			`${sourceFile}`
 		);
-		process.exit(1);
 	}
 }
 
@@ -405,14 +390,11 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 
 		for (let i = 0; i < func.params.length; i++) {
 			if (func.params.length != args.length) {
-				console.log(
-					new GSError(
-						'EvalError',
-						'Paramters list and arguments list lengths do not match',
-						`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
-					)
+				throw new GSError(
+					'EvalError',
+					'Paramters list and arguments list lengths do not match',
+					`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 				);
-				process.exit(1);
 			}
 
 			const varName = func.params[i];
@@ -433,16 +415,11 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 		return result;
 	}
 
-	console.log(
-		new GSError(
-			'EvalError',
-			`Can not call a value that is not a function: ${JSON.stringify(
-				fn
-			)}`,
-			`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
-		)
+	throw new GSError(
+		'EvalError',
+		`Can not call a value that is not a function: ${JSON.stringify(fn)}`,
+		`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 	);
-	process.exit(1);
 }
 
 export function evalObjectExpr(obj: ObjectLiteral, env: Environment): GSAny {
@@ -533,40 +510,31 @@ export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
 			assigne.value--;
 			return assigne;
 		} else {
-			console.log(
-				new GSError(
-					'EvalError',
-					'Cannot use unary operator "--" on a non-number type',
-					`${sourceFile}:${node.start.Line}:${node.start.Column}`
-				)
+			throw new GSError(
+				'EvalError',
+				'Cannot use unary operator "--" on a non-number type',
+				`${sourceFile}:${node.start.Line}:${node.start.Column}`
 			);
-			process.exit(1);
 		}
 	} else if (op == '~') {
 		if (assigne.type == 'number') {
 			// Bitwise Op
 			return DataConstructors.NUMBER(~assigne.value);
 		} else {
-			console.log(
-				new GSError(
-					'EvalError',
-					'Cannot use unary operator "~" on a non-number type',
-					`${sourceFile}:${node.start.Line}:${node.start.Column}`
-				)
+			throw new GSError(
+				'EvalError',
+				'Cannot use unary operator "~" on a non-number type',
+				`${sourceFile}:${node.start.Line}:${node.start.Column}`
 			);
-			process.exit(1);
 		}
 	} else if (op == '!') {
 		return DataConstructors.BOOLEAN(!assigne.value);
 	} else {
-		console.log(
-			new GSError(
-				'RuntimeError',
-				`Unknown operator "${op}"`,
-				`${sourceFile}:${node.start.Line}:${node.start.Column}`
-			)
+		throw new GSError(
+			'RuntimeError',
+			`Unknown operator "${op}"`,
+			`${sourceFile}:${node.start.Line}:${node.start.Column}`
 		);
-		process.exit(1);
 	}
 
 	return DataConstructors.NULL();

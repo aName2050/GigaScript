@@ -513,16 +513,13 @@ export function tokenize(source: string): Token[] {
 					}
 
 					if (isEOL(src[0]) || src.length == 0) {
-						console.error(
-							new GSError(
-								`LexerError`,
-								`Unterminated string literal`,
-								`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
-									tokenPos.Col
-								}`
-							)
+						throw new GSError(
+							`LexerError`,
+							`Unterminated string literal`,
+							`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
+								tokenPos.Col
+							}`
 						);
-						process.exit(1);
 					}
 
 					src.shift(); // move past closing doubleQuotes/singleQuotes
@@ -633,18 +630,15 @@ export function tokenize(source: string): Token[] {
 					} else if (isWhitespace(curr)) {
 						src.shift() && col++;
 					} else {
-						console.error(
-							new GSError(
-								`LexerError`,
-								`Unknown character: UNICODE-${curr.charCodeAt(
-									0
-								)} "${curr}"`,
-								`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
-									tokenPos.Col
-								}`
-							)
+						throw new GSError(
+							`LexerError`,
+							`Unknown character: UNICODE-${curr.charCodeAt(
+								0
+							)} "${curr}"`,
+							`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
+								tokenPos.Col
+							}`
 						);
-						process.exit(1);
 					}
 			}
 		}

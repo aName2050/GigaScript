@@ -92,15 +92,12 @@ export default class Parser {
 		if (errNote.length > 0) errNote = ' ' + errNote;
 		const token = this.tokens.shift() as Token;
 		if (!token || token.type != type) {
-			console.log(
-				new ParseError(
-					`Expected "${
-						getTokenByTypeEnum(type)?.value
-					}"${errNote}, instead saw "${token.value}"`,
-					`${sourceFile}:${getErrorLocation(token)}`
-				)
+			throw new ParseError(
+				`Expected "${
+					getTokenByTypeEnum(type)?.value
+				}"${errNote}, instead saw "${token.value}"`,
+				`${sourceFile}:${getErrorLocation(token)}`
 			);
-			process.exit(1);
 		}
 
 		return token;
@@ -135,13 +132,10 @@ export default class Parser {
 		const EOFToken = this.current();
 
 		if (EOFToken.type != NodeType.__EOF__) {
-			console.log(
-				new ParseError(
-					'Uncaught: Missing EndOfFile <EOF> token',
-					`${sourceFile}:${getErrorLocation(this.current())}`
-				)
+			throw new ParseError(
+				'Uncaught: Missing EndOfFile <EOF> token',
+				`${sourceFile}:${getErrorLocation(this.current())}`
 			);
-			process.exit(1);
 		}
 
 		program.end = {
@@ -242,13 +236,10 @@ export default class Parser {
 		if (this.current().type == NodeType.Semicolon) {
 			const semicolonPosData = this.advance().__GSC._POS;
 			if (isConstant) {
-				console.log(
-					new ParseError(
-						'Constant variables must be delcared with a value',
-						`${sourceFile}:${getErrorLocation(this.current())}`
-					)
+				throw new ParseError(
+					'Constant variables must be delcared with a value',
+					`${sourceFile}:${getErrorLocation(this.current())}`
 				);
-				process.exit(1);
 			}
 
 			return {
@@ -290,13 +281,10 @@ export default class Parser {
 		for (const arg of args) {
 			if (arg.kind !== 'Identifier') {
 				console.log(arg);
-				console.log(
-					new ParseError(
-						'Expected arguments to be identifiers',
-						`${sourceFile}:${getErrorLocation(this.current())}`
-					)
+				throw new ParseError(
+					'Expected arguments to be identifiers',
+					`${sourceFile}:${getErrorLocation(this.current())}`
 				);
-				process.exit(1);
 			}
 
 			params.push((arg as Identifier).symbol);
@@ -532,15 +520,12 @@ export default class Parser {
 					for (const arg of args) {
 						if (arg.kind !== 'Identifier') {
 							console.log(arg);
-							console.log(
-								new ParseError(
-									'Expected parameter to be of type string',
-									`${sourceFile}:${getErrorLocation(
-										this.current()
-									)}`
-								)
+							throw new ParseError(
+								'Expected parameter to be of type string',
+								`${sourceFile}:${getErrorLocation(
+									this.current()
+								)}`
 							);
-							process.exit(1);
 						}
 
 						params.push((arg as Identifier).symbol);
@@ -560,19 +545,16 @@ export default class Parser {
 
 					methods.push(method);
 				} else {
-					console.log(
-						new ParseError(
-							`Unexpected token following ${
-								isStatic
-									? 'static'
-									: isPublic
-									? 'public'
-									: 'private'
-							} keyword`,
-							`${sourceFile}:${getErrorLocation(this.current())}`
-						)
+					throw new ParseError(
+						`Unexpected token following ${
+							isStatic
+								? 'static'
+								: isPublic
+								? 'public'
+								: 'private'
+						} keyword`,
+						`${sourceFile}:${getErrorLocation(this.current())}`
 					);
-					process.exit(1);
 				}
 			} else if (this.current().type == NodeType.Constructor) {
 				constructor =
@@ -605,13 +587,10 @@ export default class Parser {
 		for (const arg of args) {
 			if (arg.kind !== 'Identifier') {
 				console.log(arg);
-				console.log(
-					new ParseError(
-						'Expected parameter to be of type string',
-						`${sourceFile}:${getErrorLocation(this.current())}`
-					)
+				throw new ParseError(
+					'Expected parameter to be of type string',
+					`${sourceFile}:${getErrorLocation(this.current())}`
 				);
-				process.exit(1);
 			}
 
 			params.push((arg as Identifier).symbol);
@@ -759,13 +738,10 @@ export default class Parser {
 			for (const arg of args) {
 				if (arg.kind !== 'Identifier') {
 					console.log(arg);
-					console.log(
-						new ParseError(
-							'Expected arguments to be identifiers',
-							`${sourceFile}:${getErrorLocation(this.current())}`
-						)
+					throw new ParseError(
+						'Expected arguments to be identifiers',
+						`${sourceFile}:${getErrorLocation(this.current())}`
 					);
-					process.exit(1);
 				}
 
 				params.push((arg as Identifier).symbol);
@@ -938,13 +914,10 @@ export default class Parser {
 		for (const arg of args) {
 			if (arg.kind !== 'Identifier') {
 				console.log(arg);
-				console.log(
-					new ParseError(
-						'Expected arguments to be identifiers',
-						`${sourceFile}:${getErrorLocation(this.current())}`
-					)
+				throw new ParseError(
+					'Expected arguments to be identifiers',
+					`${sourceFile}:${getErrorLocation(this.current())}`
 				);
-				process.exit(1);
 			}
 
 			params.push((arg as Identifier).symbol);
@@ -984,13 +957,10 @@ export default class Parser {
 			) {
 				elements.push(value as ArrayElement['elements']);
 			} else {
-				console.log(
-					new ParseError(
-						`Invalid expression in array, "${value.kind}" is not allowed in arrays`,
-						`${sourceFile}:${getErrorLocation(this.current())}`
-					)
+				throw new ParseError(
+					`Invalid expression in array, "${value.kind}" is not allowed in arrays`,
+					`${sourceFile}:${getErrorLocation(this.current())}`
 				);
-				process.exit(1);
 			}
 		}
 
@@ -1243,13 +1213,10 @@ export default class Parser {
 				property = this.parseNewClassInstanceExpr();
 
 				if (property.kind != 'Identifier') {
-					console.log(
-						new ParseError(
-							'A dot operator must be used with a valid identifier',
-							`${sourceFile}:${property.start.Line}:${property.start.Column}`
-						)
+					throw new ParseError(
+						'A dot operator must be used with a valid identifier',
+						`${sourceFile}:${property.start.Line}:${property.start.Column}`
 					);
-					process.exit(1);
 				}
 			} else {
 				// computed values, like "foo[bar]"
@@ -1382,17 +1349,14 @@ export default class Parser {
 				return value;
 
 			default:
-				console.log(
-					new ParseError(
-						`Uncaught: Unexpected token "${
-							getTokenByTypeEnum(this.current().type)?.value
-						}"`,
-						`${sourceFile || 'GSREPL'}:${getErrorLocation(
-							this.current()
-						)}`
-					)
+				throw new ParseError(
+					`Uncaught: Unexpected token "${
+						getTokenByTypeEnum(this.current().type)?.value
+					}"`,
+					`${sourceFile || 'GSREPL'}:${getErrorLocation(
+						this.current()
+					)}`
 				);
-				process.exit(1);
 		}
 	}
 }

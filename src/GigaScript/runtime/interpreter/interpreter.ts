@@ -64,14 +64,11 @@ import {
 
 export function evaluate(node: STATEMENT, env: Environment): GSAny {
 	if (!node || !node.kind) {
-		console.log(
-			new GSError(
-				'RuntimeError',
-				'Unknown or undefined node during interpretation',
-				`${sourceFile}`
-			)
+		throw new GSError(
+			'RuntimeError',
+			'Unknown or undefined node during interpretation',
+			`${sourceFile}`
 		);
-		process.exit(1);
 	}
 
 	switch (node.kind) {
@@ -160,13 +157,10 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		// Handle non implemented types
 		default:
-			console.log(
-				new GSError(
-					'RuntimeError',
-					`AST Node not implemented; "${node.kind}" has not been implemented into GigaScript yet`,
-					`${sourceFile}:${node.start.Line}:${node.start.Column}`
-				)
+			throw new GSError(
+				'RuntimeError',
+				`AST Node not implemented; "${node.kind}" has not been implemented into GigaScript yet`,
+				`${sourceFile}:${node.start.Line}:${node.start.Column}`
 			);
-			process.exit(1);
 	}
 }
