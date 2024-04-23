@@ -1,5 +1,5 @@
 import { createLocalServer } from 'node'
 
-createLocalServer(function callback(req, res) {
+createLocalServer(func (req, res) {
     print('server created!')
 }, 8000)
