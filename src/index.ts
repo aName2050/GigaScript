@@ -18,6 +18,7 @@ import { readExternalGSModules } from './GigaScript/externalModules/read';
 import { Modules, ModuleNames } from './GigaScript/native/modules';
 import { DataConstructors, GSAny } from './GigaScript/runtime/types';
 import { GSModule } from './GigaScript/externalModules/types';
+import { GSError } from './GigaScript/util/gserror';
 
 const argParser = new ArgumentParser({
 	description: 'GigaScript Runtime CLI',
@@ -49,13 +50,26 @@ argParser.add_argument('-NCE', '--NoCrashOnError', {
 	help: 'disables crash on error',
 	action: 'store_true',
 });
+argParser.add_argument('-S', '--SilenceErrors', {
+	help: 'silences most error messages emitted by the GigaScript parser and interpreter',
+	action: 'store_true',
+});
 
 const CLIArgs: CLIArguments = argParser.parse_args();
 const file: string | undefined = CLIArgs.file;
 const useCUDA: boolean = CLIArgs.useCUDA || false;
 const ASTOnly: boolean = CLIArgs.ASTOnly || false;
 const debug: boolean = CLIArgs.debug || false;
-const noCrash: boolean = CLIArgs.noCrash || false;
+const noCrash: boolean = CLIArgs.NoCrashOnError || false;
+const silence: boolean = CLIArgs.SilenceErrors || false;
+
+if (silence && !noCrash) {
+	throw new GSError(
+		'CommandLineError',
+		'You can only silence error messages when the "NoCrashOnError" argument is set.',
+		'0:0'
+	);
+}
 
 export const GSConfig = {
 	file,
@@ -69,10 +83,9 @@ let installedModules: Array<GSModule> = [];
 console.log(noCrash);
 if (noCrash) {
 	try {
-		console.log('no crash mode');
 		installedModules = readExternalGSModules();
 	} catch (e) {
-		// console.log(e);
+		console.log(e);
 	}
 } else {
 	installedModules = readExternalGSModules();
