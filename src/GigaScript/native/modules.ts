@@ -14,10 +14,6 @@ import {
 import * as OS from 'node:os';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
-import * as nodeHTTP from 'node:http';
-import { GSError } from '../util/gserror';
-import { sourceFile } from '../..';
-import { objectToGSObject } from '../util/objToMap';
 
 export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs', 'node'];
 
@@ -148,46 +144,19 @@ export const Modules: Map<string, Map<string, GSAny>> = new Map()
 	.set(
 		'node',
 		new Map().set(
-			'createLocalServer',
-			DataConstructors.NATIVEFN((args, scope) => {
-				if (args[0].type != 'function')
-					throw 'RuntimeError: Expected callback function for "createLocalServer"';
+			'process',
+			DataConstructors.OBJECT(
+				new Map().set(
+					'exit',
+					DataConstructors.NATIVEFN((args, _scope) => {
+						const exitCode = args[0] as GSNumber;
 
-				const callback = args[0] as GSFunction;
-
-				const port = args[1] as GSNumber;
-
-				nodeHTTP
-					.createServer((req, res) => {
-						const funcScope = new Environment(
-							scope.cwd,
-							callback.decEnv
+						console.log(
+							`GigaScript exited with error code ${exitCode.value}`
 						);
-
-						const REQ = objectToGSObject(req);
-						const RES = objectToGSObject(res);
-
-						if (callback.params.length != 2)
-							throw new GSError(
-								'ModuleError',
-								`Expected 2 parameters in callback function`,
-								`${sourceFile}`
-							);
-
-						funcScope.declareVar('req', REQ, true);
-						funcScope.declareVar('res', RES, true);
-
-						for (const stmt of callback.body.body) {
-							evaluate(stmt, funcScope);
-						}
+						process.exit(exitCode.value);
 					})
-					.listen(port.value);
-
-				console.log(
-					`New HTTP server created and listening on port ${port.value}`
-				);
-
-				return DataConstructors.NULL();
-			})
+				)
+			)
 		)
 	);
