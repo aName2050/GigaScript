@@ -8,6 +8,10 @@ import { evaluate } from '../runtime/interpreter/interpreter';
 
 export function readExternalGSModules(): Array<GSModule> {
 	const moduleDir = path.join(process.cwd(), '.gsmodules');
+
+	// check if the .gsmodules directory exists
+	if (!fs.existsSync(moduleDir)) return [];
+
 	const modules = fs.readdirSync(moduleDir);
 
 	let installedModules: Array<GSModule> = [];
