@@ -260,6 +260,7 @@ function setTokenData(
 export function getTokenByValue(value: string): Token | undefined {
 	return Tokens[value];
 }
+
 export function getTokenByTypeEnum(TypeEnum: NodeType): Token | undefined {
 	let matchedToken: Token | undefined;
 	for (let i = 0; i < Object.entries(Tokens).length; i++) {

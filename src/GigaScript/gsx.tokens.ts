@@ -4,6 +4,55 @@ import { Token, TokenID } from './tokens';
 
 let GSX_Tokens: Record<string, Token> = {};
 
+export function getGSXTokenByValue(value: string): Token | undefined {
+	return GSX_Tokens[value];
+}
+
+/**
+ *
+ * @param id The ID of the token
+ * @param type The type of the token
+ * @param value The raw value of the token
+ * @param Line Line number the first character of the token was found on
+ * @param Column Column number the first character of the token was found on
+ * @returns A new token
+ */
+export function createGSXToken(
+	id: TokenID,
+	type: NodeType,
+	value: string,
+	PositionData: {
+		start: {
+			line: number;
+			column: number;
+		};
+		end: {
+			line: number;
+			column: number;
+		};
+	},
+	OPC?: OpPrec
+): Token {
+	return {
+		id,
+		type,
+		value,
+		__GSC: {
+			_OPC: getGSXTokenByValue(value)?.__GSC._OPC || OPC,
+			_POS: {
+				start: {
+					Line: PositionData.start.line,
+					Column: PositionData.start.column,
+				},
+				end: {
+					Line: PositionData.end.line,
+					Column: PositionData.end.column,
+				},
+			},
+		},
+	} as Token;
+}
+
 function setTokenData(
 	id: TokenID,
 	type: NodeType,
@@ -73,9 +122,9 @@ setTokenData(TokenID.Catch, NodeType.Catch, 'findOut', OpPrec.None);
 // binary operation
 setTokenData(TokenID.BinOp, NodeType.Plus, 'with', OpPrec.Additive);
 setTokenData(TokenID.BinOp, NodeType.Minus, 'without', OpPrec.Additive);
-setTokenData(TokenID.BinOp, NodeType.Multiply, 'by', OpPrec.Multiplicative);
+setTokenData(TokenID.BinOp, NodeType.Multiply, 'times', OpPrec.Multiplicative);
 setTokenData(TokenID.BinOp, NodeType.Divide, 'divide', OpPrec.Multiplicative);
-setTokenData(TokenID.BinOp, NodeType.Modulo, 'some', OpPrec.Multiplicative);
+setTokenData(TokenID.BinOp, NodeType.Modulo, '%', OpPrec.Multiplicative);
 // bitwise operations
 setTokenData(TokenID.Ampersand, NodeType.Bitwise_AND, '&', OpPrec.BITWISE_AND);
 setTokenData(TokenID.Bar, NodeType.Bitwise_OR, '|', OpPrec.BITWISE_OR);
@@ -161,31 +210,36 @@ setTokenData(TokenID.PlusPlus, NodeType.Increment, '++', OpPrec.Unary);
 setTokenData(TokenID.MinusMinus, NodeType.Decrement, '--', OpPrec.None);
 
 // [comparisons]
-setTokenData(TokenID.GreaterThan, NodeType.GreaterThan, '>', OpPrec.None);
-setTokenData(TokenID.LessThan, NodeType.LessThan, '<', OpPrec.None);
+setTokenData(TokenID.GreaterThan, NodeType.GreaterThan, 'big', OpPrec.None);
+setTokenData(TokenID.LessThan, NodeType.LessThan, 'lil', OpPrec.None);
 setTokenData(
 	TokenID.GreaterThanEquals,
 	NodeType.GreaterThanOrEquals,
-	'>=',
+	'bigfr',
 	OpPrec.None
 );
 setTokenData(
 	TokenID.LessThanEquals,
 	NodeType.LessThanOrEquals,
-	'<=',
+	'lilfr',
 	OpPrec.None
 );
-setTokenData(TokenID.EqualsEquals, NodeType.IsEqual, '==', OpPrec.Equality);
+setTokenData(TokenID.EqualsEquals, NodeType.IsEqual, 'frfr', OpPrec.Equality);
 setTokenData(
 	TokenID.ExclamationEquals,
 	NodeType.NotEqual,
-	'!=',
+	'notfr',
 	OpPrec.Equality
 );
 // [logical expressions]
 setTokenData(TokenID.Exclamation, NodeType.Not, '!', OpPrec.Unary);
-setTokenData(TokenID.AmpersandAmpersand, NodeType.And, '&&', OpPrec.LOGIC_AND);
-setTokenData(TokenID.BarBar, NodeType.Or, '||', OpPrec.LOGIC_OR);
+setTokenData(
+	TokenID.AmpersandAmpersand,
+	NodeType.And,
+	'aswell',
+	OpPrec.LOGIC_AND
+);
+setTokenData(TokenID.BarBar, NodeType.Or, 'carenot', OpPrec.LOGIC_OR);
 
 // [grouping]
 setTokenData(TokenID.OpenParen, NodeType.OpenParen, '(', OpPrec.None);
