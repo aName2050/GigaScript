@@ -58,11 +58,11 @@ export interface ObjectValue extends Value<'object', object> {
 	properties: Map<string, GSAny>;
 }
 
-function OBJECT(obj: Map<string, Value<DataType, any>>): GSObject {
+function OBJECT(obj: Map<string, GSAny>): GSObject {
 	return { type: 'object', properties: obj } as GSObject;
 }
 
-function ARRAY(arr: Array<Value<DataType, any>>): GSArray {
+function ARRAY(arr: Array<GSAny>): GSArray {
 	return { type: 'array', value: arr } as GSArray;
 }
 
