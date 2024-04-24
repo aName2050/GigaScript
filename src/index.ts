@@ -199,7 +199,61 @@ function runFile(filename: string, location: string) {
 		return res;
 	} else if (filename.endsWith('.gsx')) {
 		// Run GigaScript-X code
-		throw 'Not implemented';
+		const runtimeStart = Date.now();
+		const tokenizeStart = Date.now();
+
+		parser.tokenizeGSXSource(file);
+
+		if (debug)
+			console.log(
+				`GSX.DEBUGGER: source tokenized in ${
+					Date.now() - tokenizeStart
+				}ms`
+			);
+
+		const parseStart = Date.now();
+
+		const program: Program = parser.generateAST();
+
+		if (debug)
+			console.log(
+				`GSX.DEBUGGER: tokens parsed in ${Date.now() - parseStart}ms`
+			);
+
+		if (ASTOnly) {
+			if (debug)
+				console.log(
+					`GSX.DEBUGGER: GigaScript-X ran in ${
+						Date.now() - runtimeStart
+					}ms`
+				);
+			return console.log(JSON.stringify(program));
+		}
+
+		const evalStart = Date.now();
+
+		let res: GSAny = DataConstructors.UNDEFINED();
+
+		if (noCrash) {
+			try {
+				res = evaluate(program, env);
+			} catch (e) {
+				if (!silence) console.log(e);
+			}
+		} else res = evaluate(program, env);
+
+		if (debug)
+			console.log(
+				`GSX.DEBUGGER: AST evaluated in ${Date.now() - evalStart}ms`
+			);
+		if (debug)
+			console.log(
+				`GSX.DEBUGGER: GigaScript-X ran in ${
+					Date.now() - runtimeStart
+				}ms`
+			);
+
+		return res;
 	} else {
 		throw `${file
 			.split('.')

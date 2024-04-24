@@ -42,6 +42,7 @@ import {
 	TryCatchStatement,
 } from '../ast/statements.ast';
 import { UnaryExpr } from '../ast/unary.ast';
+import { tokenizeGSX } from '../lexer/gsx';
 import { tokenize } from '../lexer/tokenizer';
 import { NodeType } from '../nodes';
 import { Token, getTokenByTypeEnum } from '../tokens';
@@ -109,6 +110,10 @@ export default class Parser {
 
 	public tokenizeSource(src: string): void {
 		this.tokens = tokenize(src);
+	}
+
+	public tokenizeGSXSource(src: string): void {
+		this.tokens = tokenizeGSX(src);
 	}
 
 	public generateAST(): Program {
@@ -977,7 +982,7 @@ export default class Parser {
 	private parseLogOr(): EXPRESSION {
 		let lhs = this.parseLogAnd();
 
-		while (this.current().value == '||') {
+		while (this.current().type == NodeType.Or) {
 			const op = this.advance().value;
 			const rhs = this.parseLogOr();
 			lhs = {
@@ -996,7 +1001,7 @@ export default class Parser {
 	private parseLogAnd(): EXPRESSION {
 		let lhs = this.parseBitwiseOR();
 
-		while (this.current().value == '&&') {
+		while (this.current().type == NodeType.And) {
 			const op = this.advance().value;
 			const rhs = this.parseLogAnd();
 			lhs = {
@@ -1015,7 +1020,7 @@ export default class Parser {
 	private parseBitwiseOR(): EXPRESSION {
 		let lhs = this.parseBitwiseXOR();
 
-		while (this.current().value == '|') {
+		while (this.current().type == NodeType.Bitwise_OR) {
 			const op = this.advance().value;
 			const rhs = this.parseBitwiseOR();
 			lhs = {
@@ -1034,7 +1039,7 @@ export default class Parser {
 	private parseBitwiseXOR(): EXPRESSION {
 		let lhs = this.parseBitwiseAND();
 
-		while (this.current().value == '^') {
+		while (this.current().type == NodeType.Bitwise_XOR) {
 			const op = this.advance().value;
 			const rhs = this.parseBitwiseXOR();
 			lhs = {
@@ -1053,7 +1058,7 @@ export default class Parser {
 	private parseBitwiseAND(): EXPRESSION {
 		let lhs = this.parseEqualityExpr();
 
-		while (this.current().value == '&') {
+		while (this.current().type == NodeType.Bitwise_AND) {
 			const op = this.advance().value;
 			const rhs = this.parseBitwiseAND();
 			lhs = {
@@ -1072,7 +1077,14 @@ export default class Parser {
 	private parseEqualityExpr(): EXPRESSION {
 		let lhs = this.parseComparisonExpr();
 
-		while (['!=', '==', '<=', '>='].includes(this.current().value)) {
+		while (
+			[
+				NodeType.NotEqual,
+				NodeType.IsEqual,
+				NodeType.LessThanOrEquals,
+				NodeType.GreaterThanOrEquals,
+			].includes(this.current().type)
+		) {
 			const op = this.advance().value;
 			const rhs = this.parseEqualityExpr();
 			lhs = {
@@ -1091,7 +1103,11 @@ export default class Parser {
 	private parseComparisonExpr(): EXPRESSION {
 		let lhs = this.parseBitwiseSHIFT();
 
-		while (['<', '>'].includes(this.current().value)) {
+		while (
+			[NodeType.LessThan, NodeType.GreaterThan].includes(
+				this.current().type
+			)
+		) {
 			const op = this.advance().value;
 			const rhs = this.parseComparisonExpr();
 			lhs = {
@@ -1110,7 +1126,13 @@ export default class Parser {
 	private parseBitwiseSHIFT(): EXPRESSION {
 		let lhs = this.parseMultiplicativeExpr();
 
-		while (['<<', '>>', '>>>'].includes(this.current().value)) {
+		while (
+			[
+				NodeType.Bitwise_LShift,
+				NodeType.Bitwise_SRShift,
+				NodeType.Bitwise_ZFRShift,
+			].includes(this.current().type)
+		) {
 			const op = this.advance().value;
 			const rhs = this.parseBitwiseSHIFT();
 			lhs = {
@@ -1129,7 +1151,11 @@ export default class Parser {
 	private parseMultiplicativeExpr(): EXPRESSION {
 		let lhs = this.parseAdditiveExpr();
 
-		while (['*', '/', '%'].includes(this.current().value)) {
+		while (
+			[NodeType.Multiply, NodeType.Divide, NodeType.Modulo].includes(
+				this.current().type
+			)
+		) {
 			const op = this.advance().value;
 			const rhs = this.parseMultiplicativeExpr();
 			lhs = {
@@ -1148,7 +1174,7 @@ export default class Parser {
 	private parseAdditiveExpr(): EXPRESSION {
 		let lhs = this.parseCallMemberExpr();
 
-		while (['+', '-'].includes(this.current().value)) {
+		while ([NodeType.Plus, NodeType.Minus].includes(this.current().type)) {
 			const op = this.advance().value;
 			const rhs = this.parseAdditiveExpr();
 			lhs = {
@@ -1266,7 +1292,9 @@ export default class Parser {
 
 	private parseUnaryExpr(): EXPRESSION {
 		// Post-assigne unary expr (eg. var++)
-		while (['++', '--'].includes(this.next().value)) {
+		while (
+			[NodeType.Increment, NodeType.Decrement].includes(this.next().type)
+		) {
 			const assigne = this.parsePrimaryExpression();
 			const op = this.advance();
 			return {
@@ -1279,7 +1307,9 @@ export default class Parser {
 		}
 
 		// Pre-assigne unary expr (eg. !var)
-		while (['~', '!'].includes(this.current().value)) {
+		while (
+			[NodeType.Bitwise_NOT, NodeType.Not].includes(this.current().type)
+		) {
 			const op = this.advance();
 			const assigne = this.parsePrimaryExpression();
 			return {
