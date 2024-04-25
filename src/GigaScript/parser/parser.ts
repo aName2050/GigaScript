@@ -777,19 +777,19 @@ export default class Parser {
 
 		if (
 			[
-				'=',
-				'+=',
-				'-=',
-				'*=',
-				'/=',
-				'%=',
-				'<<=',
-				'>>=',
-				'>>>=',
-				'&=',
-				'|=',
-				'^=',
-			].includes(this.current().value)
+				NodeType.Equals,
+				NodeType.AsgAdd,
+				NodeType.AsgMin,
+				NodeType.AsgMult,
+				NodeType.AsgDiv,
+				NodeType.AsgMod,
+				NodeType.Bitwise_AsgLShift,
+				NodeType.Bitwise_AsgSRShift,
+				NodeType.Bitwise_AsgZFRShift,
+				NodeType.Bitwise_AsgAND,
+				NodeType.Bitwise_AsgOR,
+				NodeType.Bitwise_AsgXOR,
+			].includes(this.current().type)
 		) {
 			const op = this.advance().value;
 			const rhs = this.parseAsgExpr();
