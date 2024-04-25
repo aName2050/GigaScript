@@ -1,3 +1,5 @@
+// TODO: replace raw string values with NodeType within AST output
+
 import { sourceFile } from '../..';
 import { AssignmentExpr } from '../ast/assignments.ast';
 import { CodeBlockNode, EXPRESSION, Program, STATEMENT } from '../ast/ast';

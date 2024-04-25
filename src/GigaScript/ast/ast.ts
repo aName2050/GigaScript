@@ -1,3 +1,5 @@
+// TODO: switch raw value storage to NodeType storage
+
 export type ASTNodeType =
 	// Statements
 	| 'Program'
