@@ -66,34 +66,6 @@ export function tokenizeGSX(source: string): Token[] {
 			);
 		} else if (typeof token == 'object') {
 			switch (token.value) {
-				// case '=':
-				// 	{
-				// 		src.shift();
-				// 		col++;
-				// 		const multiCharToken = src[0] === '=' ? '==' : '=';
-				// 		if (multiCharToken.length == 2) {
-				// 			src.shift(); // advance past second character
-				// 			col++;
-				// 		}
-				// 		tokens.push({
-				// 			...GSX_Tokens[multiCharToken],
-				// 			__GSC: {
-				// 				_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
-				// 				_POS: {
-				// 					start: {
-				// 						Line: tokenPos.line,
-				// 						Column: tokenPos.Col,
-				// 					},
-				// 					end: {
-				// 						Line: line,
-				// 						Column: col,
-				// 					},
-				// 				},
-				// 			},
-				// 		});
-				// 	}
-				// 	break;
-
 				case '+':
 					{
 						src.shift();
@@ -640,6 +612,8 @@ export function tokenizeGSX(source: string): Token[] {
 			OpPrec.None
 		)
 	);
+
+	console.log(tokens);
 
 	return tokens;
 }

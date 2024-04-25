@@ -1,3 +1,9 @@
-import { process } from 'node'
+let mutable = "hello";
+const constant = "yoo";
 
-process.exit(1)
+print(mutable)
+print(constant)
+
+mutable = 'changed'
+
+print(mutable)
