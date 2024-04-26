@@ -1,9 +1,9 @@
-let mutable = "hello";
-const constant = "yoo";
+func test(callback) {
+    const x = 32;
+    callback(x)
+}
 
-print(mutable)
-print(constant)
-
-mutable = 'changed'
-
-print(mutable)
+test(func (x) {
+    print('hello from a callback function!')
+    print(x)
+})
