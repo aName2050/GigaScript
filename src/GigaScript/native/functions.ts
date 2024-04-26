@@ -57,3 +57,19 @@ export const formatString = DataConstructors.NATIVEFN((args, scope) => {
 
 	return DataConstructors.STRING(out);
 });
+
+export const JSON = DataConstructors.OBJECT(
+	new Map()
+		.set(
+			'toString',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				throw 'not implemented';
+			})
+		)
+		.set(
+			'toJSON',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				throw 'not implemented';
+			})
+		)
+);
