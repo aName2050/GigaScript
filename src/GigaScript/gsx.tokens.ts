@@ -96,12 +96,12 @@ setTokenData(TokenID.Class, NodeType.Class, 'students', OpPrec.None);
 setTokenData(TokenID.Constructor, NodeType.Constructor, 'builder', OpPrec.None);
 setTokenData(TokenID.Private, NodeType.Private, 'introvert', OpPrec.None);
 setTokenData(TokenID.Public, NodeType.Public, 'extrovert', OpPrec.None);
-setTokenData(TokenID.Static, NodeType.Static, 'unchanged', OpPrec.None);
+setTokenData(TokenID.Static, NodeType.Static, 'unchanging', OpPrec.None);
 setTokenData(TokenID.New, NodeType.New, 'new', OpPrec.None);
 setTokenData(TokenID._This, NodeType.Identifier, 'this', OpPrec.None);
 
-setTokenData(TokenID.If, NodeType.If, 'sus', OpPrec.None);
-setTokenData(TokenID.Else, NodeType.Else, 'imposter', OpPrec.None);
+setTokenData(TokenID.If, NodeType.If, 'shallItBe', OpPrec.None);
+setTokenData(TokenID.Else, NodeType.Else, 'otherwise', OpPrec.None);
 
 setTokenData(TokenID.While, NodeType.While, 'while', OpPrec.None);
 setTokenData(TokenID.For, NodeType.For, 'for', OpPrec.None);
@@ -113,7 +113,7 @@ setTokenData(TokenID.Export, NodeType.Export, 'yeet', OpPrec.None);
 setTokenData(TokenID.From, NodeType.From, 'from', OpPrec.None);
 setTokenData(TokenID.As, NodeType.As, 'as', OpPrec.Assignment);
 
-setTokenData(TokenID.Throw, NodeType.Throw, '💀', OpPrec.None);
+setTokenData(TokenID.Throw, NodeType.Throw, 'shoot', OpPrec.None);
 
 setTokenData(TokenID.Try, NodeType.Try, 'messAround', OpPrec.None);
 setTokenData(TokenID.Catch, NodeType.Catch, 'findOut', OpPrec.None);
@@ -151,7 +151,7 @@ setTokenData(
 
 // punctation
 setTokenData(TokenID.Semicolon, NodeType.Semicolon, 'rn', OpPrec.None);
-setTokenData(TokenID.Colon, NodeType.Colon, ':', OpPrec.None);
+setTokenData(TokenID.Colon, NodeType.Colon, 'is', OpPrec.None);
 setTokenData(TokenID.Dot, NodeType.Dot, '.', OpPrec.None);
 setTokenData(TokenID.Comma, NodeType.Comma, ',', OpPrec.None);
 

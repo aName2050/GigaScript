@@ -11,27 +11,34 @@ import {
 } from '../ast/class.ast';
 import { evaluate } from './interpreter/interpreter';
 import { STATEMENT } from '../ast/ast';
+import { sourceFile } from '../..';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
 
+	const isGSXFile = sourceFile?.endsWith('.gsx');
+
 	// Native values
-	env.declareVar('true', NativeValues.True, true);
-	env.declareVar('false', NativeValues.False, true);
-	env.declareVar('null', NativeValues.Null, true);
-	env.declareVar('undefined', NativeValues.Undefined, true);
+	env.declareVar(isGSXFile ? 'nocap' : 'true', NativeValues.True, true);
+	env.declareVar(isGSXFile ? 'cap' : 'false', NativeValues.False, true);
+	env.declareVar(isGSXFile ? 'fake' : 'null', NativeValues.Null, true);
+	env.declareVar(
+		isGSXFile ? 'undefined' : 'undefined',
+		NativeValues.Undefined,
+		true
+	);
 
 	// Native variables
-	env.declareVar('error', NativeValues.Error, true);
+	env.declareVar(isGSXFile ? 'whoops' : 'error', NativeValues.Error, true);
 
 	// Native functions
-	env.declareVar('print', NativeFunctions.print, true);
+	env.declareVar(isGSXFile ? 'yap' : 'print', NativeFunctions.print, true);
 	env.declareVar(
 		'generateTimestamp',
 		NativeFunctions.generateTimestamp,
 		true
 	);
-	env.declareVar('math', NativeFunctions.math, true);
+	env.declareVar(isGSXFile ? 'nerd' : 'math', NativeFunctions.math, true);
 	env.declareVar('formatString', NativeFunctions.formatString, true);
 
 	return env;

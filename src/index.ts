@@ -112,7 +112,7 @@ if (debug) {
 }
 
 if (useCUDA) {
-	throw 'Tokenization using NVIDIA(R) CUDA(R) Cores';
+	throw 'Tokenization using NVIDIA(R) CUDA(R) Cores is currently not available';
 }
 
 const fileLocation: string = file ? path.parse(file).dir : '';

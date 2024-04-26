@@ -1,4 +1,4 @@
-import { DataConstructors, Value } from '../runtime/types';
+import { DataConstructors, GSNumber, Value } from '../runtime/types';
 import { getValue } from '../util/getValue';
 
 export const print = DataConstructors.NATIVEFN((args, scope) => {
@@ -26,6 +26,17 @@ export const math = DataConstructors.OBJECT(
 			DataConstructors.NATIVEFN((args, _scope) => {
 				const num = (args[0] as Value<'number', number>).value;
 				return DataConstructors.NUMBER(Math.sqrt(num));
+			})
+		)
+		.set(
+			'random',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				const max = (args[0] as GSNumber) || DataConstructors.NUMBER(1);
+				const min = (args[1] as GSNumber) || DataConstructors.NUMBER(0);
+
+				return DataConstructors.NUMBER(
+					Math.random() * (max.value - min.value) + min.value
+				);
 			})
 		)
 );

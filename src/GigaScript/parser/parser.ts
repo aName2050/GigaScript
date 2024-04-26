@@ -464,6 +464,8 @@ export default class Parser {
 				this.current().type == NodeType.Public ||
 				this.current().type == NodeType.Private
 			) {
+				// property notation
+				// <public | private> <static?> [IDENTIFIER] = [VALUE];
 				const startPos = this.current().__GSC._POS;
 				const isPublic = this.advance().type == NodeType.Public;
 

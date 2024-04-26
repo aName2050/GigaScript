@@ -1,9 +1,9 @@
-lit mutable be "hello" rn
-bro constant be "yoo" rn
+lit truthy be nocap rn
+lit falsey be cap rn
 
-print(mutable)
-print(constant)
+yap(truthy)
+yap(falsey)
 
-mutable be 'changed'
+"shoot 'error!!'"
 
-print(mutable)
+yap(nerd.random(1, 10))
