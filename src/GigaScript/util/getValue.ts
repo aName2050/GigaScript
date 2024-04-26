@@ -1,8 +1,10 @@
 import {
-	FuncVal,
+	ClassVal,
 	GSAny,
 	GSArray,
 	GSBoolean,
+	GSFunction,
+	GSNativeFn,
 	GSNull,
 	GSNumber,
 	GSObject,
@@ -33,13 +35,22 @@ export function getValue(
 
 			return obj;
 		case 'function':
-			const fn = value as FuncVal;
+			const fn = value as GSFunction;
 
 			return {
 				name: fn.name,
-				body: fn.body,
+				body: fn.body.body,
 				isNative: false,
 			};
+
+		case 'class':
+			const Class = value as ClassVal;
+
+			return {
+				name: Class.name,
+				instance: Class.instance,
+			};
+
 		case 'array':
 			let arr: Array<any> = [];
 

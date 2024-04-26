@@ -793,7 +793,7 @@ export default class Parser {
 				NodeType.Bitwise_AsgXOR,
 			].includes(this.current().type)
 		) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseAsgExpr();
 			return {
 				kind: 'AssignmentExpr',
@@ -985,7 +985,7 @@ export default class Parser {
 		let lhs = this.parseLogAnd();
 
 		while (this.current().type == NodeType.Or) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseLogOr();
 			lhs = {
 				kind: 'BinaryExpr',
@@ -1004,7 +1004,7 @@ export default class Parser {
 		let lhs = this.parseBitwiseOR();
 
 		while (this.current().type == NodeType.And) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseLogAnd();
 			lhs = {
 				kind: 'BinaryExpr',
@@ -1023,7 +1023,7 @@ export default class Parser {
 		let lhs = this.parseBitwiseXOR();
 
 		while (this.current().type == NodeType.Bitwise_OR) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseBitwiseOR();
 			lhs = {
 				kind: 'BitwiseExpr',
@@ -1042,7 +1042,7 @@ export default class Parser {
 		let lhs = this.parseBitwiseAND();
 
 		while (this.current().type == NodeType.Bitwise_XOR) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseBitwiseXOR();
 			lhs = {
 				kind: 'BitwiseExpr',
@@ -1061,7 +1061,7 @@ export default class Parser {
 		let lhs = this.parseEqualityExpr();
 
 		while (this.current().type == NodeType.Bitwise_AND) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseBitwiseAND();
 			lhs = {
 				kind: 'BitwiseExpr',
@@ -1087,7 +1087,7 @@ export default class Parser {
 				NodeType.GreaterThanOrEquals,
 			].includes(this.current().type)
 		) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseEqualityExpr();
 			lhs = {
 				kind: 'BinaryExpr',
@@ -1110,7 +1110,7 @@ export default class Parser {
 				this.current().type
 			)
 		) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseComparisonExpr();
 			lhs = {
 				kind: 'BinaryExpr',
@@ -1135,7 +1135,7 @@ export default class Parser {
 				NodeType.Bitwise_ZFRShift,
 			].includes(this.current().type)
 		) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseBitwiseSHIFT();
 			lhs = {
 				kind: 'BitwiseExpr',
@@ -1158,7 +1158,7 @@ export default class Parser {
 				this.current().type
 			)
 		) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseMultiplicativeExpr();
 			lhs = {
 				kind: 'BinaryExpr',
@@ -1177,7 +1177,7 @@ export default class Parser {
 		let lhs = this.parseCallMemberExpr();
 
 		while ([NodeType.Plus, NodeType.Minus].includes(this.current().type)) {
-			const op = this.advance().value;
+			const op = this.advance().type;
 			const rhs = this.parseAdditiveExpr();
 			lhs = {
 				kind: 'BinaryExpr',
@@ -1302,7 +1302,7 @@ export default class Parser {
 			return {
 				kind: 'UnaryExpr',
 				assigne,
-				operator: op.value,
+				operator: op.type,
 				start: assigne.start,
 				end: op.__GSC._POS.end,
 			} as UnaryExpr;
@@ -1317,7 +1317,7 @@ export default class Parser {
 			return {
 				kind: 'UnaryExpr',
 				assigne,
-				operator: op.value,
+				operator: op.type,
 				start: op.__GSC._POS.start,
 				end: assigne.end,
 			} as UnaryExpr;

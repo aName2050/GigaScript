@@ -14,10 +14,13 @@ import {
 	ObjectLiteral,
 } from '../../../ast/literals.ast';
 import { UnaryExpr } from '../../../ast/unary.ast';
+import { NodeType } from '../../../nodes';
+import { getTokenByTypeEnum } from '../../../tokens';
 import { getValue } from '../../../util/getValue';
 import { GSError } from '../../../util/gserror';
 import Environment from '../../env';
 import {
+	ClassVal,
 	DataConstructors,
 	FuncVal,
 	GSAny,
@@ -38,18 +41,18 @@ import { evalCodeBlock } from './statements';
 export function evalNumericBinaryExpr(
 	lhs: GSAny,
 	rhs: GSAny,
-	op: string
+	op: BinaryExpr['op']
 ): GSAny {
-	if (op === '!=') {
+	if (op === NodeType.NotEqual) {
 		return equals(lhs, rhs, false);
-	} else if (op === '==') {
+	} else if (op === NodeType.IsEqual) {
 		return equals(lhs, rhs, true);
-	} else if (op === '&&') {
+	} else if (op === NodeType.And) {
 		const blhs = lhs as GSBoolean;
 		const brhs = rhs as GSBoolean;
 
 		return DataConstructors.BOOLEAN(blhs.value && brhs.value);
-	} else if (op === '||') {
+	} else if (op === NodeType.Or) {
 		const blhs = lhs as GSBoolean;
 		const brhs = rhs as GSBoolean;
 
@@ -59,31 +62,41 @@ export function evalNumericBinaryExpr(
 		const nrhs = rhs as GSNumber;
 
 		switch (op) {
-			case '+':
+			case NodeType.Plus:
 				return DataConstructors.NUMBER(nlhs.value + nrhs.value);
 
-			case '-':
+			case NodeType.Minus:
 				return DataConstructors.NUMBER(nlhs.value - nrhs.value);
 
-			case '*':
+			case NodeType.Multiply:
 				return DataConstructors.NUMBER(nlhs.value * nrhs.value);
 
-			case '/':
+			case NodeType.Divide:
 				return DataConstructors.NUMBER(nlhs.value / nrhs.value);
 
-			case '%':
+			case NodeType.Modulo:
 				return DataConstructors.NUMBER(nlhs.value % nrhs.value);
 
-			case '<':
+			case NodeType.LessThan:
 				return DataConstructors.BOOLEAN(nlhs.value < nrhs.value);
 
-			case '>':
+			case NodeType.GreaterThan:
 				return DataConstructors.BOOLEAN(nlhs.value > nrhs.value);
+
+			case NodeType.LessThanOrEquals:
+				return DataConstructors.BOOLEAN(nlhs.value <= nrhs.value);
+
+			case NodeType.GreaterThanOrEquals:
+				return DataConstructors.BOOLEAN(nlhs.value >= nrhs.value);
 
 			default:
 				throw new GSError(
 					'RuntimeError',
-					`unknown operator "${op}" in operation ${lhs.value} ${op} ${rhs.value}`,
+					`unknown operator "${
+						getTokenByTypeEnum(op)?.value
+					}" in operation "${lhs.value} ${
+						getTokenByTypeEnum(op)?.value
+					} ${rhs.value}"`,
 					`${sourceFile}`
 				);
 		}
@@ -108,23 +121,23 @@ export function evalBitwiseExpr(expr: BitwiseExpr, env: Environment): GSAny {
 		const nrhs = rhs as GSNumber;
 
 		switch (expr.op) {
-			case '&':
+			case NodeType.Bitwise_AND:
 				return DataConstructors.NUMBER(nlhs.value & nrhs.value);
-			case '|':
+			case NodeType.Bitwise_OR:
 				return DataConstructors.NUMBER(nlhs.value | nrhs.value);
-			case '^':
+			case NodeType.Bitwise_XOR:
 				return DataConstructors.NUMBER(nlhs.value ^ nrhs.value);
-			case '<<':
+			case NodeType.Bitwise_LShift:
 				return DataConstructors.NUMBER(nlhs.value << nrhs.value);
-			case '>>':
+			case NodeType.Bitwise_SRShift:
 				return DataConstructors.NUMBER(nlhs.value >> nrhs.value);
-			case '>>>':
+			case NodeType.Bitwise_ZFRShift:
 				return DataConstructors.NUMBER(nlhs.value >>> nrhs.value);
 
 			default:
 				throw new GSError(
 					'EvalError',
-					`Unknown bitwise operator "${expr.op}"`,
+					`Unknown bitwise operator "${getTokenByTypeEnum(expr.op)}"`,
 					`${sourceFile}:${expr.start.Line}:${expr.start.Column}`
 				);
 		}
@@ -194,6 +207,11 @@ function equals(lhs: GSAny, rhs: GSAny, strict: boolean): GSAny {
 				compare((lhs as NativeFnVal).call, (rhs as NativeFnVal).call)
 			);
 
+		case 'class':
+			return DataConstructors.BOOLEAN(
+				compare((lhs as ClassVal).instance, (rhs as ClassVal).instance)
+			);
+
 		default:
 			throw new GSError(
 				'RuntimeError',
@@ -225,7 +243,8 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 
 	const op = node.AsgOp;
 
-	if (op == '=') return env.assignVar(varName, evaluate(node.value, env));
+	if (op == NodeType.Equals)
+		return env.assignVar(varName, evaluate(node.value, env));
 
 	const value = evaluate(node.value, env);
 	let variable = env.lookupVar(varName);
@@ -245,7 +264,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 
 	if (type == 'number') {
 		switch (op) {
-			case '+=':
+			case NodeType.AsgAdd:
 				return env.assignVar(
 					varName,
 					DataConstructors.NUMBER(
@@ -253,7 +272,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 							evaluate(node.value, env).value
 					)
 				);
-			case '-=':
+			case NodeType.AsgMin:
 				return env.assignVar(
 					varName,
 					DataConstructors.NUMBER(
@@ -261,7 +280,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 							evaluate(node.value, env).value
 					)
 				);
-			case '*=':
+			case NodeType.AsgMult:
 				return env.assignVar(
 					varName,
 					DataConstructors.NUMBER(
@@ -269,7 +288,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 							evaluate(node.value, env).value
 					)
 				);
-			case '/=':
+			case NodeType.AsgDiv:
 				return env.assignVar(
 					varName,
 					DataConstructors.NUMBER(
@@ -277,7 +296,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 							evaluate(node.value, env).value
 					)
 				);
-			case '%=':
+			case NodeType.AsgMod:
 				return env.assignVar(
 					varName,
 					DataConstructors.NUMBER(
@@ -295,7 +314,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 		}
 	} else if (type == 'string') {
 		switch (op) {
-			case '+=':
+			case NodeType.AsgAdd:
 				return env.assignVar(
 					varName,
 					DataConstructors.STRING(
@@ -303,13 +322,13 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 							evaluate(node.value, env).value
 					)
 				);
-			case '-=':
+			case NodeType.AsgAdd:
 				return DataConstructors.NUMBER(NaN);
-			case '*=':
+			case NodeType.AsgMult:
 				return DataConstructors.NUMBER(NaN);
-			case '/=':
+			case NodeType.AsgDiv:
 				return DataConstructors.NUMBER(NaN);
-			case '%=':
+			case NodeType.AsgDiv:
 				return DataConstructors.NUMBER(NaN);
 
 			default:
@@ -321,7 +340,7 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 		}
 	} else if (type == 'boolean') {
 		switch (op) {
-			case '+=':
+			case NodeType.AsgAdd:
 				return env.assignVar(
 					varName,
 					DataConstructors.BOOLEAN(
@@ -329,13 +348,13 @@ export function evalAssignment(node: AssignmentExpr, env: Environment): GSAny {
 							evaluate(node.value, env).value
 					)
 				);
-			case '-=':
+			case NodeType.AsgAdd:
 				return DataConstructors.NUMBER(NaN);
-			case '*=':
+			case NodeType.AsgMult:
 				return DataConstructors.NUMBER(NaN);
-			case '/=':
+			case NodeType.AsgDiv:
 				return DataConstructors.NUMBER(NaN);
-			case '%=':
+			case NodeType.AsgDiv:
 				return DataConstructors.NUMBER(NaN);
 
 			default:
@@ -497,7 +516,7 @@ export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
 	const op = node.operator;
 	const assigne = evaluate(node.assigne, env);
 
-	if (op == '++') {
+	if (op == NodeType.Increment) {
 		if (assigne.type == 'number') {
 			assigne.value++;
 			return assigne;
@@ -510,7 +529,7 @@ export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
 				)
 			);
 		}
-	} else if (op == '--') {
+	} else if (op == NodeType.Decrement) {
 		if (assigne.type == 'number') {
 			assigne.value--;
 			return assigne;
@@ -521,7 +540,7 @@ export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
 				`${sourceFile}:${node.start.Line}:${node.start.Column}`
 			);
 		}
-	} else if (op == '~') {
+	} else if (op == NodeType.Bitwise_NOT) {
 		if (assigne.type == 'number') {
 			// Bitwise Op
 			return DataConstructors.NUMBER(~assigne.value);
@@ -532,12 +551,12 @@ export function evalUnaryExpr(node: UnaryExpr, env: Environment): GSAny {
 				`${sourceFile}:${node.start.Line}:${node.start.Column}`
 			);
 		}
-	} else if (op == '!') {
+	} else if (op == NodeType.Not) {
 		return DataConstructors.BOOLEAN(!assigne.value);
 	} else {
 		throw new GSError(
 			'RuntimeError',
-			`Unknown operator "${op}"`,
+			`Unknown operator "${getTokenByTypeEnum(op)}"`,
 			`${sourceFile}:${node.start.Line}:${node.start.Column}`
 		);
 	}

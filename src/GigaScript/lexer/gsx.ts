@@ -613,7 +613,7 @@ export function tokenizeGSX(source: string): Token[] {
 		)
 	);
 
-	console.log(tokens);
+	// console.log(tokens);
 
 	return tokens;
 }
