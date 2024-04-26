@@ -1,4 +1,4 @@
-import { DataConstructors, GSNumber, Value } from '../runtime/types';
+import { DataConstructors, GSNumber, GSString } from '../runtime/types';
 import { getValue } from '../util/getValue';
 
 export const print = DataConstructors.NATIVEFN((args, scope) => {
@@ -24,7 +24,7 @@ export const math = DataConstructors.OBJECT(
 		.set(
 			'sqrt',
 			DataConstructors.NATIVEFN((args, _scope) => {
-				const num = (args[0] as Value<'number', number>).value;
+				const num = (args[0] as GSNumber).value;
 				return DataConstructors.NUMBER(Math.sqrt(num));
 			})
 		)
@@ -42,12 +42,12 @@ export const math = DataConstructors.OBJECT(
 );
 
 export const formatString = DataConstructors.NATIVEFN((args, scope) => {
-	const str = args.shift() as Value<'string', string>;
+	const str = args.shift() as GSString;
 
 	let out = '';
 
 	for (let i = 0; i < args.length; i++) {
-		const arg = args[i] as Value<'string', string>;
+		const arg = args[i] as GSString;
 
 		out = str.value.replace(/\${}/, arg.value);
 	}
