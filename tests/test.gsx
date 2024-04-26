@@ -7,3 +7,13 @@ yap(falsey)
 "shoot 'error!!'"
 
 yap(nerd.random(1, 10))
+
+bro object be {
+    x is 32,
+    truthy,
+    complex is {
+        more is 'hello'
+    }
+} rn
+
+yap(object)
