@@ -5,13 +5,14 @@ import { MemberExpr } from '../ast/expressions.ast';
 import { Identifier } from '../ast/literals.ast';
 import { ClassBody } from '../types';
 import {
+	ClassDeclaration,
 	ClassMethod,
 	ClassProperty,
 	ConstructorStatement,
 } from '../ast/class.ast';
 import { evaluate } from './interpreter/interpreter';
 import { STATEMENT } from '../ast/ast';
-import { sourceFile } from '../..';
+import { sourceFile } from '../../index';
 
 export function createGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
@@ -50,7 +51,7 @@ export default class Environment {
 	private constants: Set<string>;
 	private classes: Map<string, ClassBody>;
 	public cwd: string;
-	private Exports: Map<string, GSAny>;
+	private Exports: Map<string, GSAny | ClassDeclaration>;
 
 	constructor(currentWorkingDirectory: string, parentEnv?: Environment) {
 		this.parent = parentEnv;
@@ -63,12 +64,15 @@ export default class Environment {
 		this.cwd = currentWorkingDirectory;
 	}
 
-	public addExport(identifier: string, value: GSAny): void {
+	public addExport(
+		identifier: string,
+		value: GSAny | ClassDeclaration
+	): void {
 		this.Exports.set(identifier, value);
 		return;
 	}
 
-	public get exports(): Map<string, GSAny> {
+	public get exports(): Map<string, GSAny | ClassDeclaration> {
 		return this.Exports;
 	}
 
@@ -80,7 +84,7 @@ export default class Environment {
 		isConstant: boolean
 	): GSAny {
 		if (this.variables.has(identifier))
-			throw `Cannot redeclare variable "${identifier}"`;
+			throw `EvalError: Cannot redeclare variable "${identifier}"`;
 
 		this.variables.set(identifier, value);
 
@@ -101,7 +105,7 @@ export default class Environment {
 		const env = this.resolve(identifer);
 
 		if (env.constants.has(identifer) && !overrideConstant)
-			throw `Can not reassign "${identifer}" because it is a cosntant`;
+			throw `EvalError: Can not reassign "${identifer}" because it is a cosntant`;
 
 		env.variables.set(identifer, value);
 
@@ -120,7 +124,7 @@ export default class Environment {
 	public resolve(identifer: string): Environment {
 		if (this.variables.has(identifer)) return this;
 		if (this.parent == undefined)
-			throw `Unable to resolve variable "${identifer}" as it doesn't exist`;
+			throw `EvalError: Unable to resolve variable "${identifer}" as it doesn't exist`;
 
 		return this.parent.resolve(identifer);
 	}
@@ -132,7 +136,7 @@ export default class Environment {
 			const value = this.lookupObjectValue(expr.object as MemberExpr);
 
 			if (value == undefined) {
-				throw `Property "${
+				throw `EvalError: Property "${
 					expr.property.symbol
 				}" does't exist on object "${
 					(expr.object as Identifier).symbol
@@ -155,9 +159,9 @@ export default class Environment {
 		const prop = object.properties.get(expr.property.symbol);
 
 		if (!prop)
-			throw `Property ${expr.property.symbol} does not exist on object "${
-				(expr.object as Identifier).symbol
-			}"`;
+			throw `EvalError: Property ${
+				expr.property.symbol
+			} does not exist on object "${(expr.object as Identifier).symbol}"`;
 
 		return prop;
 	}
@@ -191,7 +195,7 @@ export default class Environment {
 			const value = this.lookupObjectValue(expr.object as MemberExpr);
 
 			if (value == undefined) {
-				throw `Property "${
+				throw `EvalError: Property "${
 					expr.property.symbol
 				}" does't exist on object "${
 					(expr.object as Identifier).symbol
@@ -212,9 +216,9 @@ export default class Environment {
 		const prop = object.properties.get(expr.property.symbol);
 
 		if (!prop)
-			throw `Property ${expr.property.symbol} does not exist on object "${
-				(expr.object as Identifier).symbol
-			}"`;
+			throw `EvalError: Property ${
+				expr.property.symbol
+			} does not exist on object "${(expr.object as Identifier).symbol}"`;
 
 		return prop;
 	}

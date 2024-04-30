@@ -85,7 +85,12 @@ if (noCrash) {
 	try {
 		installedModules = readExternalGSModules();
 	} catch (e) {
-		if (!silence) console.log(e);
+		if (!silence) {
+			console.log(
+				'An error occurred while reading the ".gsmodules" folder.'
+			);
+			console.log(e);
+		}
 	}
 } else {
 	installedModules = readExternalGSModules();
@@ -117,7 +122,7 @@ if (useCUDA) {
 
 const fileLocation: string = file ? path.parse(file).dir : '';
 
-const srcFileLocStr: string | undefined = file ? path.resolve(file) : undefined;
+const srcFileLocStr: string = file ? path.resolve(file) : 'GSREPL';
 
 export { CLIArgs, srcFileLocStr as sourceFile, useCUDA };
 

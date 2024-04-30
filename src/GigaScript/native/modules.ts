@@ -1,11 +1,10 @@
 import { Program } from '../ast/ast';
 import Parser from '../parser/parser';
-import Environment, { createGlobalScope } from '../runtime/env';
+import { createGlobalScope } from '../runtime/env';
 import { evaluate } from '../runtime/interpreter/interpreter';
 import {
 	DataConstructors,
 	GSAny,
-	GSFunction,
 	GSNumber,
 	GSObject,
 	GSString,
@@ -14,10 +13,14 @@ import {
 import * as OS from 'node:os';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
+import { ClassDeclaration } from '../ast/class.ast';
 
 export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs', 'node'];
 
-export const Modules: Map<string, Map<string, GSAny>> = new Map()
+export const Modules: Map<
+	string,
+	Map<string, GSAny | ClassDeclaration>
+> = new Map()
 	.set(
 		'gigascript',
 		new Map()

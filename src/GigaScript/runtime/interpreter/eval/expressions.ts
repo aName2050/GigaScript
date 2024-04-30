@@ -465,7 +465,7 @@ export function evalNewClassInstanceExpr(
 ): GSObject {
 	const classObj = env.getClassAsObjectLiteral(expr.name);
 
-	const constructor = classObj.instance.properties.get(
+	const constructor: FuncVal = classObj.instance.properties.get(
 		'constructor'
 	) as FuncVal;
 
@@ -477,24 +477,26 @@ export function evalNewClassInstanceExpr(
 
 	classEnv.declareVar('this', localClassObj, true);
 
-	const constructorEnv = new Environment(
-		classEnv.cwd,
-		classEnv as Environment
-	);
-
-	// eval constructor statement
-	if (expr.args.length != constructor.params.length)
-		throw `RuntimeError: constructor expected ${constructor.params.length} arguments, instead got ${expr.args.length}`;
-
-	constructor.params.forEach((param, i) => {
-		constructorEnv.declareVar(
-			param,
-			evaluate(expr.args[i], constructorEnv),
-			false
+	if (constructor) {
+		const constructorEnv = new Environment(
+			classEnv.cwd,
+			classEnv as Environment
 		);
-	});
 
-	evalCodeBlock(constructor.body, constructorEnv, false);
+		// eval constructor statement
+		if (expr.args.length != constructor.params.length)
+			throw `RuntimeError: constructor expected ${constructor.params.length} arguments, instead got ${expr.args.length}`;
+
+		constructor.params.forEach((param, i) => {
+			constructorEnv.declareVar(
+				param,
+				evaluate(expr.args[i], constructorEnv),
+				false
+			);
+		});
+
+		evalCodeBlock(constructor.body, constructorEnv, false);
+	}
 
 	return classObj.instance;
 }

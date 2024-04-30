@@ -5,6 +5,7 @@ import Parser from '../parser/parser';
 import { Program } from '../ast/ast';
 import { createGlobalScope } from '../runtime/env';
 import { evaluate } from '../runtime/interpreter/interpreter';
+import { GSString } from '../runtime/types';
 
 export function readExternalGSModules(): Array<GSModule> {
 	const moduleDir = path.join(process.cwd(), '.gsmodules');
@@ -26,7 +27,7 @@ export function readExternalGSModules(): Array<GSModule> {
 		const env = createGlobalScope(moduleDir);
 		evaluate(program, env);
 
-		const moduleName = env.exports.get('MODULE_NAME')?.value;
+		const moduleName = (env.exports.get('MODULE_NAME') as GSString).value;
 		if (!moduleName)
 			throw `ModuleError: Unable to read file "${path.join(
 				moduleDir,

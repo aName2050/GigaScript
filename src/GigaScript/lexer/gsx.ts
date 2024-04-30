@@ -1,4 +1,4 @@
-import { sourceFile } from '../..';
+import { sourceFile } from '../../index';
 import { GSX_Tokens, createGSXToken, getGSXTokenByValue } from '../gsx.tokens';
 import { NodeType } from '../nodes';
 import { Token, TokenID } from '../tokens';

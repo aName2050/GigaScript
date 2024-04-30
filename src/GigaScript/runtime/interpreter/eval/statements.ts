@@ -25,7 +25,7 @@ import Parser from '../../../parser/parser';
 import * as fs from 'node:fs';
 import { Identifier } from '../../../ast/literals.ast';
 import { GSError } from '../../../util/gserror';
-import { sourceFile } from '../../../..';
+import { sourceFile } from '../../../../index';
 import { ClassDeclaration } from '../../../ast/class.ast';
 import { IfStatement } from '../../../ast/conditionals.ast';
 import { ModuleNames, Modules } from '../../../native/modules';
@@ -143,8 +143,17 @@ export function evalImportStatement(
 			for (let j = 0; j < imports.length; j++) {
 				if (exports[i][0] == imports[j][0]) {
 					const identifier = imports[j][1] as string;
-					const value = exports[i][1] as GSAny;
-					env.declareVar(identifier, value, true);
+					const value = exports[i][1];
+
+					if ((value as ClassDeclaration).name) {
+						const Class = value as ClassDeclaration;
+						env.declareClass(
+							Class.name,
+							Class.properties,
+							Class.methods,
+							Class.constructor
+						);
+					} else env.declareVar(identifier, value as GSAny, true);
 				}
 			}
 		}
@@ -173,15 +182,25 @@ export function evalImportStatement(
 			for (let j = 0; j < imports.length; j++) {
 				if (exports[i][0] == imports[j][0]) {
 					const identifier = imports[j][1] as string;
-					const value = exports[i][1] as GSAny;
-					env.declareVar(identifier, value, true);
+					const value = exports[i][1];
+					console.log(value);
+					if ((value as ClassDeclaration).name) {
+						env.declareClass(
+							(value as ClassDeclaration).name,
+							(value as ClassDeclaration).properties,
+							(value as ClassDeclaration).methods,
+							(value as ClassDeclaration).constructor
+						);
+					} else env.declareVar(identifier, value as GSAny, true);
 				}
 			}
 		}
 	} else if (fileLocation.endsWith('.gsx')) {
-		throw 'Not implemented';
+		throw 'RuntimeError: importing GSX files is currently not supported';
 	} else {
-		throw `Unsupported file type "${path.extname(fileLocation)}`;
+		throw `RuntimeError: Unsupported file type "${path.extname(
+			fileLocation
+		)}`;
 	}
 
 	return DataConstructors.NULL();
@@ -202,6 +221,11 @@ export function evalExportStatement(
 		env.addExport((node.value as FunctionDeclaration).name, exportedValue);
 	} else if (node.value.kind == 'Identifier') {
 		env.addExport((node.value as Identifier).symbol, exportedValue);
+	} else if (node.value.kind == 'ClassDeclaration') {
+		env.addExport(
+			(node.value as ClassDeclaration).name,
+			node.value as ClassDeclaration
+		);
 	} else {
 		throw new GSError(
 			'RuntimeError',
