@@ -5,10 +5,16 @@ export class Map {
 
     public set(k, v) {
         this.object[k] = v
+        print(k, v)
         return v;
     }
 
     public get(k) {
+        print(k, this.object[k])
         return this.object[k];
+    }
+
+    public getAll() {
+        return this.object;
     }
 }

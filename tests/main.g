@@ -7,3 +7,5 @@ map.set('test2', 64)
 
 print(map.get('test'))
 print(map.get('test2'))
+
+print(map.getAll())
