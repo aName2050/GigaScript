@@ -378,6 +378,18 @@ export function evalMemberExpr(
 	expr?: MemberExpr | null
 ): GSAny {
 	if (expr) {
+		expr = {
+			kind: 'MemberExpr',
+			object: expr.object,
+			property: {
+				kind: 'Identifier',
+				symbol: env.lookupVar(expr.property.symbol).value,
+			} as Identifier,
+			computed: expr.computed,
+			start: expr.start,
+			end: expr.end,
+		} as MemberExpr;
+
 		const Var = env.lookupObjectValue(expr);
 
 		return Var;

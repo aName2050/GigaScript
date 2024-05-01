@@ -1,5 +1,3 @@
-// TODO: replace raw string values with NodeType within AST output
-
 import { sourceFile } from '../../index';
 import { AssignmentExpr } from '../ast/assignments.ast';
 import { CodeBlockNode, EXPRESSION, Program, STATEMENT } from '../ast/ast';
@@ -1252,6 +1250,25 @@ export default class Parser {
 				// computed values, like "foo[bar]"
 				computed = true;
 				property = this.parseExpr();
+				if (
+					property.kind != 'StringLiteral' &&
+					property.kind != 'Identifier'
+				) {
+					throw new ParseError(
+						'ComputedObjectError: computed objects can only use STRINGS or IDENTIFIERS',
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					);
+				}
+
+				if (property.kind == 'StringLiteral') {
+					property = {
+						kind: 'Identifier',
+						symbol: (property as StringLiteral).value,
+						start: property.start,
+						end: property.end,
+					} as Identifier;
+				}
+
 				this.expect(
 					NodeType.CloseBracket,
 					'following computed object member expression'
