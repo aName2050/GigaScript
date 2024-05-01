@@ -139,17 +139,29 @@ export const Modules: Map<
 	)
 	.set(
 		'path',
-		new Map().set(
-			'resolve',
-			DataConstructors.NATIVEFN((args, _scope) => {
-				let paths: Array<string> = [];
-				args.forEach(arg => {
-					paths.push((arg as GSString).value);
-				});
+		new Map()
+			.set(
+				'resolve',
+				DataConstructors.NATIVEFN((args, _scope) => {
+					let paths: Array<string> = [];
+					args.forEach(arg => {
+						paths.push((arg as GSString).value);
+					});
 
-				return DataConstructors.STRING(path.resolve(...paths));
-			})
-		)
+					return DataConstructors.STRING(path.resolve(...paths));
+				})
+			)
+			.set(
+				'join',
+				DataConstructors.NATIVEFN((args, _scope) => {
+					let paths: Array<string> = [];
+					args.forEach(arg => {
+						paths.push((arg as GSString).value);
+					});
+
+					return DataConstructors.STRING(path.join(...paths));
+				})
+			)
 	)
 	.set(
 		'node',
