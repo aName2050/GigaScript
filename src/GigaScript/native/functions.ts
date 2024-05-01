@@ -41,7 +41,7 @@ export const math = DataConstructors.OBJECT(
 		)
 );
 
-export const formatString = DataConstructors.NATIVEFN((args, scope) => {
+export const formatString = DataConstructors.NATIVEFN((args, _scope) => {
 	const str = args.shift() as GSString;
 
 	let out = '';

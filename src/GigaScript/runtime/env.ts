@@ -78,6 +78,10 @@ export default class Environment {
 
 	// VARIABLES
 
+	public get Variables(): Map<string, GSAny> {
+		return this.variables;
+	}
+
 	public declareVar(
 		identifier: string,
 		value: GSAny,
@@ -156,7 +160,16 @@ export default class Environment {
 
 		let object = env.variables.get(varName) as GSObject;
 
-		const prop = object.properties.get(expr.property.symbol);
+		let prop = object.properties.get(expr.property.symbol);
+
+		console.log(
+			env.Variables.has(expr.property.symbol),
+			expr.property.symbol
+		);
+
+		if (env.Variables.has(expr.property.symbol)) {
+			prop = env.lookupVar(expr.property.symbol);
+		}
 
 		if (!prop)
 			throw `EvalError: Property ${
