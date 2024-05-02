@@ -1,4 +1,11 @@
-import { ClassVal, DataConstructors, FuncVal, GSAny, GSObject } from './types';
+import {
+	ClassVal,
+	DataConstructors,
+	FuncVal,
+	GSAny,
+	GSObject,
+	GSString,
+} from './types';
 import * as NativeFunctions from '../native/functions';
 import * as NativeValues from '../native/valueKeywords';
 import { MemberExpr } from '../ast/expressions.ast';
@@ -136,71 +143,98 @@ export default class Environment {
 	// OBJECTS
 
 	public lookupObjectValue(expr: MemberExpr): GSAny {
-		if (expr.object.kind == 'MemberExpr') {
-			const value = this.lookupObjectValue(expr.object as MemberExpr);
+		if (expr.computed) {
+			const object = this.getObject(expr);
+			const prop = evaluate(expr.property, this);
 
-			if (value == undefined) {
-				throw `EvalError: Property "${
-					expr.property.symbol
-				}" does't exist on object "${
+			if (object.type == 'object') {
+				return (object as GSObject).properties.get(
+					(prop as GSString).value
+				)!;
+			} else {
+				throw `EvalError: Property "${prop}" does not exist on object "${
 					(expr.object as Identifier).symbol
 				}"`;
 			}
+		} else {
+			if (expr.object.kind == 'MemberExpr') {
+				const value = this.lookupObjectValue(expr.object as MemberExpr);
 
-			if (value.type == 'object')
-				return (value as GSObject).properties.get(
+				if (value == undefined) {
+					throw `EvalError: Property "${
+						expr.property.symbol
+					}" does't exist on object "${
+						(expr.object as Identifier).symbol
+					}"`;
+				}
+
+				if (value.type == 'object')
+					return (value as GSObject).properties.get(
+						expr.property.symbol
+					)!;
+				else return value;
+			}
+
+			const varName = (expr.object as Identifier).symbol;
+			const env = this.resolve(varName);
+			// varName == 'this' ? (this as Environment) : this.resolve(varName);
+
+			let object = env.variables.get(varName) as GSObject;
+
+			let prop = object.properties.get(expr.property.symbol);
+
+			if (env.Variables.has(expr.property.symbol)) {
+				prop = env.lookupVar(expr.property.symbol);
+			}
+
+			if (!prop)
+				throw `EvalError: Property ${
 					expr.property.symbol
-				)!;
-			else return value;
+				} does not exist on object "${
+					(expr.object as Identifier).symbol
+				}"`;
+
+			return prop;
 		}
-
-		const varName = (expr.object as Identifier).symbol;
-		const env = this.resolve(varName);
-		// varName == 'this' ? (this as Environment) : this.resolve(varName);
-
-		let object = env.variables.get(varName) as GSObject;
-
-		let prop = object.properties.get(expr.property.symbol);
-
-		console.log(
-			env.Variables.has(expr.property.symbol),
-			expr.property.symbol
-		);
-
-		if (env.Variables.has(expr.property.symbol)) {
-			prop = env.lookupVar(expr.property.symbol);
-		}
-
-		if (!prop)
-			throw `EvalError: Property ${
-				expr.property.symbol
-			} does not exist on object "${(expr.object as Identifier).symbol}"`;
-
-		return prop;
 	}
 
 	public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
-		if (expr.object.kind == 'MemberExpr') {
-			let obj = this.getObject(expr.object as MemberExpr);
+		if (expr.computed) {
+			const object = this.getObject(expr);
+			const prop = evaluate(expr.property, this);
 
-			if (obj.type == 'object') {
-				(obj as GSObject).properties.set(
-					expr.property.symbol,
+			if (object.type == 'object') {
+				(object as GSObject).properties.set(
+					(prop as GSString).value,
 					newValue
 				);
+				return object;
+			} else {
+				throw `EvalError: Cannot modify property of "${prop}" of non-object`;
+			}
+		} else {
+			if (expr.object.kind == 'MemberExpr') {
+				let obj = this.getObject(expr.object as MemberExpr);
+
+				if (obj.type == 'object') {
+					(obj as GSObject).properties.set(
+						expr.property.symbol,
+						newValue
+					);
+				}
+
+				return obj;
 			}
 
-			return obj;
+			const objectIdentifer = (expr.object as Identifier).symbol;
+			const env = this.resolve(objectIdentifer);
+
+			const object = env.variables.get(objectIdentifer) as GSObject;
+
+			object.properties.set(expr.property.symbol, newValue);
+
+			return object;
 		}
-
-		const objectIdentifer = (expr.object as Identifier).symbol;
-		const env = this.resolve(objectIdentifer);
-
-		const object = env.variables.get(objectIdentifer) as GSObject;
-
-		object.properties.set(expr.property.symbol, newValue);
-
-		return object;
 	}
 
 	private getObject(expr: MemberExpr): GSAny {

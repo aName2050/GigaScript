@@ -15,14 +15,7 @@ import path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { ClassDeclaration } from '../ast/class.ast';
 
-export const ModuleNames: string[] = [
-	'gigascript',
-	'os',
-	'path',
-	'fs',
-	'node',
-	'gs:map',
-];
+export const ModuleNames: string[] = ['gigascript', 'os', 'path', 'fs', 'node'];
 
 export const Modules: Map<
 	string,
@@ -182,6 +175,3 @@ export const Modules: Map<
 			)
 		)
 	);
-
-// TODO: re-implement Maps
-// .set('gs:map', new Map().set('Map', {} as ClassDeclaration));

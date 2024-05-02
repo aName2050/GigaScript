@@ -1267,6 +1267,13 @@ export default class Parser {
 						start: property.start,
 						end: property.end,
 					} as Identifier;
+				} else {
+					property = {
+						kind: 'Identifier',
+						symbol: (property as Identifier).symbol,
+						start: property.start,
+						end: property.end,
+					} as Identifier;
 				}
 
 				this.expect(
