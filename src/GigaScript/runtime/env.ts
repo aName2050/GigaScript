@@ -147,15 +147,9 @@ export default class Environment {
 			const object = this.getObject(expr);
 			const prop = evaluate(expr.property, this);
 
-			if (object.type == 'object') {
-				return (object as GSObject).properties.get(
-					(prop as GSString).value
-				)!;
-			} else {
-				throw `EvalError: Property "${prop}" does not exist on object "${
-					(expr.object as Identifier).symbol
-				}"`;
-			}
+			console.log(prop);
+
+			return DataConstructors.NULL();
 		} else {
 			if (expr.object.kind == 'MemberExpr') {
 				const value = this.lookupObjectValue(expr.object as MemberExpr);
@@ -203,15 +197,7 @@ export default class Environment {
 			const object = this.getObject(expr);
 			const prop = evaluate(expr.property, this);
 
-			if (object.type == 'object') {
-				(object as GSObject).properties.set(
-					(prop as GSString).value,
-					newValue
-				);
-				return object;
-			} else {
-				throw `EvalError: Cannot modify property of "${prop}" of non-object`;
-			}
+			return DataConstructors.NULL();
 		} else {
 			if (expr.object.kind == 'MemberExpr') {
 				let obj = this.getObject(expr.object as MemberExpr);
