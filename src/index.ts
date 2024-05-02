@@ -260,9 +260,13 @@ function runFile(filename: string, location: string) {
 
 		return res;
 	} else {
-		throw `${file
-			.split('.')
-			.pop()} is not a supported file type. ".g" and ".gsx" are the only supported types.`;
+		throw new GSError(
+			'FileReadError',
+			`"${srcFileLocStr
+				.split('.')
+				.pop()}" is not a supported file type. Only ".g" and ".gsx" are supported`,
+			`${srcFileLocStr}`
+		);
 	}
 }
 
