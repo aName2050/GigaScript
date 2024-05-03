@@ -1263,14 +1263,14 @@ export default class Parser {
 				if (property.kind == 'StringLiteral') {
 					property = {
 						kind: 'Identifier',
-						symbol: (property as StringLiteral).value,
+						symbol: 'PROP_' + (property as StringLiteral).value,
 						start: property.start,
 						end: property.end,
 					} as Identifier;
 				} else {
 					property = {
 						kind: 'Identifier',
-						symbol: (property as Identifier).symbol,
+						symbol: 'VAR_' + (property as Identifier).symbol,
 						start: property.start,
 						end: property.end,
 					} as Identifier;

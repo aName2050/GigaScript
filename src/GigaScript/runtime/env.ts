@@ -156,22 +156,24 @@ export default class Environment {
 
 			if (value.type == 'object')
 				return (value as GSObject).properties.get(
-					this.lookupVar(expr.property.symbol).value
+					expr.property.symbol.split('PROP_')[0] == 'PROP_'
+						? expr.property.symbol.split('_')[1]
+						: this.lookupVar(expr.property.symbol.split('VAR_')[1])
+								.value
 				)!;
 			else return value;
 		}
 
 		const varName = (expr.object as Identifier).symbol;
 		const env = this.resolve(varName);
-		// varName == 'this' ? (this as Environment) : this.resolve(varName);
 
 		let object = env.variables.get(varName) as GSObject;
 
-		let prop = object.properties.get(expr.property.symbol);
-
-		if (env.Variables.has(expr.property.symbol)) {
-			prop = env.lookupVar(expr.property.symbol);
-		}
+		const prop = object.properties.get(
+			expr.property.symbol.split('_')[0] == 'PROP_'
+				? expr.property.symbol.split('_')[1]
+				: this.lookupVar(expr.property.symbol.split('_')[1]).value
+		);
 
 		if (!prop)
 			throw `EvalError: Property ${
@@ -185,9 +187,14 @@ export default class Environment {
 		if (expr.object.kind == 'MemberExpr') {
 			let obj = this.getObject(expr.object as MemberExpr);
 
+			console.log(expr.property.symbol);
+
 			if (obj.type == 'object') {
 				(obj as GSObject).properties.set(
-					expr.property.symbol,
+					expr.property.symbol.split('_')[0] == 'PROP_'
+						? expr.property.symbol.split('_')[1]
+						: this.lookupVar(expr.property.symbol.split('_')[1])
+								.value,
 					newValue
 				);
 			}
@@ -200,7 +207,12 @@ export default class Environment {
 
 		const object = env.variables.get(objectIdentifer) as GSObject;
 
-		object.properties.set(expr.property.symbol, newValue);
+		object.properties.set(
+			expr.property.symbol.split('_')[0] == 'PROP_'
+				? expr.property.symbol.split('_')[1]
+				: this.lookupVar(expr.property.symbol.split('_')[1]).value,
+			newValue
+		);
 
 		return object;
 	}
