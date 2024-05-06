@@ -22,14 +22,25 @@ export function readExternalGSModules(): Array<GSModule> {
 			encoding: 'utf-8',
 		});
 		const parser = new Parser();
-		parser.tokenizeSource(file);
-		const program: Program = parser.generateAST();
+		try {
+			parser.tokenizeSource(file);
+		} catch (e) {
+			console.log(`${parser.tokenizeSource(file)}`);
+			console.log(e);
+		}
+		let program: Program;
+		try {
+			program = parser.generateAST();
+		} catch (e) {
+			console.log(`${parser.tokenizeSource(file)}`);
+			console.log(e);
+		}
 		const env = createGlobalScope(moduleDir);
-		evaluate(program, env);
+		evaluate(program!, env);
 
 		const moduleName = (env.exports.get('MODULE_NAME') as GSString).value;
 		if (!moduleName)
-			throw `ModuleError: Unable to read file "${path.join(
+			throw `ModuleError: Unable to read module "${path.join(
 				moduleDir,
 				module
 			)}". File is missing "MODULE_NAME" export`;
