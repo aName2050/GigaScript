@@ -1247,7 +1247,7 @@ export default class Parser {
 					);
 				}
 			} else {
-				// computed values, like "foo[bar]"
+				// computed values, like "foo['bar'] or foo[ident]"
 				computed = true;
 				property = this.parseExpr();
 				if (
@@ -1258,22 +1258,6 @@ export default class Parser {
 						'ComputedObjectError: computed objects can only use STRINGS or IDENTIFIERS',
 						`${sourceFile}:${getErrorLocation(this.current())}`
 					);
-				}
-
-				if (property.kind == 'StringLiteral') {
-					property = {
-						kind: 'Identifier',
-						symbol: 'PROP_' + (property as StringLiteral).value,
-						start: property.start,
-						end: property.end,
-					} as Identifier;
-				} else {
-					property = {
-						kind: 'Identifier',
-						symbol: 'VAR_' + (property as Identifier).symbol,
-						start: property.start,
-						end: property.end,
-					} as Identifier;
 				}
 
 				this.expect(

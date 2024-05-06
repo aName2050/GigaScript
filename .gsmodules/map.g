@@ -5,6 +5,7 @@ export class Map {
 
     public set(k, v) {
         this.object[k] = v
+        print(k, v)
         return v;
     }
 

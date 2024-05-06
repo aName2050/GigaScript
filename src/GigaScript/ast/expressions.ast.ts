@@ -1,5 +1,5 @@
 import { CodeBlockNode, EXPRESSION } from './ast';
-import { Identifier } from './literals.ast';
+import { Identifier, StringLiteral } from './literals.ast';
 
 export interface CallExpr extends EXPRESSION {
 	kind: 'CallExpr';
@@ -10,7 +10,7 @@ export interface CallExpr extends EXPRESSION {
 export interface MemberExpr extends EXPRESSION {
 	kind: 'MemberExpr';
 	object: EXPRESSION;
-	property: Identifier;
+	property: Identifier | StringLiteral;
 	computed: boolean;
 }
 

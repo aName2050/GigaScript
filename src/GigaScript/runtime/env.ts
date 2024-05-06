@@ -145,39 +145,37 @@ export default class Environment {
 	public lookupObjectValue(expr: MemberExpr): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
 			const value = this.lookupObjectValue(expr.object as MemberExpr);
+			const property = expr.computed
+				? evaluate(expr.property, this).value
+				: (expr.property as Identifier).symbol;
 
 			if (value == undefined) {
 				throw `EvalError: Property "${
-					expr.property.symbol
+					property.value
 				}" does't exist on object "${
 					(expr.object as Identifier).symbol
 				}"`;
 			}
 
 			if (value.type == 'object')
-				return (value as GSObject).properties.get(
-					expr.property.symbol.split('PROP_')[0] == 'PROP_'
-						? expr.property.symbol.split('_')[1]
-						: this.lookupVar(expr.property.symbol.split('VAR_')[1])
-								.value
-				)!;
+				return (value as GSObject).properties.get(property.value)!;
 			else return value;
 		}
 
 		const varName = (expr.object as Identifier).symbol;
 		const env = this.resolve(varName);
 
+		const property = expr.computed
+			? evaluate(expr.property, env).value
+			: (expr.property as Identifier).symbol;
+
 		let object = env.variables.get(varName) as GSObject;
 
-		const prop = object.properties.get(
-			expr.property.symbol.split('_')[0] == 'PROP_'
-				? expr.property.symbol.split('_')[1]
-				: this.lookupVar(expr.property.symbol.split('_')[1]).value
-		);
+		const prop = object.properties.get(property.value);
 
 		if (!prop)
 			throw `EvalError: Property ${
-				expr.property.symbol
+				property.value
 			} does not exist on object "${(expr.object as Identifier).symbol}"`;
 
 		return prop;
@@ -185,18 +183,13 @@ export default class Environment {
 
 	public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
-			let obj = this.getObject(expr.object as MemberExpr);
-
-			console.log(expr.property.symbol);
+			const obj = this.getObject(expr.object as MemberExpr);
+			const property = expr.computed
+				? evaluate(expr.property, this).value
+				: (expr.property as Identifier).symbol;
 
 			if (obj.type == 'object') {
-				(obj as GSObject).properties.set(
-					expr.property.symbol.split('_')[0] == 'PROP_'
-						? expr.property.symbol.split('_')[1]
-						: this.lookupVar(expr.property.symbol.split('_')[1])
-								.value,
-					newValue
-				);
+				(obj as GSObject).properties.set(property, newValue);
 			}
 
 			return obj;
@@ -206,13 +199,11 @@ export default class Environment {
 		const env = this.resolve(objectIdentifer);
 
 		const object = env.variables.get(objectIdentifer) as GSObject;
+		const property = expr.computed
+			? evaluate(expr.property, env).value
+			: (expr.property as Identifier).symbol;
 
-		object.properties.set(
-			expr.property.symbol.split('_')[0] == 'PROP_'
-				? expr.property.symbol.split('_')[1]
-				: this.lookupVar(expr.property.symbol.split('_')[1]).value,
-			newValue
-		);
+		object.properties.set(property, newValue);
 
 		return object;
 	}
@@ -220,32 +211,34 @@ export default class Environment {
 	private getObject(expr: MemberExpr): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
 			const value = this.lookupObjectValue(expr.object as MemberExpr);
+			const property = expr.computed
+				? evaluate(expr.property, this).value
+				: (expr.property as Identifier).symbol;
 
 			if (value == undefined) {
-				throw `EvalError: Property "${
-					expr.property.symbol
-				}" does't exist on object "${
+				throw `EvalError: Property "${property}" does't exist on object "${
 					(expr.object as Identifier).symbol
 				}"`;
 			}
 
 			if (value.type == 'object')
-				return (value as GSObject).properties.get(
-					expr.property.symbol
-				)!;
+				return (value as GSObject).properties.get(property)!;
 		}
 
 		const varName = (expr.object as Identifier).symbol;
 		const env = this.resolve(varName);
 
 		let object = env.variables.get(varName) as GSObject;
+		const property = expr.computed
+			? evaluate(expr.property, env).value
+			: (expr.property as Identifier).symbol;
 
-		const prop = object.properties.get(expr.property.symbol);
+		const prop = object.properties.get(property);
 
 		if (!prop)
-			throw `EvalError: Property ${
-				expr.property.symbol
-			} does not exist on object "${(expr.object as Identifier).symbol}"`;
+			throw `EvalError: Property ${property} does not exist on object "${
+				(expr.object as Identifier).symbol
+			}"`;
 
 		return prop;
 	}
