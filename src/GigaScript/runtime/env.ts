@@ -145,40 +145,36 @@ export default class Environment {
 	public lookupObjectValue(expr: MemberExpr): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
 			const value = this.lookupObjectValue(expr.object as MemberExpr);
-			const property = expr.computed
+			const property: string = expr.computed
 				? evaluate(expr.property, this).value
 				: (expr.property as Identifier).symbol;
 
 			if (value == undefined) {
-				throw `EvalError: Property "${
-					property.value
-				}" does't exist on object "${
+				throw `EvalError: Property "${property}" does't exist on object "${
 					(expr.object as Identifier).symbol
 				}"`;
 			}
 
 			if (value.type == 'object')
-				return (value as GSObject).properties.get(property.value)!;
+				return (value as GSObject).properties.get(property)!;
 			else return value;
 		}
 
 		const varName = (expr.object as Identifier).symbol;
 		const env = this.resolve(varName);
 
-		const property = expr.computed
+		const property: string = expr.computed
 			? evaluate(expr.property, env).value
 			: (expr.property as Identifier).symbol;
-
-		console.log(property);
 
 		let object = env.variables.get(varName) as GSObject;
 
 		const prop = object.properties.get(property);
 
 		if (!prop)
-			throw `EvalError: Property ${
-				property.value
-			} does not exist on object "${(expr.object as Identifier).symbol}"`;
+			throw `EvalError: Property ${property} does not exist on object "${
+				(expr.object as Identifier).symbol
+			}"`;
 
 		return prop;
 	}
@@ -186,7 +182,7 @@ export default class Environment {
 	public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
 			const obj = this.getObject(expr.object as MemberExpr);
-			const property = expr.computed
+			const property: string = expr.computed
 				? evaluate(expr.property, this).value
 				: (expr.property as Identifier).symbol;
 
@@ -201,7 +197,7 @@ export default class Environment {
 		const env = this.resolve(objectIdentifer);
 
 		const object = env.variables.get(objectIdentifer) as GSObject;
-		const property = expr.computed
+		const property: string = expr.computed
 			? evaluate(expr.property, env).value
 			: (expr.property as Identifier).symbol;
 
@@ -213,7 +209,7 @@ export default class Environment {
 	private getObject(expr: MemberExpr): GSAny {
 		if (expr.object.kind == 'MemberExpr') {
 			const value = this.lookupObjectValue(expr.object as MemberExpr);
-			const property = expr.computed
+			const property: string = expr.computed
 				? evaluate(expr.property, this).value
 				: (expr.property as Identifier).symbol;
 
@@ -231,7 +227,7 @@ export default class Environment {
 		const env = this.resolve(varName);
 
 		let object = env.variables.get(varName) as GSObject;
-		const property = expr.computed
+		const property: string = expr.computed
 			? evaluate(expr.property, env).value
 			: (expr.property as Identifier).symbol;
 
