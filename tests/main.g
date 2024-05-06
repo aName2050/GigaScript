@@ -1,11 +1,3 @@
-import { Map } from 'gs:maps'
+const arr = [1, 2, 3, 4];
 
-const map = new Map();
-
-map.set('test', 32)
-map.set('test2', 64)
-
-print(map.get('test'))
-print(map.get('test2'))
-
-print(map.getAll())
+print(arr)
