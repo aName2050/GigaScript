@@ -169,9 +169,11 @@ export default class Environment {
 			? evaluate(expr.property, env).value
 			: (expr.property as Identifier).symbol;
 
+		console.log(property);
+
 		let object = env.variables.get(varName) as GSObject;
 
-		const prop = object.properties.get(property.value);
+		const prop = object.properties.get(property);
 
 		if (!prop)
 			throw `EvalError: Property ${

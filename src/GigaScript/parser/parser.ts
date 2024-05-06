@@ -94,9 +94,9 @@ export default class Parser {
 		const token = this.tokens.shift() as Token;
 		if (!token || token.type != type) {
 			throw new ParseError(
-				`Expected "${
-					getTokenByTypeEnum(type)?.value
-				}"${errNote}, instead saw "${token.value}"`,
+				`Expected token "${
+					NodeType[getTokenByTypeEnum(type)!.type]
+				}"${errNote}, instead saw token "${NodeType[token.type]}"`,
 				`${sourceFile}:${getErrorLocation(token)}`
 			);
 		}
@@ -817,10 +817,19 @@ export default class Parser {
 		const properties = new Array<Property>();
 
 		while (this.notEOF() && this.current().type != NodeType.CloseBrace) {
-			const key = this.expect(
-				NodeType.Identifier,
-				'as key for KEY-VALUE pair declaration on object expression'
-			);
+			let key: Token;
+			if (this.current().type == NodeType.String) {
+				// if the key is a "string"
+				key = this.expect(
+					NodeType.String,
+					'as key for KEY-VALUE pair declaration on object expression'
+				);
+			} else {
+				key = this.expect(
+					NodeType.Identifier,
+					'as key for KEY-VALUE pair declaration on object expression'
+				);
+			}
 
 			if (this.current().type == NodeType.Comma) {
 				// { key, }
