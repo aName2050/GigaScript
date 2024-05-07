@@ -1,4 +1,10 @@
-import { DataConstructors, GSNumber, GSString } from '../runtime/types';
+import {
+	DataConstructors,
+	GSArray,
+	GSFunction,
+	GSNumber,
+	GSString,
+} from '../runtime/types';
 import { getValue } from '../util/getValue';
 
 export const print = DataConstructors.NATIVEFN((args, scope) => {
@@ -36,6 +42,49 @@ export const math = DataConstructors.OBJECT(
 
 				return DataConstructors.NUMBER(
 					Math.random() * (max.value - min.value) + min.value
+				);
+			})
+		)
+);
+
+export const Array = DataConstructors.OBJECT(
+	new Map()
+		.set(
+			'push',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+				if (!args[1]) throw 'Expected 2 arguments, instead got 1';
+
+				(args[0] as GSArray).value.push(args[1]);
+
+				return args[0];
+			})
+		)
+		.set(
+			'pop',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+
+				return (args[0] as GSArray).value.pop();
+			})
+		)
+		.set(
+			'has',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+				if (!args[1]) throw 'Expected 2 arguments, instead got 1';
+
+				console.log(
+					args[0].value,
+					args[1],
+					(args[0] as GSArray).value.includes(args[1])
+				);
+
+				return DataConstructors.BOOLEAN(
+					(args[0] as GSArray).value.includes(args[1])
 				);
 			})
 		)
