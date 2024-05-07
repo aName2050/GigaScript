@@ -77,15 +77,12 @@ export const Array = DataConstructors.OBJECT(
 					throw 'Expected type "array" as first argument';
 				if (!args[1]) throw 'Expected 2 arguments, instead got 1';
 
-				console.log(
-					args[0].value,
-					args[1],
-					(args[0] as GSArray).value.includes(args[1])
-				);
+				let has = false;
+				(args[0] as GSArray).value.forEach(val => {
+					if (val.value == args[1].value) has = true;
+				});
 
-				return DataConstructors.BOOLEAN(
-					(args[0] as GSArray).value.includes(args[1])
-				);
+				return DataConstructors.BOOLEAN(has);
 			})
 		)
 );
