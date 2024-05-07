@@ -85,6 +85,21 @@ export const Array = DataConstructors.OBJECT(
 				return DataConstructors.BOOLEAN(has);
 			})
 		)
+		.set(
+			'getFromIndex',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+				if (args[1].type != 'number')
+					throw 'Expected index to be of type "number"';
+
+				return (args[0] as GSArray).value[args[1].value];
+			})
+		)
+	// .set(
+	// 	'length',
+	// 	DataConstructors.NATIVEFN((args))
+	// )
 );
 
 export const formatString = DataConstructors.NATIVEFN((args, _scope) => {

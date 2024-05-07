@@ -1,15 +1,9 @@
-const arr = [1, 2, 3, 4];
+import { Set } from 'gs:sets'
 
-print(arr)
+const set = new Set();
 
-Array.push(arr, 5)
+set.add(3)
+set.add(3)
+set.add(4)
 
-print(arr)
-
-print(Array.pop(arr))
-print(Array.pop(arr))
-
-print(arr)
-
-print(Array.has(arr, 1))
-print(Array.has(arr, 6))
+print(set.getAll())
