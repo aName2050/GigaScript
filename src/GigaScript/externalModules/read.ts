@@ -25,14 +25,14 @@ export function readExternalGSModules(): Array<GSModule> {
 		try {
 			parser.tokenizeSource(file);
 		} catch (e) {
-			console.log(`${parser.tokenizeSource(file)}`);
+			console.log(`${path.join(moduleDir, module)}`);
 			console.log(e);
 		}
 		let program: Program;
 		try {
 			program = parser.generateAST();
 		} catch (e) {
-			console.log(`${parser.tokenizeSource(file)}`);
+			console.log(`${path.join(moduleDir, module)}`);
 			console.log(e);
 		}
 		const env = createGlobalScope(moduleDir);
