@@ -12,9 +12,7 @@ export class Set {
     }
 
     public has(v) {
-        let hasValue = false;
-
-        for (let i = 0; i < )
+        return Array.has(this.arr, v);
     }
 
     public getAll() {
