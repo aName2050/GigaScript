@@ -96,10 +96,14 @@ export const Array = DataConstructors.OBJECT(
 				return (args[0] as GSArray).value[args[1].value];
 			})
 		)
-	// .set(
-	// 	'length',
-	// 	DataConstructors.NATIVEFN((args))
-	// )
+		.set(
+			'length',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				return DataConstructors.NUMBER(
+					(args[0] as GSArray).value.length
+				);
+			})
+		)
 );
 
 export const formatString = DataConstructors.NATIVEFN((args, _scope) => {
