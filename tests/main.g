@@ -1,12 +1,6 @@
-import { Set } from 'gs:sets'
+const obj = { x: 32, y: 64, complex: { arr: [1, 2, 3, 'a', 'b', 'c'], hello: 'world!', nested: { _string: 'nested object!' } } };
+const test = GSON.toString(obj);
 
-const set = new Set();
+print(test)
 
-set.add(3)
-set.add(3)
-set.add(4)
-
-print(set.getAll())
-
-print(set.has(3))
-print(set.has(5))
+print(GSON.toGSON(test))

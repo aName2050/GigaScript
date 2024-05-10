@@ -1,11 +1,12 @@
 import {
 	DataConstructors,
 	GSArray,
-	GSFunction,
 	GSNumber,
+	GSObject,
 	GSString,
 } from '../runtime/types';
 import { getValue } from '../util/getValue';
+import { objectToMap } from '../util/objToMap';
 
 export const print = DataConstructors.NATIVEFN((args, scope) => {
 	const output: Array<any> = [];
@@ -123,18 +124,25 @@ export const formatString = DataConstructors.NATIVEFN((args, _scope) => {
 	return DataConstructors.STRING(out);
 });
 
-export const JSON = DataConstructors.OBJECT(
+export const GSON = DataConstructors.OBJECT(
 	new Map()
 		.set(
 			'toString',
 			DataConstructors.NATIVEFN((args, _scope) => {
-				throw 'not implemented';
+				return DataConstructors.STRING(
+					JSON.stringify(getValue(args[0]))
+				);
 			})
 		)
 		.set(
-			'toJSON',
+			'toGSON',
 			DataConstructors.NATIVEFN((args, _scope) => {
-				throw 'not implemented';
+				console.warn(
+					'GSExperimentalFunctionWarning: "GSON.toGSON()" is an experimental feature. Use at your own risk.'
+				);
+				return DataConstructors.OBJECT(
+					objectToMap(JSON.parse(args[0].value))
+				);
 			})
 		)
 );

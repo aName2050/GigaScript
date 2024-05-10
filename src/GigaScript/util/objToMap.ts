@@ -10,7 +10,7 @@ export function objectToGSObject(obj: object): GSObject {
 	return gsObj;
 }
 
-function objectToMap(
+export function objectToMap(
 	obj: object,
 	visited = new Set<any>()
 ): Map<string, GSAny | GSObject> {

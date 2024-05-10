@@ -32,7 +32,7 @@ export function createToken(
 		type,
 		value,
 		__GSC: {
-			_OPC: getTokenByValue(value)?.__GSC._OPC || OPC,
+			_OPC: getTokenByValue(value)?.__GSC?._OPC || OPC,
 			_POS: {
 				start: {
 					Line: PositionData.start.line,

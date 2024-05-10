@@ -49,6 +49,7 @@ export function createGlobalScope(cwd: string): Environment {
 	env.declareVar(isGSXFile ? 'nerd' : 'math', NativeFunctions.math, true);
 	env.declareVar('formatString', NativeFunctions.formatString, true);
 	env.declareVar('Array', NativeFunctions.Array, true);
+	env.declareVar('GSON', NativeFunctions.GSON, true);
 
 	return env;
 }
