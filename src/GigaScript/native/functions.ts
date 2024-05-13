@@ -1,16 +1,15 @@
 import {
-	NATIVE_FUNCTION,
-	NULL,
-	NUMBER,
-	NumberValue,
-	OBJECT,
-	STRING,
-	StringValue,
-} from '../runtime/values';
-import { getValue } from '../util/util';
+	DataConstructors,
+	GSArray,
+	GSNumber,
+	GSObject,
+	GSString,
+} from '../runtime/types';
+import { getValue } from '../util/getValue';
+import { objectToMap } from '../util/objToMap';
 
-export const print = NATIVE_FUNCTION((args, scope) => {
-	const output: any[] = [];
+export const print = DataConstructors.NATIVEFN((args, scope) => {
+	const output: Array<any> = [];
 
 	for (const arg of args) {
 		output.push(getValue(arg));
@@ -18,105 +17,132 @@ export const print = NATIVE_FUNCTION((args, scope) => {
 
 	console.log(...output);
 
-	return NULL();
+	return DataConstructors.NULL();
 });
 
-export const timestamp = NATIVE_FUNCTION((args, scope) => {
-	return NUMBER(Date.now());
+export const generateTimestamp = DataConstructors.NATIVEFN((args, scope) => {
+	return DataConstructors.NUMBER(Date.now());
 });
 
-export const math = OBJECT(
+export const math = DataConstructors.OBJECT(
 	new Map()
-		.set('pi', NUMBER(Math.PI))
-		.set('e', NUMBER(Math.E))
+		.set('pi', DataConstructors.NUMBER(Math.PI))
+		.set('e', DataConstructors.NUMBER(Math.E))
 		.set(
 			'sqrt',
-			NATIVE_FUNCTION((args, _scope) => {
-				const num = (args[0] as NumberValue).value;
-				return NUMBER(Math.sqrt(num));
-			})
-		)
-		.set(
-			'abs',
-			NATIVE_FUNCTION((args, _scope) => {
-				const num = (args[0] as NumberValue).value;
-				return NUMBER(Math.abs(num));
-			})
-		)
-		.set(
-			'round',
-			NATIVE_FUNCTION((args, _scope) => {
-				const num = (args[0] as NumberValue).value;
-				return NUMBER(Math.round(num));
+			DataConstructors.NATIVEFN((args, _scope) => {
+				const num = (args[0] as GSNumber).value;
+				return DataConstructors.NUMBER(Math.sqrt(num));
 			})
 		)
 		.set(
 			'random',
-			NATIVE_FUNCTION((args, _scope) => {
-				const max = Math.floor((args[0] as NumberValue).value);
-				const min = Math.ceil((args[1] as NumberValue).value);
-				return NUMBER(Math.random() * (max - min + 1) + min);
-			})
-		)
-		.set(
-			'ceil',
-			NATIVE_FUNCTION((args, _scope) => {
-				return NUMBER(Math.ceil((args[0] as NumberValue).value));
-			})
-		)
-		.set(
-			'exp',
-			NATIVE_FUNCTION((args, _scope) => {
-				return NUMBER(Math.exp((args[0] as NumberValue).value));
-			})
-		)
-		.set(
-			'floor',
-			NATIVE_FUNCTION((args, _scope) => {
-				return NUMBER(Math.floor((args[0] as NumberValue).value));
-			})
-		)
-		.set(
-			'max',
-			NATIVE_FUNCTION((args, _scope) => {
-				const values: Array<number> = new Array<number>();
-				args.forEach(arg => {
-					values.push((arg as NumberValue).value);
-				});
-				return NUMBER(Math.max(...values));
-			})
-		)
-		.set(
-			'pow',
-			NATIVE_FUNCTION((args, _scope) => {
-				return NUMBER(
-					Math.pow(
-						(args[0] as NumberValue).value,
-						(args[1] as NumberValue).value
-					)
+			DataConstructors.NATIVEFN((args, _scope) => {
+				const max = (args[0] as GSNumber) || DataConstructors.NUMBER(1);
+				const min = (args[1] as GSNumber) || DataConstructors.NUMBER(0);
+
+				return DataConstructors.NUMBER(
+					Math.random() * (max.value - min.value) + min.value
 				);
-			})
-		)
-		.set(
-			'round',
-			NATIVE_FUNCTION((args, _scope) => {
-				return NUMBER(Math.round((args[0] as NumberValue).value));
 			})
 		)
 );
 
-export const format = NATIVE_FUNCTION((args, scope) => {
-	const str = args.shift() as StringValue;
+export const Array = DataConstructors.OBJECT(
+	new Map()
+		.set(
+			'push',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+				if (!args[1]) throw 'Expected 2 arguments, instead got 1';
 
-	let res = '';
+				(args[0] as GSArray).value.push(args[1]);
+
+				return args[0];
+			})
+		)
+		.set(
+			'pop',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+
+				return (args[0] as GSArray).value.pop();
+			})
+		)
+		.set(
+			'has',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+				if (!args[1]) throw 'Expected 2 arguments, instead got 1';
+
+				let has = false;
+				(args[0] as GSArray).value.forEach(val => {
+					if (val.value == args[1].value) has = true;
+				});
+
+				return DataConstructors.BOOLEAN(has);
+			})
+		)
+		.set(
+			'getFromIndex',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				if (args[0].type != 'array')
+					throw 'Expected type "array" as first argument';
+				if (args[1].type != 'number')
+					throw 'Expected index to be of type "number"';
+
+				return (args[0] as GSArray).value[args[1].value];
+			})
+		)
+		.set(
+			'length',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				return DataConstructors.NUMBER(
+					(args[0] as GSArray).value.length
+				);
+			})
+		)
+);
+
+export const formatString = DataConstructors.NATIVEFN((args, _scope) => {
+	const str = args.shift() as GSString;
+
+	let out = '';
 
 	for (let i = 0; i < args.length; i++) {
-		const arg = args[i] as StringValue;
+		const arg = args[i] as GSString;
 
-		res = str.value.replace(/\${}/, arg.value);
+		out = str.value.replace(/\${}/, arg.value);
 	}
 
-	if (!args[0]) throw '"format" expected 2 arguments, but got 1.';
+	if (!args[0])
+		throw 'TypeError: "formatString" expected 2 arguments, but got 1';
 
-	return STRING(res);
+	return DataConstructors.STRING(out);
 });
+
+export const GSON = DataConstructors.OBJECT(
+	new Map()
+		.set(
+			'toString',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				return DataConstructors.STRING(
+					JSON.stringify(getValue(args[0]))
+				);
+			})
+		)
+		.set(
+			'toGSON',
+			DataConstructors.NATIVEFN((args, _scope) => {
+				console.warn(
+					'GSExperimentalFunctionWarning: "GSON.toGSON()" is an experimental feature. Use at your own risk.'
+				);
+				return DataConstructors.OBJECT(
+					objectToMap(JSON.parse(args[0].value))
+				);
+			})
+		)
+);

@@ -1,10 +1,7 @@
-import { sourceFile } from '../../index';
-import { GSX_Tokens, createGSXToken, getGSXTokenByValue } from '../gsx.tokens';
+import { TokenID, Token, Tokens, getTokenByValue } from '../tokens';
 import { NodeType } from '../nodes';
-import { Token, TokenID } from '../tokens';
-import { GSError } from '../util/gserror';
-import { OpPrec } from './types';
 import {
+	createToken,
 	handleEscSeq,
 	isAlpha,
 	isEOL,
@@ -12,28 +9,32 @@ import {
 	isValidEscapeChar,
 	isWhitespace,
 } from './util';
+import { OpPrec } from './types';
+import { GSError } from '../util/gserror';
+import { sourceFile } from '../../index';
 
 /**
  *
  * @param source The source file
  * @returns An array of tokens
  */
-export function tokenizeGSX(source: string): Token[] {
+export function tokenize(source: string): Token[] {
 	const tokens: Array<Token> = new Array<Token>();
 	const src = source.split('');
 
-	let line = 1,
-		col = 1;
+	let line = 1;
+	let col = 1;
 
+	// Loop until <EOF>
 	while (src.length > 0) {
 		const curr = src[0];
-		const token: Token | undefined = getGSXTokenByValue(curr);
+		const token: Token | undefined = getTokenByValue(curr);
 		const tokenPos = { line, Col: col };
 
 		if (isInt(curr) || (curr == '-' && isInt(src[1]))) {
-			let num = src.shift()!;
+			let num = src.shift()!; // set first digit or negative sign
 			col++;
-			let reachedDecPoint = false;
+			let reachedDecPoint = false; // number has a decimal point
 
 			while (src.length > 0) {
 				if (src[0] == '.' && !reachedDecPoint) {
@@ -47,7 +48,7 @@ export function tokenizeGSX(source: string): Token[] {
 			}
 
 			tokens.push(
-				createGSXToken(
+				createToken(
 					TokenID._Number,
 					NodeType.Number,
 					num,
@@ -57,7 +58,7 @@ export function tokenizeGSX(source: string): Token[] {
 							column: tokenPos.Col,
 						},
 						end: {
-							line,
+							line: line,
 							column: col,
 						},
 					},
@@ -66,20 +67,48 @@ export function tokenizeGSX(source: string): Token[] {
 			);
 		} else if (typeof token == 'object') {
 			switch (token.value) {
-				case '+':
+				case '=':
 					{
 						src.shift();
 						col++;
-						const multiCharToken = src[0] == '+' ? '++' : '';
-
+						const multiCharToken = src[0] === '=' ? '==' : '=';
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
+								_POS: {
+									start: {
+										Line: tokenPos.line,
+										Column: tokenPos.Col,
+									},
+									end: {
+										Line: line,
+										Column: col,
+									},
+								},
+							},
+						});
+					}
+					break;
+
+				case '+':
+					{
+						src.shift();
+						col++;
+						const multiCharToken =
+							src[0] === '=' ? '+=' : src[0] === '+' ? '++' : '+';
+						if (multiCharToken.length == 2) {
+							src.shift(); // advance past second character
+							col++;
+						}
+						tokens.push({
+							...Tokens[multiCharToken],
+							__GSC: {
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -99,16 +128,16 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						const multiCharToken = src[0] == '-' ? '--' : '';
-
+						const multiCharToken =
+							src[0] === '=' ? '-=' : src[0] === '-' ? '--' : '-';
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -128,15 +157,15 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						const multiCharToken = src[0] == '=' ? '*=' : '';
+						const multiCharToken = src[0] === '=' ? '*=' : '*';
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -156,15 +185,15 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						const multiCharToken = src[0] === '=' ? '/=' : '';
+						const multiCharToken = src[0] === '=' ? '/=' : '/';
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -190,9 +219,9 @@ export function tokenizeGSX(source: string): Token[] {
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -212,7 +241,13 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						let multiCharToken: '' | '>>' | '>>=' | '>>>' | '>>>=';
+						let multiCharToken:
+							| '>'
+							| '>='
+							| '>>'
+							| '>>='
+							| '>>>'
+							| '>>>=';
 
 						if (src[0] === '>' && src[1] === '>' && src[2] === '=')
 							multiCharToken = '>>>=';
@@ -221,7 +256,8 @@ export function tokenizeGSX(source: string): Token[] {
 						else if (src[0] === '>' && src[1] === '=')
 							multiCharToken = '>>=';
 						else if (src[0] === '>') multiCharToken = '>>';
-						else multiCharToken = '';
+						else if (src[0] === '=') multiCharToken = '>=';
+						else multiCharToken = '>';
 
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
@@ -241,9 +277,9 @@ export function tokenizeGSX(source: string): Token[] {
 						}
 
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -263,12 +299,13 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						let multiCharToken: '' | '<<' | '<<=';
+						let multiCharToken: '<=' | '<' | '<<' | '<<=';
 
 						if (src[0] === '<' && src[1] === '=')
 							multiCharToken = '<<=';
 						else if (src[0] === '<') multiCharToken = '<<';
-						else multiCharToken = '';
+						else if (src[0] === '=') multiCharToken = '<=';
+						else multiCharToken = '<';
 
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
@@ -280,9 +317,9 @@ export function tokenizeGSX(source: string): Token[] {
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -302,11 +339,15 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-
+						const multiCharToken = src[0] === '=' ? '!=' : '!';
+						if (multiCharToken.length == 2) {
+							src.shift(); // advance past second character
+							col++;
+						}
 						tokens.push({
-							...GSX_Tokens['!'],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens['!'].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -326,15 +367,16 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						const multiCharToken = src[0] === '=' ? '&=' : '&';
+						const multiCharToken =
+							src[0] === '&' ? '&&' : src[0] === '=' ? '&=' : '&';
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -354,15 +396,16 @@ export function tokenizeGSX(source: string): Token[] {
 					{
 						src.shift();
 						col++;
-						const multiCharToken = src[0] === '=' ? '|=' : '|';
+						const multiCharToken =
+							src[0] === '|' ? '||' : src[0] === '=' ? '|=' : '|';
 						if (multiCharToken.length == 2) {
 							src.shift(); // advance past second character
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -388,9 +431,9 @@ export function tokenizeGSX(source: string): Token[] {
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -416,9 +459,9 @@ export function tokenizeGSX(source: string): Token[] {
 							col++;
 						}
 						tokens.push({
-							...GSX_Tokens[multiCharToken],
+							...Tokens[multiCharToken],
 							__GSC: {
-								_OPC: GSX_Tokens[multiCharToken].__GSC._OPC,
+								_OPC: Tokens[multiCharToken].__GSC._OPC,
 								_POS: {
 									start: {
 										Line: tokenPos.line,
@@ -483,7 +526,7 @@ export function tokenizeGSX(source: string): Token[] {
 					col++;
 
 					tokens.push(
-						createGSXToken(TokenID._String, NodeType.String, str, {
+						createToken(TokenID._String, NodeType.String, str, {
 							start: {
 								line: tokenPos.line,
 								column: tokenPos.Col,
@@ -501,7 +544,7 @@ export function tokenizeGSX(source: string): Token[] {
 					col++;
 					// matches single character tokens
 					tokens.push(
-						createGSXToken(
+						createToken(
 							token.id,
 							token.type,
 							token.value,
@@ -525,19 +568,22 @@ export function tokenizeGSX(source: string): Token[] {
 			switch (curr) {
 				default:
 					if (isAlpha(curr)) {
+						// first char of an identifier can't be a number
 						let ident: string = '';
 						ident += src.shift();
 						col++;
 
 						while (src.length > 0 && isAlpha(src[0], true)) {
+							// rest of identifier can contain numbers
 							ident += src.shift();
 							col++;
 						}
 
-						const RESERVED = GSX_Tokens[ident];
+						// check for reserved keywords
+						const RESERVED = Tokens[ident];
 						if (typeof RESERVED == 'object') {
 							tokens.push(
-								createGSXToken(
+								createToken(
 									RESERVED.id,
 									RESERVED.type,
 									RESERVED.value,
@@ -547,7 +593,7 @@ export function tokenizeGSX(source: string): Token[] {
 											column: tokenPos.Col,
 										},
 										end: {
-											line,
+											line: line,
 											column: col,
 										},
 									},
@@ -555,8 +601,9 @@ export function tokenizeGSX(source: string): Token[] {
 								)
 							);
 						} else {
+							// user defined symbol
 							tokens.push(
-								createGSXToken(
+								createToken(
 									TokenID._Identifier,
 									NodeType.Identifier,
 									ident,
@@ -566,7 +613,7 @@ export function tokenizeGSX(source: string): Token[] {
 											column: tokenPos.Col,
 										},
 										end: {
-											line,
+											line: line,
 											column: col,
 										},
 									},
@@ -575,6 +622,7 @@ export function tokenizeGSX(source: string): Token[] {
 							);
 						}
 					} else if (isEOL(curr)) {
+						// end of current line
 						line++;
 						src.shift();
 						col = 1;
@@ -583,37 +631,38 @@ export function tokenizeGSX(source: string): Token[] {
 						src.shift() && col++;
 					} else {
 						throw new GSError(
-							'LexerError',
+							`LexerError`,
 							`Unknown character: UNICODE-${curr.charCodeAt(
 								0
 							)} "${curr}"`,
-							`${sourceFile}:${tokenPos.line}:${tokenPos.Col}`
+							`${sourceFile || 'GSREPL'}:${tokenPos.line}:${
+								tokenPos.Col
+							}`
 						);
 					}
 			}
 		}
 	}
 
+	// col++;
 	tokens.push(
-		createGSXToken(
+		createToken(
 			TokenID.__EOF__,
 			NodeType.__EOF__,
 			'<EOF>',
 			{
 				start: {
-					line,
+					line: line,
 					column: col,
 				},
 				end: {
-					line,
+					line: line,
 					column: col + 1,
 				},
 			},
 			OpPrec.None
 		)
 	);
-
-	// console.log(tokens);
 
 	return tokens;
 }

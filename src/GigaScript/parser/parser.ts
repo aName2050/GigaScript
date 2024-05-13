@@ -1,290 +1,645 @@
+import { sourceFile } from '../../index';
+import { AssignmentExpr } from '../ast/assignments.ast';
+import { CodeBlockNode, EXPRESSION, Program, STATEMENT } from '../ast/ast';
+import { BinaryExpr } from '../ast/binop.ast';
+import { BitwiseExpr } from '../ast/bitwise.ast';
 import {
-	BinaryExpr,
-	Expr,
-	Identifier,
-	NumericLiteral,
-	Program,
-	Stmt,
-	VarDeclaration,
-	AssignmentExpr,
-	Property,
-	ObjectLiteral,
-	MemberExpr,
-	CallExpr,
+	ClassDeclaration,
+	ClassMethod,
+	ClassNewInstanceExpr,
+	ClassProperty,
+	ConstructorStatement,
+} from '../ast/class.ast';
+import { IfStatement } from '../ast/conditionals.ast';
+import {
 	FunctionDeclaration,
+	VariableDeclaration,
+} from '../ast/declarations.ast';
+import {
+	CallExpr,
+	FunctionDeclarationExpr,
+	MemberExpr,
+} from '../ast/expressions.ast';
+import {
+	ArrayLiteral,
+	Identifier,
+	NumberLiteral,
+	ObjectLiteral,
+	Property,
 	StringLiteral,
-	IfStatement,
-	TryCatchStatement,
-	ForStatement,
-	ImportStatement,
-	ExportStatement,
-	WhileStatement,
+	ArrayElement,
+} from '../ast/literals.ast';
+import {
 	BreakStatement,
 	ContinueStatement,
-	ClassDeclaration,
-	ClassProperty,
-	ClassMethod,
-	ClassInit,
+	ForStatement,
+	WhileStatement,
+} from '../ast/loops.ast';
+import { ExportStatement, ImportStatement } from '../ast/module.ast';
+import {
 	ReturnStatement,
 	ThrowStatement,
-	ClassConstructor,
-} from '../ast/ast';
-import { tokenize } from '../lexer/lexer';
-import { Class, Token, TokenType } from '../types';
+	TryCatchStatement,
+} from '../ast/statements.ast';
+import { UnaryExpr } from '../ast/unary.ast';
+import { tokenizeGSX } from '../lexer/gsx';
+import { tokenize } from '../lexer/tokenizer';
+import { NodeType } from '../nodes';
+import { Token, getTokenByTypeEnum } from '../tokens';
+import { ClassBody } from '../types';
+import { getErrorLocation } from '../util/getErrLoc';
+import { ParseError } from '../util/parseError';
 
-/**
- * Produces valid AST from source.
- */
 export default class Parser {
-	private tokens: Token[] = [];
+	private tokens: Array<Token> = [];
 
 	/**
-	 * Determine if parsing is complete by reaching the END OF FILE token.
+	 * Check for End of File token
 	 */
-	private not_eof(): boolean {
-		return this.tokens[0].type != TokenType.EOF;
+	private notEOF(): boolean {
+		return this.tokens[0].type != NodeType.__EOF__;
 	}
 
 	/**
-	 * Returns current token
+	 * @returns the current token
 	 */
-	private at(): Token {
+	private current(): Token {
 		return this.tokens[0] as Token;
 	}
 
 	/**
-	 * Returns the previous token then shifts the token array to the next token.
+	 * @returns the current token and shifts the token array
 	 */
-	private eat(): Token {
-		const prev = this.tokens.shift() as Token;
-		return prev;
+	private advance(): Token {
+		return this.tokens.shift() as Token;
 	}
 
 	/**
-	 * Returns the next token
+	 *
+	 * @returns the next token
 	 */
 	private next(): Token {
 		return this.tokens[1] as Token;
 	}
 
 	/**
-	 * Returns the previous token and then shifts the token array to the next token.
-	 * Also checks the type of the expected token and throws an error if it doesn't match.
+	 * Checks if the current token matches the expected type, and throws an error if it doesn't
+	 *
+	 * @param errNote Output: Expected "(expectedTokenType)" (errNote), instead saw "(encounteredTokenType)"
+	 *
+	 * @returns the current token if it matches the expected token
 	 */
-	private expect(type: TokenType, err: any): Token {
-		const prev = this.tokens.shift() as Token;
-		if (!prev || prev.type != type) {
-			console.error(
-				`ParseError: ${err}`,
-				prev,
-				`- Expecting: type`,
-				type
+	private expect(type: NodeType, errNote = ''): Token {
+		if (errNote.length > 0) errNote = ' ' + errNote;
+		const token = this.tokens.shift() as Token;
+		if (!token || token.type != type) {
+			throw new ParseError(
+				`Expected token "${
+					NodeType[getTokenByTypeEnum(type)!.type]
+				}"${errNote}, instead saw token "${NodeType[token.type]}"`,
+				`${sourceFile}:${getErrorLocation(token)}`
 			);
-			process.exit(1);
 		}
 
-		return prev;
+		return token;
 	}
 
-	public generateAST(source: string): Program {
-		this.tokens = tokenize(source);
+	public get Tokens(): Array<Token> {
+		return this.tokens;
+	}
+
+	public tokenizeSource(src: string): void {
+		this.tokens = tokenize(src);
+	}
+
+	public tokenizeGSXSource(src: string): void {
+		this.tokens = tokenizeGSX(src);
+	}
+
+	public generateAST(): Program {
 		const program: Program = {
 			kind: 'Program',
 			body: [],
+			start: {
+				Line: 1,
+				Column: 1,
+			},
+			end: {
+				Line: 1,
+				Column: 1,
+			},
 		};
 
-		// Parse until end of file
-		while (this.not_eof()) {
-			program.body.push(this.parse_stmt());
+		while (this.notEOF()) {
+			program.body.push(this.parseStatement());
 		}
+
+		const EOFToken = this.current();
+
+		if (EOFToken.type != NodeType.__EOF__) {
+			throw new ParseError(
+				'Uncaught: Missing EndOfFile <EOF> token',
+				`${sourceFile}:${getErrorLocation(this.current())}`
+			);
+		}
+
+		program.end = {
+			Line: EOFToken.__GSC._POS.end.Line!,
+			Column: EOFToken.__GSC._POS.end.Column!,
+		};
 
 		return program;
 	}
 
-	public generateGSXAST(source: Token[]): Program {
-		this.tokens = source;
-		const program: Program = {
-			kind: 'Program',
-			body: [],
-		};
+	// [STATEMENTS]
+	private parseStatement(): STATEMENT {
+		switch (this.current().type) {
+			case NodeType.Let:
+			case NodeType.Const:
+				return this.parseVariableDeclaration();
 
-		while (this.not_eof()) {
-			program.body.push(this.parse_stmt());
-		}
+			case NodeType.Func:
+				return this.parseFunctionDeclaration();
+			case NodeType.Return:
+				return this.parseReturnStatement();
 
-		return program;
-	}
+			case NodeType.Import:
+				return this.parseImportStatement();
+			case NodeType.Export:
+				return this.parseExportStatement();
 
-	/**
-	 * Handle complex statements
-	 */
-	private parse_stmt(): Stmt {
-		switch (this.at().type) {
-			case TokenType.Let:
-			case TokenType.Const:
-				// console.log('parsing let | const');
-				return this.parse_var_declaration();
-			case TokenType.Func:
-				// console.log('parsing func');
-				return this.parse_func_declaration();
-			case TokenType.Return:
-				// console.log('parsing return');
-				return this.parse_return_statement();
-			case TokenType.Class:
-				// console.log('parsing class');
-				return this.parse_class_declaration();
-			case TokenType.If:
-				// console.log('parsing if');
-				return this.parse_if_statement();
-			case TokenType.For:
-				// console.log('parsing for');
-				return this.parse_for_statement();
-			case TokenType.While:
-				// console.log('parsing while');
-				return this.parse_while_statement();
-			case TokenType.Break:
-				// console.log('parsing break');
-				return this.parse_break_statement();
-			case TokenType.Continue:
-				// console.log('parsing continue');
-				return this.parse_continue_statement();
-			case TokenType.Import:
-				// console.log('parsing import');
-				return this.parse_import_statement();
-			case TokenType.Export:
-				// console.log('parsing export');
-				return this.parse_export_statement();
-			case TokenType.Throw:
-				// console.log('parsing throw');
-				return this.parse_throw_statement();
+			case NodeType.Class:
+				return this.parseClassDeclaration();
+
+			case NodeType.If:
+				return this.parseIfStatement();
+
+			case NodeType.Throw:
+				return this.parseThrowStatement();
+
+			case NodeType.For:
+				return this.parseForStatement();
+			case NodeType.While:
+				return this.parseWhileStatement();
+			case NodeType.Break:
+				return this.parseBreakStatement();
+			case NodeType.Continue:
+				return this.parseContinueStatement();
 
 			default:
-				// console.log('parsing expression');
-				return this.parse_expr();
+				return this.parseExpr();
 		}
 	}
 
-	/**
-	 * Handle blocks of code
-	 */
-	private parse_block_statement(): Stmt[] {
-		this.expect(
-			TokenType.OpenBrace,
-			`Expected "{" at start of code block.`
-		);
+	private parseCodeBlock(): CodeBlockNode {
+		const openBracePos = this.expect(
+			NodeType.OpenBrace,
+			'at start of code block'
+		).__GSC._POS;
 
-		const body: Stmt[] = [];
+		const body: CodeBlockNode = {
+			kind: 'CodeBlockNode',
+			body: [],
+			start: {
+				Line: openBracePos.start.Line!,
+				Column: openBracePos.start.Column!,
+			},
+			end: {
+				Line: openBracePos.end.Line!,
+				Column: openBracePos.end.Column!,
+			},
+		};
 
-		while (this.not_eof() && this.at().type !== TokenType.CloseBrace) {
-			const stmt = this.parse_stmt();
-			body.push(stmt);
+		while (this.notEOF() && this.current().type !== NodeType.CloseBrace) {
+			const stmt = this.parseStatement();
+			body.body.push(stmt);
 		}
 
-		this.expect(TokenType.CloseBrace, `Expected "}" at end of code block.`);
+		const closeBracePos = this.expect(
+			NodeType.CloseBrace,
+			'at end of code block'
+		).__GSC._POS;
+
+		body.end = {
+			Line: closeBracePos.end.Line!,
+			Column: closeBracePos.end.Column!,
+		};
 
 		return body;
 	}
 
-	private parse_for_statement(): Stmt {
-		this.eat(); // advance past for keyword
+	// [STATEMENTS.DECLARATIONS]
 
-		this.expect(
-			TokenType.OpenParen,
-			'Expected "(" following "for" keyword'
-		);
+	private parseVariableDeclaration(): STATEMENT {
+		const varDecTokenPos = this.current().__GSC._POS;
+		const isConstant = this.advance().type == NodeType.Const;
+		const identifier = this.expect(
+			NodeType.Identifier,
+			`following ${isConstant ? 'const' : 'let'} keyword`
+		).value;
 
-		const init = this.parse_var_declaration();
-		const test = this.parse_expr();
+		if (this.current().type == NodeType.Semicolon) {
+			const semicolonPosData = this.advance().__GSC._POS;
+			if (isConstant) {
+				throw new ParseError(
+					'Constant variables must be delcared with a value',
+					`${sourceFile}:${getErrorLocation(this.current())}`
+				);
+			}
 
-		this.expect(
-			TokenType.Semicolon,
-			'Expected ";" following test expression in "for" statement'
-		);
+			return {
+				kind: 'VariableDeclaration',
+				constant: false,
+				identifier,
+				start: varDecTokenPos.start,
+				end: semicolonPosData.end,
+			} as VariableDeclaration;
+		}
 
-		const update = this.parse_assignment_expr();
+		this.expect(NodeType.Equals, 'following variable identifier');
 
-		this.expect(
-			TokenType.CloseParen,
-			'Expected ")" following update expression in "for" statement'
-		);
+		const declaration = {
+			kind: 'VariableDeclaration',
+			value: this.parseExpr(),
+			identifier,
+			constant: isConstant,
+			start: varDecTokenPos.start,
+			end: this.next().__GSC._POS.end,
+		} as VariableDeclaration;
 
-		const body = this.parse_block_statement();
+		this.expect(NodeType.Semicolon, 'following variable declaration');
 
-		return {
-			kind: 'ForStatement',
-			init,
-			test,
-			update,
+		return declaration;
+	}
+
+	private parseFunctionDeclaration(): STATEMENT {
+		const funcTokenPos = this.advance().__GSC._POS;
+
+		const name = this.expect(
+			NodeType.Identifier,
+			'following "func" keyword'
+		).value;
+
+		const args = this.parseArgs();
+		const params: Array<string> = [];
+
+		for (const arg of args) {
+			if (arg.kind !== 'Identifier') {
+				console.log(arg);
+				throw new ParseError(
+					'Expected arguments to be identifiers',
+					`${sourceFile}:${getErrorLocation(this.current())}`
+				);
+			}
+
+			params.push((arg as Identifier).symbol);
+		}
+
+		const body = this.parseCodeBlock();
+
+		const func = {
+			kind: 'FunctionDeclaration',
+			name,
 			body,
-		} as ForStatement;
+			parameters: params,
+			start: funcTokenPos.start,
+			end: body.end,
+		} as FunctionDeclaration;
+
+		return func;
 	}
 
-	private parse_while_statement(): Stmt {
-		this.eat(); // advance past while keyword
+	// [FUNCTIONS.ARGUMENTS/PARAMETERS]
+	private parseArgs(): Array<EXPRESSION> {
+		this.expect(NodeType.OpenParen, 'before parameter list');
 
-		this.expect(
-			TokenType.OpenParen,
-			'Expected "(" following while statement'
-		);
+		const args =
+			this.current().type == NodeType.CloseParen
+				? []
+				: this.parseArgumentsList();
 
-		const test = this.parse_expr();
+		this.expect(NodeType.CloseParen, 'after parameters list');
 
-		this.expect(
-			TokenType.CloseParen,
-			'Expected ")" following while statement test expression.'
-		);
+		return args;
+	}
 
-		const body = this.parse_block_statement();
+	private parseArgumentsList(): Array<EXPRESSION> {
+		const args = [this.parseExpr()];
+
+		while (this.current().type == NodeType.Comma && this.advance()) {
+			args.push(this.parseExpr());
+		}
+
+		return args;
+	}
+
+	private parseReturnStatement(): STATEMENT {
+		const returnTokenPos = this.advance().__GSC._POS;
+
+		const value = this.parseExpr();
+
+		const semicolonTokenPos = this.expect(
+			NodeType.Semicolon,
+			'following return statement'
+		).__GSC._POS;
 
 		return {
-			kind: 'WhileStatement',
-			test,
-			body,
-		} as WhileStatement;
+			kind: 'ReturnStatement',
+			value,
+			start: returnTokenPos.start,
+			end: semicolonTokenPos.end,
+		} as ReturnStatement;
 	}
 
-	private parse_break_statement(): Stmt {
-		this.eat(); // advance past break keyword
+	private parseThrowStatement(): STATEMENT {
+		const throwTokenPos = this.advance().__GSC._POS;
+		const message = this.parseExpr();
 
 		return {
-			kind: 'BreakStatement',
-		} as BreakStatement;
+			kind: 'ThrowStatement',
+			message,
+			start: throwTokenPos.start,
+			end: message.end,
+		} as ThrowStatement;
 	}
 
-	private parse_continue_statement(): Stmt {
-		this.eat(); // advance past continue keyword
+	private parseImportStatement(): STATEMENT {
+		const importTokenPos = this.advance().__GSC._POS;
+
+		this.expect(NodeType.OpenBrace, 'following import keyword');
+
+		/**
+		 * <ExportOriginalIdentifer, AliasIdentifier>
+		 */
+		const imports = new Map<string, string>();
+
+		while (this.notEOF() && this.current().type != NodeType.CloseBrace) {
+			if (this.current().type == NodeType.Identifier) {
+				if (this.next().type == NodeType.As) {
+					// this advances past the Identifier (checked with this.current()),
+					// then advances past the "as" keyword (checked with this.next()),
+					// then advances past the alias Identifer
+
+					const exportedIdent = this.advance().value;
+					this.advance(); // advance past "as"
+					const aliasIdent = this.expect(
+						NodeType.Identifier,
+						'following "as" keyword'
+					).value;
+					imports.set(exportedIdent, aliasIdent);
+				} else {
+					const exportedIdent = this.advance().value;
+					imports.set(exportedIdent, exportedIdent);
+				}
+			} else if (this.current().type == NodeType.Comma) this.advance(); // advance past comma
+		}
+
+		this.expect(NodeType.CloseBrace, 'following imports');
+
+		this.expect(NodeType.From, 'in import statement');
+
+		const source = this.expect(
+			NodeType.String,
+			'containing the file to import'
+		);
 
 		return {
-			kind: 'ContinueStatement',
-		} as ContinueStatement;
+			kind: 'ImportStatement',
+			imports,
+			source: source.value,
+			start: importTokenPos.start,
+			end: source.__GSC._POS.end,
+		} as ImportStatement;
 	}
 
-	private parse_if_statement(): Stmt {
-		this.eat(); // advance past if keyword
-		this.expect(
-			TokenType.OpenParen,
-			'Expected "(" following if statement.'
-		);
+	private parseExportStatement(): STATEMENT {
+		const exportTokenPos = this.advance().__GSC._POS;
 
-		const test = this.parse_expr();
+		const value = this.parseStatement();
 
-		this.expect(
-			TokenType.CloseParen,
-			'Expected ")" following if statement test expression.'
-		);
+		return {
+			kind: 'ExportStatement',
+			value,
+			start: exportTokenPos.start,
+			end: value.end,
+		} as ExportStatement;
+	}
 
-		const body = this.parse_block_statement();
+	private parseClassDeclaration(): STATEMENT {
+		const classTokenPos = this.advance().__GSC._POS;
 
-		let alt: Stmt[] = [];
+		const name = this.expect(
+			NodeType.Identifier,
+			'following class keyword'
+		).value;
 
-		if (this.at().type == TokenType.Else) {
-			this.eat(); // advance past else keyword
+		this.expect(NodeType.OpenBrace, 'following class identifier');
 
-			if (this.at().type == TokenType.If) {
-				// Allows Else If statements
-				alt = [this.parse_if_statement()];
+		const Class = this.parseClassBody();
+
+		const endPos = this.expect(NodeType.CloseBrace, 'following class body')
+			.__GSC._POS;
+
+		return {
+			kind: 'ClassDeclaration',
+			name,
+			properties: Class.properties,
+			methods: Class.methods,
+			constructor: Class.constructor,
+			start: classTokenPos.start,
+			end: endPos.end,
+		} as ClassDeclaration;
+	}
+
+	private parseClassBody(): ClassBody {
+		const properties: Array<ClassProperty> = new Array<ClassProperty>();
+		const methods: Array<ClassMethod> = new Array<ClassMethod>();
+		let constructor: ConstructorStatement | undefined = undefined;
+
+		// loop through body of class
+		while (this.notEOF() && this.current().type != NodeType.CloseBrace) {
+			if (
+				this.current().type == NodeType.Public ||
+				this.current().type == NodeType.Private
+			) {
+				// property notation
+				// <public | private> <static?> [IDENTIFIER] = [VALUE];
+				const startPos = this.current().__GSC._POS;
+				const isPublic = this.advance().type == NodeType.Public;
+
+				let isStatic: boolean = false;
+				if (this.current().type == NodeType.Static) {
+					this.advance();
+					isStatic = true;
+				}
+
+				const identifier = this.expect(
+					NodeType.Identifier,
+					`following ${
+						isStatic ? 'static' : isPublic ? 'public' : 'private'
+					} keyword`
+				).value;
+
+				if (this.current().type == NodeType.Semicolon) {
+					// undefined property
+					const endPos = this.expect(
+						NodeType.Semicolon,
+						'following property declaration'
+					).__GSC._POS;
+
+					const prop = {
+						kind: 'ClassProperty',
+						identifier,
+						static: isStatic,
+						public: isPublic,
+						start: startPos.start,
+						end: endPos.end,
+					} as ClassProperty;
+
+					properties.push(prop);
+				} else if (this.current().type == NodeType.Equals) {
+					// defined property
+					this.advance();
+
+					const value = this.parseExpr();
+
+					const prop = {
+						kind: 'ClassProperty',
+						identifier,
+						public: isPublic,
+						static: isStatic,
+						value,
+						start: startPos.start,
+						end: value.end,
+					} as ClassProperty;
+
+					this.expect(
+						NodeType.Semicolon,
+						'following property declarations'
+					);
+
+					properties.push(prop);
+				} else if (this.current().type == NodeType.OpenParen) {
+					// method
+					const args = this.parseArgs();
+					const params: Array<string> = [];
+
+					for (const arg of args) {
+						if (arg.kind !== 'Identifier') {
+							console.log(arg);
+							throw new ParseError(
+								'Expected parameter to be of type string',
+								`${sourceFile}:${getErrorLocation(
+									this.current()
+								)}`
+							);
+						}
+
+						params.push((arg as Identifier).symbol);
+					}
+
+					const body: CodeBlockNode = this.parseCodeBlock();
+
+					const method = {
+						kind: 'ClassMethod',
+						name: identifier,
+						public: isPublic,
+						params,
+						body,
+						start: startPos.start,
+						end: body.end,
+					} as ClassMethod;
+
+					methods.push(method);
+				} else {
+					throw new ParseError(
+						`Unexpected token following ${
+							isStatic
+								? 'static'
+								: isPublic
+								? 'public'
+								: 'private'
+						} keyword`,
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					);
+				}
+			} else if (this.current().type == NodeType.Constructor) {
+				constructor =
+					this.parseConstructorStatement() as ConstructorStatement;
 			} else {
-				alt = this.parse_block_statement();
+				console.log(
+					new ParseError(
+						`Expected "public", "private", or "constructor" keywords, instead saw "${
+							this.current().value
+						}"`,
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					)
+				);
+			}
+		}
+
+		return {
+			constructor,
+			properties,
+			methods,
+		} as ClassBody;
+	}
+
+	private parseConstructorStatement(): STATEMENT {
+		const constructorTokenPos = this.advance().__GSC._POS;
+
+		const args = this.parseArgs();
+		const params: Array<string> = [];
+
+		for (const arg of args) {
+			if (arg.kind !== 'Identifier') {
+				console.log(arg);
+				throw new ParseError(
+					'Expected parameter to be of type string',
+					`${sourceFile}:${getErrorLocation(this.current())}`
+				);
+			}
+
+			params.push((arg as Identifier).symbol);
+		}
+
+		const body = this.parseCodeBlock();
+
+		return {
+			kind: 'ConstructorStatement',
+			params,
+			body,
+			start: constructorTokenPos.start,
+			end: body.end,
+		} as ConstructorStatement;
+	}
+
+	private parseIfStatement(): STATEMENT {
+		const ifTokenPos = this.advance().__GSC._POS;
+
+		this.expect(NodeType.OpenParen, 'following "if" statement');
+
+		const test = this.parseExpr();
+
+		this.expect(NodeType.CloseParen, 'following expression');
+
+		const body = this.parseCodeBlock();
+
+		let alt: CodeBlockNode = {} as CodeBlockNode;
+
+		if (this.current().type == NodeType.Else) {
+			this.advance();
+
+			if (this.current().type == NodeType.If) {
+				const altBody = this.parseIfStatement();
+				alt = {
+					kind: 'CodeBlockNode',
+					body: [altBody],
+					start: body.start,
+					end: body.end,
+				} as CodeBlockNode;
+			} else {
+				alt = this.parseCodeBlock();
 			}
 		}
 
@@ -293,604 +648,630 @@ export default class Parser {
 			test,
 			body,
 			alt,
+			start: ifTokenPos.start,
+			end: body.end,
 		} as IfStatement;
 	}
 
-	private parse_import_statement(): Stmt {
-		this.eat(); // advance past import keyword
+	private parseForStatement(): STATEMENT {
+		const forTokenPos = this.advance().__GSC._POS;
 
-		const variable = this.expect(
-			TokenType.Identifier,
-			'Expected identifier after import statement.'
-		).value;
+		this.expect(NodeType.OpenParen, 'following "for" keyword');
+
+		const initializer = this.parseVariableDeclaration();
+		const test = this.parseExpr();
 
 		this.expect(
-			TokenType.From,
-			'Expected "from" keyword following identifier.'
+			NodeType.Semicolon,
+			'following test expression in for loop'
 		);
 
-		const file = this.expect(
-			TokenType.String,
-			'Expected string to file location in import statement.'
-		).value;
+		const update = this.parseAsgExpr();
+
+		this.expect(
+			NodeType.CloseParen,
+			'following update expression in for loop'
+		);
+
+		const body = this.parseCodeBlock();
 
 		return {
-			kind: 'ImportStatement',
-			variable,
-			file,
-		} as ImportStatement;
+			kind: 'ForStatement',
+			initializer,
+			test,
+			update,
+			body,
+			start: forTokenPos.start,
+			end: body.end,
+		} as ForStatement;
 	}
 
-	private parse_export_statement(): Stmt {
-		this.eat(); // advance past export keyword
+	private parseWhileStatement(): STATEMENT {
+		const whileTokenPos = this.advance().__GSC._POS;
 
-		const exportedValue = this.parse_expr();
+		this.expect(NodeType.OpenParen, 'following "while" keyword');
 
-		if (exportedValue.kind != 'Identifier') {
-			throw 'Export statements can only export identifiers (variables and functions).';
+		const test = this.parseExpr();
+
+		this.expect(
+			NodeType.CloseParen,
+			'following test expression in while loop'
+		);
+
+		const body = this.parseCodeBlock();
+
+		return {
+			kind: 'WhileStatement',
+			test,
+			body,
+			start: whileTokenPos.start,
+			end: body.end,
+		} as WhileStatement;
+	}
+
+	private parseBreakStatement(): STATEMENT {
+		const tokenPos = this.advance().__GSC._POS;
+
+		return {
+			kind: 'BreakStatement',
+			start: tokenPos.start,
+			end: tokenPos.end,
+		} as BreakStatement;
+	}
+
+	private parseContinueStatement(): STATEMENT {
+		const tokenPos = this.advance().__GSC._POS;
+
+		return {
+			kind: 'ContinueStatement',
+			start: tokenPos.start,
+			end: tokenPos.end,
+		} as ContinueStatement;
+	}
+
+	// [EXPRESSIONS]
+	private parseExpr(): EXPRESSION {
+		return this.parseFunctionExpr();
+	}
+
+	// Special Expressions
+	private parseFunctionExpr(): EXPRESSION {
+		if (this.current().type == NodeType.Func) {
+			const start = this.advance().__GSC._POS.start;
+
+			const args = this.parseArgs();
+			const params: Array<string> = [];
+
+			for (const arg of args) {
+				if (arg.kind !== 'Identifier') {
+					console.log(arg);
+					throw new ParseError(
+						'Expected arguments to be identifiers',
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					);
+				}
+
+				params.push((arg as Identifier).symbol);
+			}
+
+			const body = this.parseCodeBlock();
+
+			return {
+				kind: 'FunctionDeclarationExpr',
+				params,
+				body,
+				start,
+				end: body.end,
+			} as FunctionDeclarationExpr;
 		}
 
-		this.expect(
-			TokenType.Semicolon,
-			'Expected semicolon (;) following export statement'
-		);
-
-		return {
-			kind: 'ExportStatement',
-			identifier: (exportedValue as Identifier).symbol,
-			exportedValue,
-		} as ExportStatement;
+		return this.parseAsgExpr();
 	}
 
-	/**
-	 * Handle function declarations
-	 *
-	 * func IDENT (...args) {
-	 *    ...code
-	 * }
-	 */
-	private parse_func_declaration(): Stmt {
-		this.eat(); // advance past func keyword
-		const name = this.expect(
-			TokenType.Identifier,
-			'Expected identifier following func keyword.'
-		).value;
+	//
+	// Expressions parsed in Order of Precedence (_OPC)
+	//
+	// See lexer/types.ts for more info
+	//
 
-		const args = this.parse_args();
-		const params: string[] = [];
+	private parseAsgExpr(): EXPRESSION {
+		const lhs = this.parseObjectExpr();
+
+		if (
+			[
+				NodeType.Equals,
+				NodeType.AsgAdd,
+				NodeType.AsgMin,
+				NodeType.AsgMult,
+				NodeType.AsgDiv,
+				NodeType.AsgMod,
+				NodeType.Bitwise_AsgLShift,
+				NodeType.Bitwise_AsgSRShift,
+				NodeType.Bitwise_AsgZFRShift,
+				NodeType.Bitwise_AsgAND,
+				NodeType.Bitwise_AsgOR,
+				NodeType.Bitwise_AsgXOR,
+			].includes(this.current().type)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseAsgExpr();
+			return {
+				kind: 'AssignmentExpr',
+				value: rhs,
+				assigne: lhs,
+				AsgOp: op,
+				start: lhs.start,
+				end: rhs.end,
+			} as AssignmentExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseObjectExpr(): EXPRESSION {
+		if (this.current().type !== NodeType.OpenBrace) {
+			return this.parseTryCatchExpr();
+		}
+
+		const startTokenPos = this.advance().__GSC._POS;
+		const properties = new Array<Property>();
+
+		while (this.notEOF() && this.current().type != NodeType.CloseBrace) {
+			let key: Token;
+			if (this.current().type == NodeType.String) {
+				// if the key is a "string"
+				key = this.expect(
+					NodeType.String,
+					'as key for KEY-VALUE pair declaration on object expression'
+				);
+			} else {
+				key = this.expect(
+					NodeType.Identifier,
+					'as key for KEY-VALUE pair declaration on object expression'
+				);
+			}
+
+			if (this.current().type == NodeType.Comma) {
+				// { key, }
+				this.advance();
+				properties.push({
+					key: key.value,
+					kind: 'ObjectProperty',
+					start: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+					end: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+				});
+				continue;
+			} else if (this.current().type == NodeType.CloseBrace) {
+				// { key }
+				properties.push({
+					key: key.value,
+					kind: 'ObjectProperty',
+					start: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+					end: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+				} as Property);
+				continue;
+			}
+
+			// { key: value }
+			this.expect(NodeType.Colon, 'after identifier');
+			const value = this.parseExpr();
+
+			properties.push({
+				kind: 'ObjectProperty',
+				value,
+				key: key.value,
+				start: {
+					Line: key.__GSC._POS.start.Line!,
+					Column: key.__GSC._POS.start.Column!,
+				},
+				end: {
+					Line: key.__GSC._POS.start.Line!,
+					Column: key.__GSC._POS.start.Column!,
+				},
+			} as Property);
+
+			if (this.current().type != NodeType.CloseBrace) {
+				this.expect(
+					NodeType.Comma,
+					'or closing brace following property declaration'
+				);
+			}
+		}
+
+		const closeBracePos = this.expect(
+			NodeType.CloseBrace,
+			'at end of object declaration expression'
+		).__GSC._POS;
+
+		return {
+			kind: 'ObjectLiteral',
+			properties,
+			start: startTokenPos.start,
+			end: closeBracePos.end,
+		} as ObjectLiteral;
+	}
+
+	private parseTryCatchExpr(): EXPRESSION {
+		if (this.current().type != NodeType.Try) return this.parseArrayExpr();
+
+		const tryTokenPos = this.advance().__GSC._POS;
+
+		const tryBody = this.parseCodeBlock();
+
+		const catchTokenPos = this.expect(
+			NodeType.Catch,
+			'in "Try-Catch" statement'
+		);
+
+		const args = this.parseArgs();
+		const params: Array<string> = [];
+
+		if (args.length != 1) {
+			console.log(
+				new ParseError(
+					'"Catch" statements can only have one argument, containing the error variable',
+					`${sourceFile}:${getErrorLocation(catchTokenPos)}`
+				)
+			);
+		}
+
 		for (const arg of args) {
 			if (arg.kind !== 'Identifier') {
 				console.log(arg);
-				throw 'Expected paramters to of type string.';
+				throw new ParseError(
+					'Expected arguments to be identifiers',
+					`${sourceFile}:${getErrorLocation(this.current())}`
+				);
 			}
 
 			params.push((arg as Identifier).symbol);
 		}
 
-		const body: Stmt[] = this.parse_block_statement();
-
-		const func = {
-			body,
-			name,
-			parameters: params,
-			kind: 'FunctionDeclaration',
-		} as FunctionDeclaration;
-
-		return func;
-	}
-
-	private parse_return_statement(): Stmt {
-		this.eat(); // advance past return keyword
-
-		const value = this.parse_expr();
-
-		this.expect(
-			TokenType.Semicolon,
-			'Expected ";" following return statement.'
-		);
+		const catchBody = this.parseCodeBlock();
 
 		return {
-			kind: 'ReturnStatement',
-			value,
-		} as ReturnStatement;
+			kind: 'TryCatchStatement',
+			tryBody,
+			catchBody,
+			errorIdentifier: params[0],
+			start: tryTokenPos.start,
+			end: catchBody.end,
+		} as TryCatchStatement;
 	}
 
-	/**
-	 * Handle variable declarations
-	 *
-	 * let IDENT;
-	 * (let | const) IDENT = EXPR;
-	 *
-	 * Semicolons (;) are required for variable declarations
-	 */
-	private parse_var_declaration(): Stmt {
-		const isConstant = this.eat().type == TokenType.Const;
-		const identifier = this.expect(
-			TokenType.Identifier,
-			'Expected identifier following variable declaration keywords.'
-		).value;
-
-		if (this.at().type == TokenType.Semicolon) {
-			this.eat(); // eat semicolon
-			if (isConstant) {
-				throw 'ParseError: Constant values must be declared with a value.';
-			}
-
-			return {
-				kind: 'VarDeclaration',
-				constant: false,
-				identifier,
-			} as VarDeclaration;
+	private parseArrayExpr(): EXPRESSION {
+		if (this.current().type != NodeType.OpenBracket) {
+			return this.parseLogOr();
 		}
 
-		this.expect(
-			TokenType.Equals,
-			'Unexpected token. Expected "=" following identifier for variable declaration.'
-		);
+		const arrayPos = this.advance().__GSC._POS;
+		const elements: Array<ArrayElement['elements']> = [];
 
-		const declaration = {
-			kind: 'VarDeclaration',
-			value: this.parse_expr(),
-			identifier,
-			constant: isConstant,
-		} as VarDeclaration;
-
-		this.expect(
-			TokenType.Semicolon,
-			'Variable declaration statements must end with a semicolon.'
-		);
-
-		return declaration;
-	}
-
-	private parse_class_declaration(): Stmt {
-		this.eat(); // advance past class keyword
-
-		const name = this.expect(
-			TokenType.Identifier,
-			'Expected identifier following class declaration.'
-		).value;
-
-		this.expect(
-			TokenType.OpenBrace,
-			'Expected "{" following class identifier.'
-		);
-
-		const Class = this.parse_class_body();
-
-		this.expect(TokenType.CloseBrace, 'Expected "}" following class body.');
-
-		return {
-			kind: 'ClassDeclaration',
-			name,
-			properties: Class.properties,
-			methods: Class.methods,
-			constructor: Class.constructor,
-		} as ClassDeclaration;
-	}
-
-	private parse_constructor_statement(): Stmt {
-		this.eat(); // advance past constructor keyword
-
-		const args = this.parse_args();
-		const parameters: string[] = [];
-		for (const arg of args) {
-			if (arg.kind !== 'Identifier') {
-				console.log(arg);
-				throw 'Expected paramters to be of type string.';
-			}
-
-			parameters.push((arg as Identifier).symbol);
-		}
-
-		const body = this.parse_block_statement();
-
-		return {
-			kind: 'ClassConstructor',
-			parameters,
-			body,
-		} as ClassConstructor;
-	}
-
-	private parse_class_body(): Class {
-		const properties: ClassProperty[] = new Array<ClassProperty>();
-		const methods: ClassMethod[] = new Array<ClassMethod>();
-		let constructor: Stmt | undefined = undefined;
-		// Check for public/private properties/methods
-		while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
+		while (this.notEOF() && this.current().type != NodeType.CloseBracket) {
+			if (this.current().type == NodeType.Comma) this.advance(); // continue past commas
+			const value = this.parseExpr();
 			if (
-				this.at().type == TokenType.Public ||
-				this.at().type == TokenType.Private
+				[
+					'StringLiteral',
+					'NumberLiteral',
+					'ObjectLiteral',
+					'ArrayLiteral',
+					'Identifier',
+				].includes(value.kind)
 			) {
-				const isPublic = this.eat().type === TokenType.Public; // advance past public/private keyword and check if public property/method
-				const identifier = this.expect(
-					TokenType.Identifier,
-					`Expected identifier following ${
-						isPublic ? 'public' : 'private'
-					} keyword declaration.`
-				).value;
-
-				if (this.at().type == TokenType.Semicolon) {
-					// undefined PROPERTY
-					this.eat(); // advance past semicolon
-
-					const classProp = {
-						kind: 'ClassProperty',
-						public: isPublic,
-						identifier,
-					} as ClassProperty;
-
-					properties.push(classProp);
-				} else if (this.at().type == TokenType.Equals) {
-					// defined PROPERTY
-					this.eat(); // advance past =
-					const classProp = {
-						kind: 'ClassProperty',
-						public: isPublic,
-						identifier,
-						value: this.parse_expr(),
-					} as ClassProperty;
-
-					this.expect(
-						TokenType.Semicolon,
-						'Expected semicolon following class property declaration.'
-					);
-
-					properties.push(classProp);
-				} else if (this.at().type == TokenType.OpenParen) {
-					// defined METHOD
-					const args = this.parse_args();
-					const params: string[] = [];
-					for (const arg of args) {
-						if (arg.kind !== 'Identifier') {
-							console.log(arg);
-							throw 'Expected paramters to of type string.';
-						}
-
-						params.push((arg as Identifier).symbol);
-					}
-
-					const body: Stmt[] = this.parse_block_statement();
-
-					const classMethod = {
-						kind: 'ClassMethod',
-						public: isPublic,
-						identifier,
-						parameters: params,
-						body,
-					} as ClassMethod;
-
-					methods.push(classMethod);
-				} else {
-					throw `Unexpected token following ${
-						isPublic ? 'public' : 'private'
-					} property declaration. Token: ${this.at()}`;
-				}
-			} else if (this.at().type == TokenType.Constructor) {
-				constructor = this.parse_constructor_statement();
+				elements.push(value as ArrayElement['elements']);
 			} else {
-				throw `ParseError: Expected "public", "private", or "constructor" keywords. Instead got "${
-					this.at().value
-				}"`;
-			}
-		}
-
-		return {
-			constructor,
-			properties,
-			methods,
-		} as Class;
-	}
-
-	private parse_throw_statement(): Stmt {
-		this.eat(); // advance past throw keyword
-		const message = this.parse_expr();
-
-		this.expect(
-			TokenType.Semicolon,
-			'Expected ";"  following throw statement.'
-		);
-
-		return { kind: 'ThrowStatement', message } as ThrowStatement;
-	}
-
-	/**
-	 * Handle expressions
-	 */
-	private parse_expr(): Expr {
-		return this.parse_assignment_expr();
-	}
-
-	/**
-	 * Handle variable reassignments
-	 */
-	private parse_assignment_expr(): Expr {
-		const left = this.parse_class_init();
-		if (this.at().type == TokenType.Equals) {
-			this.eat(); // advance past equals token
-			const value = this.parse_assignment_expr();
-			return {
-				value,
-				assigne: left,
-				kind: 'AssignmentExpr',
-			} as AssignmentExpr;
-		}
-
-		return left;
-	}
-
-	private parse_class_init(): Expr {
-		if (this.at().type == TokenType.New) {
-			this.eat(); // advance past "new" keyword
-			const identifier = this.expect(
-				TokenType.Identifier,
-				'Expected identifier following "new" keyword.'
-			).value;
-
-			const args = this.parse_args();
-
-			return {
-				kind: 'ClassInitExpr',
-				name: identifier,
-				args,
-			} as ClassInit;
-		}
-
-		return this.parse_object_expr();
-	}
-
-	private parse_object_expr(): Expr {
-		// { Prop[] }
-		if (this.at().type !== TokenType.OpenBrace) {
-			return this.parse_try_catch_expr(); // check for Try-Catch statement
-		}
-
-		this.eat(); // advance past the open brace
-		const properties = new Array<Property>();
-
-		while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
-			const key = this.expect(
-				TokenType.Identifier,
-				'Expected key for key: value pair declaration.'
-			).value;
-
-			// Allows object key: value shortcut
-			// { key, }
-			if (this.at().type == TokenType.Comma) {
-				this.eat(); // advance past the comma
-				properties.push({ key, kind: 'Property' } as Property);
-				continue;
-			}
-			// { key }
-			else if (this.at().type == TokenType.CloseBrace) {
-				properties.push({ key, kind: 'Property' } as Property);
-				continue;
-			}
-
-			// { key: value }
-			this.expect(TokenType.Colon, 'Expected colon after identifier');
-			const value = this.parse_expr();
-
-			properties.push({ kind: 'Property', value, key });
-			if (this.at().type != TokenType.CloseBrace) {
-				this.expect(
-					TokenType.Comma,
-					'Expected comma or closing brace following property declaration.'
+				throw new ParseError(
+					`Invalid expression in array, "${value.kind}" is not allowed in arrays`,
+					`${sourceFile}:${getErrorLocation(this.current())}`
 				);
 			}
 		}
 
-		this.expect(
-			TokenType.CloseBrace,
-			'Expected closing brace when defining an object'
-		);
-		return { kind: 'ObjectLiteral', properties } as ObjectLiteral;
-	}
-
-	/**
-	 * Handle multiplication (*), division (/), and modulo (%) operations
-	 */
-	private parse_multiplicitave_expr(): Expr {
-		let left = this.parse_additive_expr();
-
-		while (['/', '*', '%'].includes(this.at().value)) {
-			const operator = this.eat().value;
-			const right = this.parse_additive_expr();
-			left = {
-				kind: 'BinaryExpr',
-				left,
-				right,
-				operator,
-			} as BinaryExpr;
-		}
-
-		return left;
-	}
-
-	/**
-	 * Handle addition (+) and subtraction (-) operations
-	 */
-	private parse_additive_expr(): Expr {
-		let left = this.parse_comparison_expr();
-
-		while (['+', '-'].includes(this.at().value)) {
-			const operator = this.eat().value;
-			const right = this.parse_comparison_expr();
-			left = {
-				kind: 'BinaryExpr',
-				left,
-				right,
-				operator,
-			} as BinaryExpr;
-		}
-
-		return left;
-	}
-
-	private parse_comparison_expr(): Expr {
-		let left = this.parse_equality_expr();
-
-		while (['<', '>'].includes(this.at().value)) {
-			const operator = this.eat().value;
-			const right = this.parse_equality_expr();
-			left = {
-				kind: 'BinaryExpr',
-				left,
-				right,
-				operator,
-			} as BinaryExpr;
-		}
-
-		return left;
-	}
-
-	private parse_equality_expr(): Expr {
-		let left = this.parse_and_expr();
-
-		while (['!=', '=='].includes(this.at().value)) {
-			const operator = this.eat().value;
-			const right = this.parse_equality_expr();
-			left = {
-				kind: 'BinaryExpr',
-				left,
-				right,
-				operator,
-			} as BinaryExpr;
-		}
-
-		return left;
-	}
-
-	private parse_and_expr(): Expr {
-		let left = this.parse_or_expr();
-
-		while (['&&'].includes(this.at().value)) {
-			const operator = this.eat().value;
-			const right = this.parse_or_expr();
-			left = {
-				kind: 'BinaryExpr',
-				left,
-				right,
-				operator,
-			} as BinaryExpr;
-		}
-
-		return left;
-	}
-
-	private parse_or_expr(): Expr {
-		let left = this.parse_call_member_expr();
-
-		while (['||'].includes(this.at().value)) {
-			const operator = this.eat().value;
-			const right = this.parse_call_member_expr();
-			left = {
-				kind: 'BinaryExpr',
-				left,
-				right,
-				operator,
-			} as BinaryExpr;
-		}
-
-		return left;
-	}
-
-	private parse_try_catch_expr(): Expr {
-		if (this.at().value !== 'try') return this.parse_multiplicitave_expr();
-
-		this.eat(); // advance past try keyword
-
-		const body = this.parse_block_statement();
-
-		if (this.at().value !== 'catch')
-			throw '"Try-Catch" statements must have a "catch" statement after "try" statement.';
-
-		this.eat(); // advance past catch keyword
-
-		const alt = this.parse_block_statement();
+		const end = this.expect(NodeType.CloseBracket, 'at end of array');
 
 		return {
-			kind: 'TryCatchStatement',
-			body,
-			alt,
-		} as TryCatchStatement;
+			kind: 'ArrayLiteral',
+			elements,
+			start: arrayPos.start,
+			end: end.__GSC._POS.end,
+		} as ArrayLiteral;
 	}
 
-	// foo.bar()()
-	private parse_call_member_expr(): Expr {
-		const member = this.parse_member_expr();
+	private parseLogOr(): EXPRESSION {
+		let lhs = this.parseLogAnd();
 
-		if (this.at().type == TokenType.OpenParen) {
-			return this.parse_call_expr(member);
+		while (this.current().type == NodeType.Or) {
+			const op = this.advance().type;
+			const rhs = this.parseLogOr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseLogAnd(): EXPRESSION {
+		let lhs = this.parseBitwiseOR();
+
+		while (this.current().type == NodeType.And) {
+			const op = this.advance().type;
+			const rhs = this.parseLogAnd();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseBitwiseOR(): EXPRESSION {
+		let lhs = this.parseBitwiseXOR();
+
+		while (this.current().type == NodeType.Bitwise_OR) {
+			const op = this.advance().type;
+			const rhs = this.parseBitwiseOR();
+			lhs = {
+				kind: 'BitwiseExpr',
+				op,
+				lhs,
+				rhs,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseBitwiseXOR(): EXPRESSION {
+		let lhs = this.parseBitwiseAND();
+
+		while (this.current().type == NodeType.Bitwise_XOR) {
+			const op = this.advance().type;
+			const rhs = this.parseBitwiseXOR();
+			lhs = {
+				kind: 'BitwiseExpr',
+				op,
+				rhs,
+				lhs,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseBitwiseAND(): EXPRESSION {
+		let lhs = this.parseEqualityExpr();
+
+		while (this.current().type == NodeType.Bitwise_AND) {
+			const op = this.advance().type;
+			const rhs = this.parseBitwiseAND();
+			lhs = {
+				kind: 'BitwiseExpr',
+				op,
+				rhs,
+				lhs,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseEqualityExpr(): EXPRESSION {
+		let lhs = this.parseComparisonExpr();
+
+		while (
+			[
+				NodeType.NotEqual,
+				NodeType.IsEqual,
+				NodeType.LessThanOrEquals,
+				NodeType.GreaterThanOrEquals,
+			].includes(this.current().type)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseEqualityExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseComparisonExpr(): EXPRESSION {
+		let lhs = this.parseBitwiseSHIFT();
+
+		while (
+			[NodeType.LessThan, NodeType.GreaterThan].includes(
+				this.current().type
+			)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseComparisonExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseBitwiseSHIFT(): EXPRESSION {
+		let lhs = this.parseMultiplicativeExpr();
+
+		while (
+			[
+				NodeType.Bitwise_LShift,
+				NodeType.Bitwise_SRShift,
+				NodeType.Bitwise_ZFRShift,
+			].includes(this.current().type)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseBitwiseSHIFT();
+			lhs = {
+				kind: 'BitwiseExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BitwiseExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseMultiplicativeExpr(): EXPRESSION {
+		let lhs = this.parseAdditiveExpr();
+
+		while (
+			[NodeType.Multiply, NodeType.Divide, NodeType.Modulo].includes(
+				this.current().type
+			)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseMultiplicativeExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	private parseAdditiveExpr(): EXPRESSION {
+		let lhs = this.parseCallMemberExpr();
+
+		while ([NodeType.Plus, NodeType.Minus].includes(this.current().type)) {
+			const op = this.advance().type;
+			const rhs = this.parseAdditiveExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
+	}
+
+	// [OTHER]
+
+	//
+	// Any other operation that has the "_OPC.None" property
+	//
+
+	private parseCallMemberExpr(): EXPRESSION {
+		const member = this.parseMemberExpr();
+
+		if (this.current().type == NodeType.OpenParen) {
+			return this.parseCallExpr(member);
 		}
 
 		return member;
 	}
 
-	private parse_call_expr(caller: Expr): Expr {
-		let call_expr: Expr = {
+	private parseCallExpr(caller: EXPRESSION): EXPRESSION {
+		const args = this.parseArgs();
+		let callExpr: EXPRESSION = {
 			kind: 'CallExpr',
 			caller,
-			args: this.parse_args(),
+			args,
+			start: caller.start,
+			end: args[args.length - 1]?.end || caller.end,
 		} as CallExpr;
 
-		if (this.at().type == TokenType.OpenParen) {
-			call_expr = this.parse_call_expr(call_expr);
-		}
+		if (this.current().type == NodeType.OpenParen)
+			callExpr = this.parseCallExpr(callExpr);
 
-		return call_expr;
+		return callExpr;
 	}
 
-	private parse_args(): Expr[] {
-		this.expect(
-			TokenType.OpenParen,
-			'Expected "(" before parameters list.'
-		);
-		const args =
-			this.at().type == TokenType.CloseParen
-				? []
-				: this.parse_arguments_list();
-
-		this.expect(TokenType.CloseParen, 'Expected ")" after parameters');
-		return args;
-	}
-
-	private parse_arguments_list(): Expr[] {
-		const args = [this.parse_assignment_expr()];
-
-		while (this.at().type == TokenType.Comma && this.eat()) {
-			args.push(this.parse_assignment_expr());
-		}
-
-		return args;
-	}
-
-	private parse_member_expr(): Expr {
-		let object = this.parse_primary_expr();
+	private parseMemberExpr(): EXPRESSION {
+		let object = this.parseNewClassInstanceExpr();
 
 		while (
-			this.at().type == TokenType.Dot ||
-			this.at().type == TokenType.OpenBracket
+			this.current().type == NodeType.Dot ||
+			this.current().type == NodeType.OpenBracket
 		) {
-			const operator = this.eat();
-			let property: Expr;
+			const op = this.advance();
+			let property: EXPRESSION;
 			let computed: boolean;
 
-			// non-computed values, like foo.bar
-			if (operator.type == TokenType.Dot) {
+			if (op.type == NodeType.Dot) {
+				// non-computed values, like "foo.bar"
 				computed = false;
-				// get ident
-				property = this.parse_primary_expr();
+				property = this.parseNewClassInstanceExpr();
+
 				if (property.kind != 'Identifier') {
-					throw 'Cannot use dot operator without valid identifier.';
+					throw new ParseError(
+						'A dot operator must be used with a valid identifier',
+						`${sourceFile}:${property.start.Line}:${property.start.Column}`
+					);
 				}
 			} else {
-				// adds suport for foo[bar]
+				// computed values, like "foo['bar'] or foo[ident]"
 				computed = true;
-				property = this.parse_expr();
+				property = this.parseExpr();
+				if (
+					property.kind != 'StringLiteral' &&
+					property.kind != 'Identifier'
+				) {
+					throw new ParseError(
+						'ComputedObjectError: computed objects can only use STRINGS or IDENTIFIERS',
+						`${sourceFile}:${getErrorLocation(this.current())}`
+					);
+				}
+
 				this.expect(
-					TokenType.CloseBracket,
-					'Expected "]" at end of object member expression'
+					NodeType.CloseBracket,
+					'following computed object member expression'
 				);
 			}
 
@@ -899,71 +1280,134 @@ export default class Parser {
 				object,
 				property,
 				computed,
+				start: object.start,
+				end: property.end,
 			} as MemberExpr;
 		}
 
 		return object;
 	}
 
-	/**
-	 * Order of Precedence
-	 *
-	 * Assignment Operators =
-	 * New Class Init
-	 * Object
-	 * Try Catch Expr
-	 * Multiplication * / %
-	 * Addition/Subtraction + -
-	 * Comparison Operators < >
-	 * Equality Operators == !=
-	 * Logical AND &&
-	 * Logical OR ||
-	 * Call
-	 * Member
-	 * PrimaryExpr
-	 */
+	private parseNewClassInstanceExpr(): EXPRESSION {
+		if (this.current().type == NodeType.New) {
+			const newTokenPos = this.advance().__GSC._POS;
 
-	/**
-	 * Parse literal values and grouping expressions
-	 */
-	private parse_primary_expr(): Expr {
-		const tk = this.at().type;
+			const name = this.expect(
+				NodeType.Identifier,
+				'following "new" keyword'
+			);
 
-		// Figure which token we are at and return its literal value
-		switch (tk) {
-			// User defined values
-			case TokenType.Identifier:
+			const args = this.parseArgs();
+
+			return {
+				kind: 'ClassNewInstanceExpr',
+				name: name.value,
+				args,
+				start: newTokenPos.start,
+				end: args[args.length - 1]?.end || name.__GSC._POS.end,
+			} as ClassNewInstanceExpr;
+		}
+
+		return this.parseUnaryExpr();
+	}
+
+	private parseUnaryExpr(): EXPRESSION {
+		// Post-assigne unary expr (eg. var++)
+		while (
+			[NodeType.Increment, NodeType.Decrement].includes(this.next().type)
+		) {
+			const assigne = this.parsePrimaryExpression();
+			const op = this.advance();
+			return {
+				kind: 'UnaryExpr',
+				assigne,
+				operator: op.type,
+				start: assigne.start,
+				end: op.__GSC._POS.end,
+			} as UnaryExpr;
+		}
+
+		// Pre-assigne unary expr (eg. !var)
+		while (
+			[NodeType.Bitwise_NOT, NodeType.Not].includes(this.current().type)
+		) {
+			const op = this.advance();
+			const assigne = this.parsePrimaryExpression();
+			return {
+				kind: 'UnaryExpr',
+				assigne,
+				operator: op.type,
+				start: op.__GSC._POS.start,
+				end: assigne.end,
+			} as UnaryExpr;
+		}
+
+		return this.parsePrimaryExpression();
+	}
+
+	// Handles everything else
+	private parsePrimaryExpression(): EXPRESSION {
+		const token = this.current();
+
+		switch (token.type) {
+			case NodeType.Identifier:
 				return {
 					kind: 'Identifier',
-					symbol: this.eat().value,
+					symbol: this.advance().value,
+					start: {
+						Line: token.__GSC._POS.start.Line,
+						Column: token.__GSC._POS.start.Column,
+					},
+					end: {
+						Line: token.__GSC._POS.end.Line,
+						Column: token.__GSC._POS.end.Column,
+					},
 				} as Identifier;
 
-			case TokenType.Number:
+			case NodeType.Number:
 				return {
-					kind: 'NumericLiteral',
-					value: parseFloat(this.eat().value),
-				} as NumericLiteral;
+					kind: 'NumberLiteral',
+					value: parseFloat(this.advance().value),
+					start: {
+						Line: token.__GSC._POS.start.Line,
+						Column: token.__GSC._POS.start.Column,
+					},
+					end: {
+						Line: token.__GSC._POS.end.Line,
+						Column: token.__GSC._POS.end.Column,
+					},
+				} as NumberLiteral;
 
-			case TokenType.String:
+			case NodeType.String:
 				return {
 					kind: 'StringLiteral',
-					value: this.eat().value,
+					value: this.advance().value,
+					start: {
+						Line: token.__GSC._POS.start.Line,
+						Column: token.__GSC._POS.start.Column,
+					},
+					end: {
+						Line: token.__GSC._POS.end.Line,
+						Column: token.__GSC._POS.end.Column,
+					},
 				} as StringLiteral;
 
-			case TokenType.OpenParen: {
-				this.eat(); // eat the opening paren
-				const value = this.parse_expr();
-				this.expect(
-					TokenType.CloseParen,
-					`Expected ")" and instead saw ${value}`
-				); // expect closing paren
+			case NodeType.OpenParen:
+				this.advance();
+				const value = this.parseExpr();
+				this.expect(NodeType.CloseParen);
 
 				return value;
-			}
 
 			default:
-				console.error(`ParseError: Unexpected token: `, this.at());
-				process.exit(1);
+				throw new ParseError(
+					`Uncaught: Unexpected token "${
+						getTokenByTypeEnum(this.current().type)?.value
+					}"`,
+					`${sourceFile || 'GSREPL'}:${getErrorLocation(
+						this.current()
+					)}`
+				);
 		}
 	}
 }
