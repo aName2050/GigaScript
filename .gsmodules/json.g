@@ -1,13 +1,9 @@
 export const MODULE_NAME = 'json';
 
-function toString(obj) {
+export func toString(obj) {
     return GSON.toString(obj);
 }
 
-export toString
-
-function toJSON(str) {
+export func toJSON(str) {
     return GSON.toGSON(str);
 }
-
-export toJSON
