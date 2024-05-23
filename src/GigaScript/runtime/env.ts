@@ -40,16 +40,24 @@ export function createGlobalScope(cwd: string): Environment {
 	env.declareVar(isGSXFile ? 'whoops' : 'error', NativeValues.Error, true);
 
 	// Native functions
-	env.declareVar(isGSXFile ? 'yap' : 'print', NativeFunctions.print, true);
 	env.declareVar(
-		'generateTimestamp',
+		isGSXFile ? 'HelloWorld' : 'print',
+		NativeFunctions.print,
+		true
+	);
+	env.declareVar(
+		isGSXFile ? 'theCurrentTimeAtThisVeryMoment' : 'generateTimestamp',
 		NativeFunctions.generateTimestamp,
 		true
 	);
 	env.declareVar(isGSXFile ? 'nerd' : 'math', NativeFunctions.math, true);
-	env.declareVar('formatString', NativeFunctions.formatString, true);
+	env.declareVar(
+		isGSXFile ? 'lockIn' : 'formatString',
+		NativeFunctions.formatString,
+		true
+	);
 	env.declareVar('Array', NativeFunctions.Array, true);
-	env.declareVar('GSON', NativeFunctions.GSON, true);
+	env.declareVar(isGSXFile ? 'GigaSON' : 'GSON', NativeFunctions.GSON, true);
 
 	return env;
 }
