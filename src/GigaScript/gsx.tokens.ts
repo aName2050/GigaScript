@@ -113,7 +113,7 @@ setTokenData(TokenID.Export, NodeType.Export, 'yeet', OpPrec.None);
 setTokenData(TokenID.From, NodeType.From, 'from', OpPrec.None);
 setTokenData(TokenID.As, NodeType.As, 'as', OpPrec.Assignment);
 
-setTokenData(TokenID.Throw, NodeType.Throw, 'uhhh', OpPrec.None);
+setTokenData(TokenID.Throw, NodeType.Throw, 'shoot', OpPrec.None);
 
 setTokenData(TokenID.Try, NodeType.Try, 'messAround', OpPrec.None);
 setTokenData(TokenID.Catch, NodeType.Catch, 'findOut', OpPrec.None);
@@ -153,8 +153,6 @@ setTokenData(
 setTokenData(TokenID.Semicolon, NodeType.Semicolon, 'rn', OpPrec.None);
 setTokenData(TokenID.Colon, NodeType.Colon, 'is', OpPrec.None);
 setTokenData(TokenID.Dot, NodeType.Dot, '.', OpPrec.None);
-// comma can be "," or "and"
-setTokenData(TokenID.Comma, NodeType.Comma, 'and', OpPrec.None);
 setTokenData(TokenID.Comma, NodeType.Comma, ',', OpPrec.None);
 
 // [assignments]
