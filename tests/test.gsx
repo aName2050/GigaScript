@@ -1,19 +1,19 @@
 lit truthy be nocap rn
 lit falsey be cap rn
 
-yap(truthy)
-yap(falsey)
+HelloWorld(truthy)
+HelloWorld(falsey)
 
 "shoot 'error!!'"
 
-yap(nerd.random(1, 10))
+HelloWorld(nerd.random(1, 10))
 
 bro object be {
-    x is 32,
-    truthy,
+    x is 32 and
+    truthy and
     complex is {
         more is 'hello'
     }
 } rn
 
-yap(object)
+HelloWorld(object)
