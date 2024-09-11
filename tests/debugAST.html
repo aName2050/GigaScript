@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>AST Viewer</title>
+		<style>
+			body {
+				font-family: Arial;
+				padding: 0;
+				background-color: #f4f4f4;
+			}
+
+			li {
+				padding: 2px;
+				border-left: 1px solid black;
+				border-radius: 5px;
+			}
+
+			ul {
+				list-style-type: none;
+			}
+
+			#ast-container {
+				border: 1px solid black;
+				border-radius: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="astBuilder">
+			<h1>Build AST</h1>
+			<textarea
+				name="AST JSON"
+				id="ASTInput"
+				rows="25"
+				cols="100"
+			></textarea>
+			<br />
+			<button id="buildTree" type="button">View as tree</button>
+			<button id="clear" type="button">Clear</button>
+		</div>
+		<h2>AST Tree</h2>
+		<div id="ast-container"></div>
+		<script>
+			var btn = document.getElementById('buildTree');
+			var txtarea = document.getElementById('ASTInput');
+
+			var clear = document.getElementById('clear');
+
+			var container = document.getElementById('ast-container');
+
+			btn.addEventListener(
+				'click',
+				function () {
+					if (!txtarea.value) return alert('an input is required');
+					container.innerHTML = buildHTMLFromAST(
+						JSON.parse(txtarea.value)
+					);
+				},
+				false
+			);
+
+			clear.addEventListener(
+				'click',
+				function () {
+					container.innerHTML = '';
+					txtarea.value = '';
+				},
+				false
+			);
+
+			function buildHTMLFromAST(ast) {
+				let html = '<ul>';
+				for (var node in ast) {
+					const keyValue = ast[node];
+					if (typeof keyValue == 'object') {
+						const openGroup = Array.isArray(keyValue) ? '[' : '{';
+						const closeGroup = Array.isArray(keyValue) ? ']' : '}';
+						html += '<li><span>' + node + '</span>: ' + openGroup;
+						html += buildHTMLFromAST(keyValue);
+						html += closeGroup + '</li>';
+					} else {
+						html += '<li>';
+						html += `${node}: "${keyValue}"`;
+						html += '</li>';
+					}
+				}
+
+				html += '</ul>';
+				return html;
+			}
+		</script>
+		<p>
+			NOTE: Maps, Sets, and Records will appear as empty objects in this
+			view
+		</p>
+		<br />
+		<br />
+		<br />
+	</body>
+</html>
