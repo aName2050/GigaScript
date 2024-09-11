@@ -1,10 +1,10 @@
 {
 	"name": "gigascript",
-	"version": "2.0.0",
+	"version": "3.0.0",
 	"description": "A simple programming language based on TypeScript and Gen-Z slang.",
 	"main": "./src/index.ts",
 	"scripts": {
-		"gigascript": "ts-node ./tests/main.g"
+		"gigascript": "ts-node ./src/index.ts"
 	},
 	"author": "Bardia Shafaee (aName2050)",
 	"license": "MIT",
