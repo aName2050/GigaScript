@@ -15,7 +15,4 @@ export enum SpecialError {
 	ImportError = 'ImportError',
 	InternalError = 'InternalError',
 	CLIError = 'CLIError',
-
-	// CUDA Errors
-	CUDAError = 'CUDAError',
 }
