@@ -28,10 +28,6 @@ if (debug) console.log('GS.DEBUGGER: GigaScript Debugger v2');
 
 const fileLocation: string = file ? path.parse(file).dir : '';
 const srcFileLoc: string = file ? path.resolve(file) : 'GSREPL';
-export {
-	args as CLI_ARGS,
-	srcFileLoc as SOURCE_FILE,
-	useCUDA as USE_CUDA_TOKENIZATION,
-};
+export { args as CLI_ARGS, srcFileLoc as SOURCE_FILE };
 
 // TODO: REPL
