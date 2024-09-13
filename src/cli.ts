@@ -16,10 +16,6 @@ argParser.add_argument('-f', '--file', {
 	type: String,
 	help: 'the file to run',
 });
-argParser.add_argument('--useCUDA', {
-	help: 'enable CUDA(R) for tokenization. Requires NVIDIA(R) GPU with CUDA(R) Cores.',
-	action: 'store_true',
-});
 argParser.add_argument('-d', '--debug', {
 	help: 'enables debug mode',
 	action: 'store_true',

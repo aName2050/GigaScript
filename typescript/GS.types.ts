@@ -16,13 +16,6 @@ export class TSError extends Error {
 	}
 }
 
-export class CUDAError extends Error {
-	constructor(name: SpecialError, message: string) {
-		super(`${message}`);
-		this.name = name;
-	}
-}
-
 /** Represents a single token */
 export interface Token {
 	/** Token ID */
@@ -37,7 +30,8 @@ export interface Token {
 		| TokenID.Operation
 		| TokenID.Special
 		| TokenID.Symbol
-		| TokenID.UnaryOperator;
+		| TokenID.UnaryOperator
+		| TokenID.Type;
 	/** Token structure */
 	type:
 		| Node.AssignmentOperator
