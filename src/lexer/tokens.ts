@@ -6,199 +6,28 @@ import { Node } from '../parser/nodes';
  *
  * @readonly
  */
-export enum TokenID {
-	// [Literal Types]
-	/** Any number between 0 and 9 */
-	_Number,
-	/** Any combination of characters and numbers (certain characters need to be escaped) */
-	_String,
+export namespace TokenID {
+	export enum Literal {}
 
-	/** True value */
-	_True,
-	/** False value */
-	_False,
+	export enum Keyword {}
 
-	/** Undefined value */
-	_Undefined,
+	export enum Operation {}
 
-	/** Null value */
-	_Null,
+	export enum Symbol {}
 
-	/** User defined symbol */
-	_Identifier,
+	export enum AssignmentOperator {}
 
-	// [Keywords]
-	// { VARIABLES }
-	/** Mutable variable declaration */
-	Mut,
-	/** Constant variable declaration */
-	Const,
+	export enum ComparisonOperator {}
 
-	// { FUNCTIONS }
-	/** Function declaration */
-	Function,
-	/** Return statement */
-	Return,
+	export enum UnaryOperator {}
 
-	// { CLASSES }
-	/** Class declaration */
-	Class,
-	/** Class constructor */
-	Constructor,
-	/** Private method/property */
-	Private,
-	/** Public method/property */
-	Public,
-	/** Static method/property */
-	Static,
-	/** New Class */
-	New,
-	/** See https://en.wikipedia.org/wiki/This_(computer_programming) */
-	_This,
+	export enum LogicalOperator {}
 
-	// { IF/ELSE STATEMENTS }
-	/** If statement */
-	If,
-	/** Else statement */
-	Else,
+	export enum BitwiseOperator {}
 
-	// { LOOPS }
-	/** While loop statement */
-	While,
-	/** For loop statement */
-	For,
-	/** Continue statement */
-	Continue,
-	/** Break statement */
-	Break,
+	export enum Group {}
 
-	// { IMPORTS/EXPORTS }
-	/** Import statement */
-	Import,
-	/** Export statement */
-	Export,
-	/** From statement */
-	From,
-	/** As statement */
-	As,
-
-	// { SPECIAL }
-	/** Throw exception statement */
-	Throw,
-
-	/** Try statement */
-	Try,
-	/** Catch statement */
-	Catch,
-
-	/** Binary Operation (+ - * / %) */
-	BinOp,
-
-	// /** Bitwise Operation ( >> << & | ~ ^ ) */
-	// BitOp,
-
-	// { SYMBOLS }
-	// Punctation
-	/** Semicolon ( ; ) */
-	Semicolon,
-	/** Colon ( : ) */
-	Colon,
-	/** Dot ( . ) */
-	Dot,
-	/** Comma ( , ) */
-	Comma,
-
-	// Assignment Operators
-	/** Equals ( = ) */
-	Equals,
-	// /** Plus Equals ( += ) */
-	PlusEquals,
-	/** Minus Equals ( -= ) */
-	MinusEquals,
-	/** Asterisk Equals ( *= ) */
-	AsteriskEquals,
-	/** Slash Equals ( /= ) */
-	SlashEquals,
-	/** Percent Equals ( %= ) */
-	PercentEquals,
-
-	// /** Less Than Less Than Equals ( <<= ) */
-	LessThanLessThanEquals,
-	/** Greater Than Greater Than Equals ( >>= ) */
-	GreaterThanGreaterThanEquals,
-	/** Greater Than Greater Than Greater Than Equals ( >>>= ) */
-	GreaterThanGreaterThanGreaterThanEquals,
-	/** Ampersand Equals ( &= ) */
-	AmpersandEquals,
-	/** Bar Equals ( |= ) */
-	BarEquals,
-	/** Caret Equals ( ^= ) */
-	CaretEquals,
-
-	// Increment/Decrement Operators
-	/** Increment ( ++ ) */
-	PlusPlus,
-	/** Decrement ( -- ) */
-	MinusMinus,
-
-	// Comparison Operators
-	/** Greater Than ( > ) */
-	GreaterThan,
-	/** Less Than ( < ) */
-	LessThan,
-	/** Greater Than or Equal to ( >= ) */
-	GreaterThanEquals,
-	/** Less Than or Equal to ( <= ) */
-	LessThanEquals,
-	/** Equal to ( == ) */
-	EqualsEquals,
-	/** Not Equal to ( != ) */
-	ExclamationEquals,
-
-	// Logical Operators
-	/** Logical And ( && ) */
-	AmpersandAmpersand,
-	/** Logical Or ( || ) */
-	BarBar,
-	/** Logical Not ( ! ) */
-	Exclamation,
-
-	// Bitwise Operators
-	/** Bitwise AND ( & ) */
-	Ampersand,
-	/** Bitwise OR ( | ) */
-	Bar,
-	/** Bitwise XOR ( ^ ) */
-	Caret,
-	/** Bitwise NOT ( ~ ) */
-	Tilda,
-	/** Bitwise LEFT SHIFT ( << ) */
-	LessThanLessThan,
-	/** Bitwise SIGNED RIGHT SHIFT ( >> ) */
-	GreaterThanGreaterThan,
-	/** Bitwise ZERO-FILL RIGHT SHIFT ( >>> ) */
-	GreaterThanGreaterThanGreaterThan,
-
-	// { GROUPING }
-	/** Open Parenthesis ( ( )*/
-	OpenParen,
-	/** Closed Parenthesis ( ) ) */
-	CloseParen,
-	/** Open Brace ( { ) */
-	OpenBrace,
-	/** Close Brace ( } ) */
-	CloseBrace,
-	/** Open Bracket ( [ ) */
-	OpenBracket,
-	/** CloseBracket ( ] ) */
-	CloseBracket,
-	/** Double Quote ( " ) */
-	DoubleQuote,
-	/** Single Quote ( ' ) */
-	SingleQuote,
-
-	/** End Of File (EOF) */
-	__EOF__,
+	export enum Special {}
 }
 
 let Tokens: Record<string, Token> = {};
