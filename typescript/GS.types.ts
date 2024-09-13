@@ -26,7 +26,18 @@ export class CUDAError extends Error {
 /** Represents a single token */
 export interface Token {
 	/** Token ID */
-	id: TokenID;
+	id:
+		| TokenID.AssignmentOperator
+		| TokenID.BitwiseOperator
+		| TokenID.ComparisonOperator
+		| TokenID.Group
+		| TokenID.Keyword
+		| TokenID.Literal
+		| TokenID.LogicalOperator
+		| TokenID.Operation
+		| TokenID.Special
+		| TokenID.Symbol
+		| TokenID.UnaryOperator;
 	/** Token structure */
 	type:
 		| Node.AssignmentOperator
