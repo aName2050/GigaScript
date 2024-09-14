@@ -386,7 +386,7 @@ const tokens: Array<{ id: Token['id']; type: Token['type']; value: string }> = [
 	{
 		id: TokenID.AssignmentOperator.GreaterThanGreaterThanGreaterThanEquals,
 		type: Node.AssignmentOperator.AsgBitwiseZFRShift,
-		value: '>>=',
+		value: '>>>=',
 	},
 	{
 		id: TokenID.AssignmentOperator.AmpersandEquals,

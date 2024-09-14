@@ -65,7 +65,63 @@ export function tokenize(source: string): Token[] {
 				case '&':
 				case '|':
 				case '^':
-				case '~':
+					// src.shift();
+					// currPos.Column++;
+
+					const multiCharTokens: { [key: string]: string[] } = {
+						'=': ['=', '=='],
+						'+': ['+', '+='],
+						'-': ['-', '-='],
+						'*': ['*', '*='],
+						'/': ['/', '/='],
+						'%': ['%', '%='],
+						'>': ['>', '>=', '>>', '>>=', '>>>', '>>>='],
+						'<': ['<', '<=', '<<', '<<='],
+						'!': ['!', '!='],
+						'&': ['&', '&&', '&='],
+						'|': ['|', '||', '|='],
+						'^': ['^', '^='],
+					};
+
+					let multiCharToken = token.value;
+
+					const possibleTokens = multiCharTokens[token.value] || [];
+					possibleTokens.sort((a, b) => b.length - a.length);
+
+					for (const possibleToken of possibleTokens) {
+						if (
+							src.slice(0, possibleToken.length).join('') ===
+							possibleToken
+						) {
+							multiCharToken =
+								possibleToken as typeof token.value;
+							src.splice(0, possibleToken.length);
+							currPos.Column += possibleToken.length;
+							break;
+						}
+					}
+
+					tokens.push(
+						GSUtil.createToken(
+							getTokenByValue(multiCharToken)!.id,
+							getTokenByValue(multiCharToken)!.type,
+							multiCharToken,
+							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
+							SOURCE_FILE,
+							{ isSymbol: true }
+						)
+					);
+
+					break;
+
+				case '"':
+				case "'":
+					let str = '';
+					const quoteType = src.shift(); // move past opening quote
+					currPos.Column++;
+
+					// TODO: finish
+					break;
 
 				default:
 					currPos.Column++;
@@ -75,9 +131,12 @@ export function tokenize(source: string): Token[] {
 							token.type,
 							token.value,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
-							SOURCE_FILE
+							SOURCE_FILE,
+							{ isSymbol: true }
 						)
 					);
+					src.shift();
+					break;
 			}
 		} else {
 			if (GSUtil.isAlpha(currentToken)) {
