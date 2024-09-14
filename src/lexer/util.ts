@@ -124,3 +124,21 @@ export function handleEscapeSequence(str: string): string {
 
 	return escChars[str] || str;
 }
+
+export function handleMultiCharSymbolToken(
+	src: string[],
+	col: number,
+	possibleTokens: string[]
+): { token: string; endCol: number } {
+	possibleTokens.sort((a, b) => b.length - a.length);
+
+	console.log('Source array:', src);
+	console.log('Possible tokens:', possibleTokens);
+
+	for (let i = 0; i < possibleTokens.length; i++) {
+		const token = possibleTokens[i];
+		console.log(token);
+	}
+
+	return { token: 'undefined', endCol: col + 8 };
+}

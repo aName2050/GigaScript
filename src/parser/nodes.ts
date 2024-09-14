@@ -63,6 +63,8 @@ export namespace Node {
 		Switch,
 		/** Case statement */
 		Case,
+		/** Default statement */
+		Default,
 
 		/** Import statement */
 		Import,
@@ -151,6 +153,12 @@ export namespace Node {
 		Increment,
 		/** Decrement ( -- ) */
 		Decrement,
+
+		/** Bitwise NOT ( ~ ) */
+		Bitwise_NOT,
+
+		/** Logical NOT ( ! ) */
+		LogicalNOT,
 	}
 
 	export enum LogicalOperator {
@@ -158,8 +166,6 @@ export namespace Node {
 		LogicalAND,
 		/** Logical OR ( || ) */
 		LogicalOR,
-		/** Logical NOT ( ! ) */
-		LogicalNOT,
 	}
 
 	export enum BitwiseOperator {
@@ -169,8 +175,6 @@ export namespace Node {
 		Bitwise_OR,
 		/** Bitwise XOR ( ^ ) */
 		Bitwise_XOR,
-		/** Bitwise NOT ( ~ ) */
-		Bitwise_NOT,
 		/** Bitwise LEFT SHIFT ( << ) */
 		Bitwise_LShift,
 		/** Bitwise SIGNED RIGHT SHIFT ( >> ) */

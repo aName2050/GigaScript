@@ -1,14 +1,12 @@
-import fs from 'fs';
-import repl from 'repl';
 import path from 'path';
 
-import { version } from '../package.json';
 import Config from '../.config/gs.json';
 
 import { GSError, TSError } from '../typescript/GS.types';
 import { SpecialError } from '../typescript/Error.types';
 
 import { args } from './cli';
+import { run } from './run';
 
 // runtime
 const { file, debug, ASTOnly, NoCrashOnError, SilenceErrors } = args;
@@ -30,4 +28,11 @@ const fileLocation: string = file ? path.parse(file).dir : '';
 const srcFileLoc: string = file ? path.resolve(file) : 'GSREPL';
 export { args as CLI_ARGS, srcFileLoc as SOURCE_FILE };
 
-// TODO: REPL
+if (file && fileLocation) {
+	run(file, fileLocation);
+} else {
+	throw new TSError(
+		SpecialError.InternalError,
+		'REPL is currently not supported, please use a GigaScript source file.'
+	);
+}
