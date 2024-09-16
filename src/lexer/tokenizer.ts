@@ -120,7 +120,56 @@ export function tokenize(source: string): Token[] {
 					const quoteType = src.shift(); // move past opening quote
 					currPos.Column++;
 
-					// TODO: finish
+					while (
+						src.length > 0 &&
+						src[0] !== quoteType &&
+						!GSUtil.isEOL(src[0]) &&
+						src.length != 0
+					) {
+						if (src[0] == '\\') {
+							src.shift();
+							currPos.Column++;
+
+							let escSeq = '\\';
+
+							while (src.length > 0 && !GSUtil.isEOL(src[0])) {
+								const nextChar = src.shift()!;
+								currPos.Column++;
+								escSeq += nextChar;
+
+								if (!GSUtil.isSupportedEscapeCharacter(escSeq))
+									break;
+							}
+
+							str += GSUtil.handleEscapeSequence(escSeq);
+						} else {
+							str += src.shift();
+							currPos.Column++;
+						}
+
+						if (GSUtil.isEOL(src[0]) || src.length == 0) {
+							throw new GSError(
+								SpecialError.SyntaxError,
+								'Unterminated string literal',
+								`${SOURCE_FILE}:${currPos.Line}:${currPos.Column}`
+							);
+						}
+					}
+
+					src.shift();
+					currPos.Column++;
+
+					tokens.push(
+						GSUtil.createToken(
+							TokenID.Literal._String,
+							Node.Literal.STRING,
+							str,
+							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
+							SOURCE_FILE,
+							{ charArray: str.split(''), symbol: false }
+						)
+					);
+
 					break;
 
 				default:
