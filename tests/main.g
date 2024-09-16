@@ -1,1 +1,1 @@
-mut test = "hello world!";
+mut test = "hello\t world!\n";

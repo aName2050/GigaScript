@@ -42,6 +42,13 @@ export namespace Node {
 		/** Else statement */
 		Else,
 
+		/** Switch statement */
+		Switch,
+		/** Case statement */
+		Case,
+		/** Default statement */
+		Default,
+
 		/** For statement */
 		For,
 		/** While statement */
@@ -58,13 +65,6 @@ export namespace Node {
 
 		/** Throw statement */
 		ThrowError,
-
-		/** Switch statement */
-		Switch,
-		/** Case statement */
-		Case,
-		/** Default statement */
-		Default,
 
 		/** Import statement */
 		Import,
