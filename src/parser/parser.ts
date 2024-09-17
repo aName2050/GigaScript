@@ -1,4 +1,7 @@
-import { Token } from '../../typescript/GS.types';
+import { SOURCE_FILE } from '..';
+import { SpecialError } from '../../typescript/Error.types';
+import { GSError, Token } from '../../typescript/GS.types';
+import { getErrorLocation, getNodeTypeStringName } from '../util/parser.util';
 import { Node } from './nodes';
 
 export default class Parser {
@@ -26,5 +29,30 @@ export default class Parser {
 	 */
 	private next(): Token {
 		return this.tokens[1] as Token;
+	}
+
+	/**
+	 *
+	 * @returns The current and shifts token array
+	 */
+	private advance(): Token {
+		return this.tokens.shift() as Token;
+	}
+
+	public expect(type: Token['type'], errNote = ' '): Token {
+		const token = this.tokens.shift() as Token;
+		// if (!token || token.type != type) {
+		// 	throw new GSError(
+		// 		SpecialError.ParseError,
+		// 		`Expected "${Node[type]}"${errNote}, instead saw token "${
+		// 			Node[token.type]
+		// 		}`,
+		// 		`${SOURCE_FILE}:${getErrorLocation(token)}`
+		// 	);
+		// }
+
+		getNodeTypeStringName(type);
+
+		return token;
 	}
 }
