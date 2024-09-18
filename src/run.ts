@@ -15,7 +15,7 @@ export function run(filename: string, location: string) {
 	if (filename.endsWith('.g')) {
 		// tokenize(file);
 		// console.log(tokenize(file));
-		parser.expect(Node.Literal.STRING, 'testtesttest');
+		parser.expect(Node.Literal.STRING, 'Literal', 'testtesttest');
 	} else {
 		throw new GSError(
 			SpecialError.ImportError,

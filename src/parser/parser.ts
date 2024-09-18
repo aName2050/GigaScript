@@ -1,6 +1,6 @@
 import { SOURCE_FILE } from '..';
 import { SpecialError } from '../../typescript/Error.types';
-import { GSError, Token } from '../../typescript/GS.types';
+import { GSError, NodeType, Token } from '../../typescript/GS.types';
 import { getErrorLocation, getNodeTypeStringName } from '../util/parser.util';
 import { Node } from './nodes';
 
@@ -39,7 +39,7 @@ export default class Parser {
 		return this.tokens.shift() as Token;
 	}
 
-	public expect(type: Token['type'], errNote = ' '): Token {
+	public expect(type: Token['type'], group: NodeType, errNote = ' '): Token {
 		const token = this.tokens.shift() as Token;
 		// if (!token || token.type != type) {
 		// 	throw new GSError(
@@ -51,7 +51,7 @@ export default class Parser {
 		// 	);
 		// }
 
-		getNodeTypeStringName(type);
+		console.log(getNodeTypeStringName(type, group));
 
 		return token;
 	}
