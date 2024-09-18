@@ -1,4 +1,4 @@
-import { Token } from '../../typescript/GS.types';
+import { NodeType, Token } from '../../typescript/GS.types';
 import { Node } from '../parser/nodes';
 
 export function getErrorLocation(token: Token): string {
@@ -6,8 +6,11 @@ export function getErrorLocation(token: Token): string {
 }
 
 export function getNodeTypeStringName(type: Token['type']): string {
-	for (const type in Node) {
-		console.log(type);
+	for (const nodeType in Node) {
+		// console.log(Node[nodeType as NodeType]);
+		for (const node in Node[nodeType as NodeType]) {
+			console.log(type);
+		}
 	}
 
 	return '';
