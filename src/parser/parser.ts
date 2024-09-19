@@ -7,6 +7,7 @@ import {
 	NumberLiteral,
 	StringLiteral,
 } from '../ast/literals/literals.ast';
+import { VariableDeclaration } from '../ast/statements/declarations.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { getErrorLocation, getNodeTypeStringName } from '../util/parser.util';
 import { Node } from './nodes';
@@ -109,15 +110,72 @@ export default class Parser {
 
 	// [STATEMENTS]
 	private parseStatement(): STATEMENT {
-		// switch (this.current().type) {
-		// 	// case Node.Keyword.Var:
-		// 	// case Node.Keyword.Const:
-		// 	// 	// return this.parseVariableDeclaration();
-		// 	// 	break;
-		// 	default:
-		// 		return this.parseExpr();
-		// }
-		return this.parseExpr();
+		switch (this.current().type) {
+			case Node.Keyword.Var:
+			case Node.Keyword.Const:
+				return this.parseVariableDeclaration();
+			default:
+				return this.parseExpr();
+		}
+	}
+
+	// DECLARATIONS
+	private parseVariableDeclaration(): STATEMENT {
+		const tokenPos = this.current().__GSC._POS;
+		const keyword = this.advance();
+		const isConst =
+			keyword.type == Node.Keyword.Const &&
+			keyword.nodeGroup == 'Keyword';
+		const identifier = this.expect(
+			Node.Literal.IDENTIFIER,
+			'Literal',
+			`following ${isConst ? 'const' : 'var'} keyword`
+		).value;
+
+		if (
+			this.current().type == Node.Symbol.Semicolon &&
+			this.current().nodeGroup == 'Symbol'
+		) {
+			const semicolonPos = this.advance().__GSC._POS;
+			if (isConst) {
+				throw new GSError(
+					SpecialError.ParseError,
+					'Constant variables must be declared with a value',
+					`${SOURCE_FILE}:${getErrorLocation(this.current())}`
+				);
+			}
+
+			return {
+				kind: 'VariableDeclaration',
+				constant: false,
+				identifier,
+				start: tokenPos.start,
+				end: semicolonPos.end,
+			} as VariableDeclaration;
+		}
+
+		this.expect(
+			Node.AssignmentOperator.Equals,
+			'AssignmentOperator',
+			'following variable identifier'
+		);
+
+		const declaration = {
+			kind: 'VariableDeclaration',
+			value: this.parseExpr(),
+			identifier,
+			constant: isConst,
+			start: tokenPos.start,
+			end: this.next().__GSC._POS.end,
+		} as VariableDeclaration;
+
+		this.expect(
+			Node.Symbol.Semicolon,
+			'Symbol',
+			'following variable declaration'
+		);
+
+		return declaration;
 	}
 
 	// [EXPRESSIONS]
@@ -128,7 +186,6 @@ export default class Parser {
 	// Fall back to primary expression parsing
 	private parsePrimaryExpression(): EXPRESSION {
 		const token = this.current();
-		console.log(token);
 
 		switch (token.type) {
 			case Node.Literal.IDENTIFIER:
