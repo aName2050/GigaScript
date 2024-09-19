@@ -41,17 +41,19 @@ export default class Parser {
 
 	public expect(type: Token['type'], group: NodeType, errNote = ' '): Token {
 		const token = this.tokens.shift() as Token;
-		// if (!token || token.type != type) {
-		// 	throw new GSError(
-		// 		SpecialError.ParseError,
-		// 		`Expected "${Node[type]}"${errNote}, instead saw token "${
-		// 			Node[token.type]
-		// 		}`,
-		// 		`${SOURCE_FILE}:${getErrorLocation(token)}`
-		// 	);
-		// }
-
-		console.log(getNodeTypeStringName(type, group));
+		if (!token || token.type != type) {
+			throw new GSError(
+				SpecialError.ParseError,
+				`Expected "${getNodeTypeStringName(
+					type,
+					group
+				)}"${errNote}, instead saw token "${getNodeTypeStringName(
+					token.type,
+					token.nodeGroup
+				)}`,
+				`${SOURCE_FILE}:${getErrorLocation(token)}`
+			);
+		}
 
 		return token;
 	}

@@ -45,6 +45,8 @@ export interface Token {
 		| Node.Special
 		| Node.Symbol
 		| Node.UnaryOperator;
+	/** Node group */
+	nodeGroup: NodeType;
 	/** Raw value as seen in the source file */
 	value: string;
 	/** GigaScript Token Data */

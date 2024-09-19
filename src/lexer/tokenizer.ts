@@ -46,6 +46,7 @@ export function tokenize(source: string): Token[] {
 				GSUtil.createToken(
 					TokenID.Literal._Number,
 					Node.Literal.NUMBER,
+					'Literal',
 					num,
 					GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
 					SOURCE_FILE
@@ -105,6 +106,7 @@ export function tokenize(source: string): Token[] {
 						GSUtil.createToken(
 							getTokenByValue(multiCharToken)!.id,
 							getTokenByValue(multiCharToken)!.type,
+							getTokenByValue(multiCharToken)!.nodeGroup,
 							multiCharToken,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
 							SOURCE_FILE,
@@ -163,6 +165,7 @@ export function tokenize(source: string): Token[] {
 						GSUtil.createToken(
 							TokenID.Literal._String,
 							Node.Literal.STRING,
+							'Literal',
 							str,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
 							SOURCE_FILE,
@@ -178,6 +181,7 @@ export function tokenize(source: string): Token[] {
 						GSUtil.createToken(
 							token.id,
 							token.type,
+							token.nodeGroup,
 							token.value,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
 							SOURCE_FILE,
@@ -204,6 +208,7 @@ export function tokenize(source: string): Token[] {
 						GSUtil.createToken(
 							RESERVED.id,
 							RESERVED.type,
+							RESERVED.nodeGroup,
 							RESERVED.value,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
 							SOURCE_FILE
@@ -214,6 +219,7 @@ export function tokenize(source: string): Token[] {
 						GSUtil.createToken(
 							TokenID.Literal._Identifier,
 							Node.Literal.IDENTIFIER,
+							'Literal',
 							ident,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
 							SOURCE_FILE
@@ -245,6 +251,7 @@ export function tokenize(source: string): Token[] {
 		GSUtil.createToken(
 			TokenID.Special.__EOF__,
 			Node.Special.__EOF__,
+			'Special',
 			'<EOF>',
 			GSUtil.tokenPos(
 				{ ...currPos },

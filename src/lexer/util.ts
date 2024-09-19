@@ -15,6 +15,7 @@ import { Token } from '../../typescript/GS.types';
 export function createToken(
 	id: Token['id'],
 	type: Token['type'],
+	nodeGroup: Token['nodeGroup'],
 	value: string,
 	position: Token['__GSC']['_POS'],
 	srcFile?: string,
@@ -23,6 +24,7 @@ export function createToken(
 	return {
 		id,
 		type,
+		nodeGroup,
 		value,
 		__GSC: {
 			_POS: position,
