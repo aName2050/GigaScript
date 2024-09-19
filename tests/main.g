@@ -1,1 +1,4 @@
-mut test = "hello\t world!\n";
+"hello world"
+69
+420
+word

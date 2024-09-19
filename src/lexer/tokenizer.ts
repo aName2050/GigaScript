@@ -211,7 +211,8 @@ export function tokenize(source: string): Token[] {
 							RESERVED.nodeGroup,
 							RESERVED.value,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
-							SOURCE_FILE
+							SOURCE_FILE,
+							{ reservedKeyword: true }
 						)
 					);
 				} else {
@@ -222,7 +223,8 @@ export function tokenize(source: string): Token[] {
 							'Literal',
 							ident,
 							GSUtil.tokenPos({ ...tokenPos }, { ...currPos }),
-							SOURCE_FILE
+							SOURCE_FILE,
+							{ userCreatedSymbol: true }
 						)
 					);
 				}
