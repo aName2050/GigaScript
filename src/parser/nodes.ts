@@ -6,92 +6,92 @@
 export namespace Node {
 	export enum Literal {
 		/** Any number between 0 and 9, including decimals */
-		NUMBER,
+		NUMBER = 0,
 		/** Any combination of characters and numbers */
-		STRING,
+		STRING = 1,
 		/** User defined symbol */
-		IDENTIFIER,
+		IDENTIFIER = 2,
 	}
 
 	export enum Keyword {
 		/** Mutable variable declaration */
-		Var,
+		Var = 3,
 		/** Constant variable declaration */
-		Const,
+		Const = 4,
 
 		/** Function declaration */
-		Function,
+		Function = 5,
 		/** Return statement */
-		Return,
+		Return = 6,
 
 		/** Class declaration */
-		Class,
+		Class = 7,
 		/** Class constructor */
-		Constructor,
+		Constructor = 8,
 		/** Private method/property */
-		Private,
+		Private = 9,
 		/** Public method/property */
-		Public,
+		Public = 10,
 		/** Static method/property */
-		Static,
+		Static = 11,
 		/** New class */
-		New,
+		New = 12,
 
 		/** If statement */
-		If,
+		If = 13,
 		/** Else statement */
-		Else,
+		Else = 14,
 
 		/** Switch statement */
-		Switch,
+		Switch = 15,
 		/** Case statement */
-		Case,
+		Case = 16,
 		/** Default statement */
-		Default,
+		Default = 17,
 
 		/** For statement */
-		For,
+		For = 18,
 		/** While statement */
-		While,
+		While = 19,
 		/** Break statement */
-		Break,
+		Break = 20,
 		/** Continue statement */
-		Continue,
+		Continue = 21,
 
 		/** Try statement */
-		Try,
+		Try = 22,
 		/** Catch statement */
-		Catch,
+		Catch = 23,
 
 		/** Throw statement */
-		ThrowError,
+		ThrowError = 24,
 
 		/** Import statement */
-		Import,
+		Import = 25,
 		/** Export statement */
-		Export,
+		Export = 26,
 		/** From statement */
-		From,
+		From = 27,
 		/** As statement */
-		As,
+		As = 28,
 	}
 
 	export enum Operation {
 		/** Binary Operation (+ - * / %) */
-		BinOp,
+		BinOp = 29,
 		/** Bitwise Operation ( >> << & | ~ ^ ) */
-		BitOp,
+		BitOp = 30,
 	}
 
 	export enum Symbol {
 		/** Semicolon ( ; ) */
-		Semicolon,
+		Semicolon = 31,
 		/** Colon ( : ) */
-		Colon,
+		Colon = 32,
 		/** Dot ( . ) */
-		Dot,
+		Dot = 33,
 		/** Comma ( , ) */
-		Comma,
+		Comma = 34,
 
 		/** Plus ( + ) */
 		Plus,
