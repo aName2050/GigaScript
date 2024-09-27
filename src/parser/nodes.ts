@@ -94,120 +94,120 @@ export namespace Node {
 		Comma = 34,
 
 		/** Plus ( + ) */
-		Plus,
+		Plus = 35,
 		/** Minus ( - ) */
-		Minus,
+		Minus = 36,
 		/** Multiply ( * ) */
-		Multiply,
+		Multiply = 37,
 		/** Divide ( / ) */
-		Divide,
+		Divide = 38,
 		/** Modulo ( % ) */
-		Modulo,
+		Modulo = 39,
 	}
 
 	export enum AssignmentOperator {
 		/** Equals ( = ) */
-		Equals,
+		Equals = 40,
 		/** Plus Equals ( += ) */
-		AsgAdd,
+		AsgAdd = 41,
 		/** Minus Equals ( -= ) */
-		AsgMin,
+		AsgMin = 42,
 		/** Multiply Equals ( *= ) */
-		AsgMult,
+		AsgMult = 43,
 		/** Divide Equals ( /= ) */
-		AsgDiv,
+		AsgDiv = 44,
 		/** Modulo Equals ( %= ) */
-		AsgMod,
+		AsgMod = 45,
 
 		/** Bitwise LShift Equals ( <<= ) */
-		AsgBitwiseLShift,
+		AsgBitwiseLShift = 46,
 		/** Bitwise Signed RShift Equals Equals ( >>= ) */
-		AsgBitwiseSRShift,
+		AsgBitwiseSRShift = 47,
 		/** Bitwise Zero-Fill RShift Equals ( >>>= ) */
-		AsgBitwiseZFRShift,
+		AsgBitwiseZFRShift = 48,
 		/** Bitwise AND Equals ( &= ) */
-		AsgBitwiseAND,
+		AsgBitwiseAND = 49,
 		/** Bitwise OR Equals ( |= ) */
-		AsgBitwiseOR,
+		AsgBitwiseOR = 50,
 		/** Bitwise XOR Equals ( ^= ) */
-		AsgBitwiseXOR,
+		AsgBitwiseXOR = 51,
 	}
 
 	export enum ComparisonOperator {
 		/** Greater Than ( > ) */
-		GreaterThan,
+		GreaterThan = 52,
 		/** Less Than ( < ) */
-		LessThan,
+		LessThan = 53,
 		/** Greater Than or Equal to ( >= ) */
-		GreaterThanOrEquals,
+		GreaterThanOrEquals = 54,
 		/** Less Than or Equal to ( <= ) */
-		LessThanOrEquals,
+		LessThanOrEquals = 55,
 		/** Equal to ( == ) */
-		IsEqual,
+		IsEqual = 56,
 		/** Not Equal to ( != ) */
-		NotEqual,
+		NotEqual = 57,
 	}
 
 	export enum UnaryOperator {
 		/** Increment ( ++ ) */
-		Increment,
+		Increment = 58,
 		/** Decrement ( -- ) */
-		Decrement,
+		Decrement = 59,
 
 		/** Bitwise NOT ( ~ ) */
-		Bitwise_NOT,
+		Bitwise_NOT = 60,
 
 		/** Logical NOT ( ! ) */
-		LogicalNOT,
+		LogicalNOT = 61,
 	}
 
 	export enum LogicalOperator {
 		/** Logical AND ( && ) */
-		LogicalAND,
+		LogicalAND = 62,
 		/** Logical OR ( || ) */
-		LogicalOR,
+		LogicalOR = 63,
 	}
 
 	export enum BitwiseOperator {
 		/** Bitwise AND ( & ) */
-		Bitwise_AND,
+		Bitwise_AND = 64,
 		/** Bitwise OR ( | ) */
-		Bitwise_OR,
+		Bitwise_OR = 65,
 		/** Bitwise XOR ( ^ ) */
-		Bitwise_XOR,
+		Bitwise_XOR = 66,
 		/** Bitwise LEFT SHIFT ( << ) */
-		Bitwise_LShift,
+		Bitwise_LShift = 67,
 		/** Bitwise SIGNED RIGHT SHIFT ( >> ) */
-		Bitwise_SRShift,
+		Bitwise_SRShift = 68,
 		/** Bitwise ZERO-FILL RIGHT SHIFT ( >>> ) */
-		Bitwise_ZFRShift,
+		Bitwise_ZFRShift = 69,
 	}
 
 	export enum Group {
 		/** Open Parenthesis ( ( )*/
-		OpenParen,
+		OpenParen = 70,
 		/** Closed Parenthesis ( ) ) */
-		CloseParen,
+		CloseParen = 71,
 		/** Open Brace ( { ) */
-		OpenBrace,
+		OpenBrace = 72,
 		/** Close Brace ( } ) */
-		CloseBrace,
+		CloseBrace = 73,
 		/** Open Bracket ( [ ) */
-		OpenBracket,
+		OpenBracket = 74,
 		/** CloseBracket ( ] ) */
-		CloseBracket,
+		CloseBracket = 75,
 		/** Double Quote ( " ) */
-		DoubleQuote,
+		DoubleQuote = 76,
 		/** Single Quote ( ' ) */
-		SingleQuote,
+		SingleQuote = 77,
 	}
 
 	export enum Special {
 		/** Type declaration */
-		__TYPE,
+		__TYPE = 78,
 		/** Comment */
-		__COMMENT__,
+		__COMMENT__ = 79,
 		/** End of File */
-		__EOF__,
+		__EOF__ = 80,
 	}
 }

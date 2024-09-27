@@ -9,210 +9,210 @@ import { Node } from '../parser/nodes';
 export namespace TokenID {
 	export enum Literal {
 		/** Any number between 0 and 9 */
-		_Number,
+		_Number = 0,
 		/** Any combination of characters and numbers */
-		_String,
+		_String = 1,
 
 		/** True value */
-		_True,
+		_True = 2,
 		/** False value */
-		_False,
+		_False = 3,
 
 		/** Undefined value */
-		_Undefined,
+		_Undefined = 4,
 
 		/** Null value */
-		_Null,
+		_Null = 5,
 
 		/** User defined symbol */
-		_Identifier,
+		_Identifier = 6,
 	}
 
 	export enum Keyword {
 		/** Mutable variable declaration */
-		Var,
+		Var = 7,
 		/** Constant variable declaration */
-		Const,
+		Const = 8,
 
 		/** Function declaration */
-		Function,
+		Function = 9,
 		/** Return statement */
-		Return,
+		Return = 10,
 
 		/** Class declaration */
-		Class,
+		Class = 11,
 		/** Class constructor method */
-		Constructor,
+		Constructor = 12,
 		/** Private method/property */
-		Private,
+		Private = 13,
 		/** Public method/property */
-		Public,
+		Public = 14,
 		/** Static method/property */
-		Static,
+		Static = 15,
 		/** New class */
-		New,
+		New = 16,
 		/** See https://en.wikipedia.org/wiki/This_(computer_programming) */
-		_This,
+		_This = 17,
 
 		/** If statement */
-		If,
+		If = 18,
 		/** Else statement */
-		Else,
+		Else = 19,
 
 		/** Switch statement */
-		Switch,
+		Switch = 20,
 		/** Case statement */
-		Case,
+		Case = 21,
 		/** Default statement */
-		Default,
+		Default = 22,
 
 		/** While loop statement */
-		While,
+		While = 23,
 		/** For loop statement */
-		For,
+		For = 24,
 		/** Continue loop statement */
-		Continue,
+		Continue = 25,
 		/** Break loop statement */
-		Break,
+		Break = 26,
 
 		/** Import external file statement */
-		Import,
+		Import = 27,
 		/** Export value statement */
-		Export,
+		Export = 28,
 		/** From file statement */
-		From,
+		From = 29,
 		/** As statement */
-		As,
+		As = 30,
 
 		/** Throw an exception */
-		ThrowError,
+		ThrowError = 31,
 
 		/** Try statement */
-		Try,
+		Try = 32,
 		/** Catch statement */
-		Catch,
+		Catch = 33,
 	}
 
 	export enum Operation {
 		/** Binary operation ( + - * / % ) */
-		BinOp,
+		BinOp = 34,
 
 		/** Bitwise Operation ( >> << & | ~ ^ ) */
-		BitwiseOp,
+		BitwiseOp = 35,
 	}
 
 	export enum Symbol {
-		Semicolon,
-		Colon,
-		Dot,
-		Comma,
+		Semicolon = 36,
+		Colon = 37,
+		Dot = 38,
+		Comma = 39,
 	}
 
 	export enum AssignmentOperator {
-		Equals,
+		Equals = 40,
 
-		PlusEquals,
-		MinusEquals,
-		AsteriskEquals,
-		SlashEquals,
-		PercentEquals,
+		PlusEquals = 41,
+		MinusEquals = 42,
+		AsteriskEquals = 43,
+		SlashEquals = 44,
+		PercentEquals = 45,
 
 		/** <<= */
-		LessThanLessThanEquals,
+		LessThanLessThanEquals = 46,
 		/** >>= */
-		GreaterThanGreaterThanEquals,
+		GreaterThanGreaterThanEquals = 47,
 		/** >>>= */
-		GreaterThanGreaterThanGreaterThanEquals,
+		GreaterThanGreaterThanGreaterThanEquals = 48,
 		/** &= */
-		AmpersandEquals,
+		AmpersandEquals = 49,
 		/** |= */
-		BarEquals,
+		BarEquals = 50,
 		/** ^= */
-		CaretEquals,
+		CaretEquals = 51,
 	}
 
 	export enum ComparisonOperator {
-		GreaterThan,
-		LessThan,
-		GreaterThanEquals,
-		LessThanEquals,
-		EqualsEquals,
-		ExclamationEquals,
+		GreaterThan = 52,
+		LessThan = 53,
+		GreaterThanEquals = 54,
+		LessThanEquals = 55,
+		EqualsEquals = 56,
+		ExclamationEquals = 57,
 	}
 
 	export enum UnaryOperator {
 		/** Increment ( ++ ) */
-		PlusPlus,
+		PlusPlus = 58,
 		/** Decrement ( -- ) */
-		MinusMinus,
+		MinusMinus = 59,
 
 		/** ~ */
-		Tilda,
+		Tilda = 60,
 
 		/** ! */
-		Exclamation,
+		Exclamation = 61,
 	}
 
 	export enum LogicalOperator {
 		/** && */
-		AmpersandAmpersand,
+		AmpersandAmpersand = 62,
 		/** || */
-		BarBar,
+		BarBar = 63,
 	}
 
 	export enum BitwiseOperator {
 		/** & */
-		Ampersand,
+		Ampersand = 64,
 		/** | */
-		Bar,
+		Bar = 65,
 		/** ^ */
-		Caret,
+		Caret = 66,
 
 		/** Bitwise LEFT SHIFT ( << ) */
-		LessThanLessThan,
+		LessThanLessThan = 67,
 		/** Bitwise SIGNED RIGHT SHIFT ( >> ) */
-		GreaterThanGreaterThan,
+		GreaterThanGreaterThan = 68,
 		/** Bitwise ZERO-FILL RIGHT SHIFT ( >>> ) */
-		GreaterThanGreaterThanGreaterThan,
+		GreaterThanGreaterThanGreaterThan = 69,
 	}
 
 	export enum Group {
 		/** ( */
-		OpenParen,
+		OpenParen = 70,
 		/** ) */
-		CloseParen,
+		CloseParen = 71,
 		/** { */
-		OpenBrace,
+		OpenBrace = 72,
 		/** } */
-		CloseBrace,
+		CloseBrace = 73,
 		/** [ */
-		OpenBracket,
+		OpenBracket = 74,
 		/** ] */
-		CloseBracket,
+		CloseBracket = 75,
 		/** " */
-		DoubleQuote,
+		DoubleQuote = 76,
 		/** ' */
-		SingleQuote,
+		SingleQuote = 77,
 	}
 
 	export enum Type {
-		__STRING__,
-		__NUMBER__,
-		__BOOLEAN__,
-		__NIL__,
-		__OBJECT__,
-		__FUNCTION__,
-		__ARRAY__,
-		__CLASS__,
+		__STRING__ = 78,
+		__NUMBER__ = 79,
+		__BOOLEAN__ = 80,
+		__NIL__ = 81,
+		__OBJECT__ = 82,
+		__FUNCTION__ = 83,
+		__ARRAY__ = 84,
+		__CLASS__ = 85,
 	}
 
 	export enum Special {
 		/** Type declaration */
-		__TYPE,
+		__TYPE = 86,
 		/** COmment */
-		__COMMENT__,
+		__COMMENT__ = 87,
 		/** End Of File */
-		__EOF__,
+		__EOF__ = 88,
 	}
 }
 
