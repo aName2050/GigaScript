@@ -1,13 +1,16 @@
 import { SOURCE_FILE } from '..';
 import { SpecialError } from '../../typescript/Error.types';
 import { GSError, NodeType, Token } from '../../typescript/GS.types';
-import { EXPRESSION, Program, STATEMENT } from '../ast/ast';
+import { CodeBlockNode, EXPRESSION, Program, STATEMENT } from '../ast/ast';
 import {
 	Identifer,
 	NumberLiteral,
 	StringLiteral,
 } from '../ast/literals/literals.ast';
-import { VariableDeclaration } from '../ast/statements/declarations.ast';
+import {
+	FunctionDeclaration,
+	VariableDeclaration,
+} from '../ast/statements/declarations.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { getErrorLocation, getNodeTypeStringName } from '../util/parser.util';
 import { Node } from './nodes';
@@ -114,9 +117,49 @@ export default class Parser {
 			case Node.Keyword.Var:
 			case Node.Keyword.Const:
 				return this.parseVariableDeclaration();
+			case Node.Keyword.Function:
+				return this.parseFunctionDeclaration();
 			default:
 				return this.parseExpr();
 		}
+	}
+
+	private parseCodeBlock(): CodeBlockNode {
+		const startPos = this.expect(
+			Node.Group.OpenBrace,
+			'Group',
+			'at start of code block'
+		).__GSC._POS.start;
+
+		const body: CodeBlockNode = {
+			kind: 'CodeBlockNode',
+			body: [],
+			start: {
+				Line: startPos.Line!,
+				Column: startPos.Column!,
+			},
+			end: {
+				Line: startPos.Line!,
+				Column: startPos.Column!,
+			},
+		};
+
+		while (!this.isEOF() && this.current().type !== Node.Group.CloseBrace) {
+			body.body.push(this.parseStatement());
+		}
+
+		const endPos = this.expect(
+			Node.Group.CloseBrace,
+			'Group',
+			'at end of code block'
+		).__GSC._POS.end;
+
+		body.end = {
+			Line: endPos.Line!,
+			Column: endPos.Column!,
+		};
+
+		return body;
 	}
 
 	// DECLARATIONS
@@ -176,6 +219,69 @@ export default class Parser {
 		);
 
 		return declaration;
+	}
+
+	// argument list declaration helper function
+	private parseArgumentsList(): EXPRESSION[] {
+		const args = [this.parseExpr()];
+
+		while (this.current().type == Node.Symbol.Comma && this.advance()) {
+			args.push(this.parseExpr());
+		}
+
+		return args;
+	}
+
+	// function declaration helper function
+	private parseArgs(): EXPRESSION[] {
+		this.expect(Node.Group.OpenParen, 'Group', 'before parameter list');
+
+		const args =
+			this.current().type == Node.Group.CloseParen
+				? []
+				: this.parseArgumentsList();
+
+		this.expect(Node.Group.CloseParen, 'Group', 'following parameter list');
+
+		return args;
+	}
+
+	private parseFunctionDeclaration(): STATEMENT {
+		const tokenPos = this.advance().__GSC._POS;
+
+		const name = this.expect(
+			Node.Literal.IDENTIFIER,
+			'Literal',
+			'following "function" keyword'
+		).value;
+
+		const args = this.parseArgs();
+		const params: string[] = [];
+
+		for (const arg of args) {
+			if (arg.kind !== 'Identifier') {
+				throw new GSError(
+					SpecialError.ParseError,
+					`Expected arguments to be identifiers: ${arg.kind}`,
+					`${SOURCE_FILE}:${getErrorLocation(this.current())}`
+				);
+			}
+
+			params.push((arg as Identifer).symbol);
+		}
+
+		const body = this.parseCodeBlock();
+
+		const func = {
+			kind: 'FunctionDeclaration',
+			name,
+			body,
+			parameters: params,
+			start: tokenPos.start,
+			end: body.end,
+		} as FunctionDeclaration;
+
+		return func;
 	}
 
 	// [EXPRESSIONS]
@@ -240,7 +346,7 @@ export default class Parser {
 			default:
 				throw new GSError(
 					SpecialError.ParseError,
-					`Unexpected token " + ${getNodeTypeStringName(
+					`Unexpected token "${getNodeTypeStringName(
 						token.type,
 						token.nodeGroup
 					)}"`,

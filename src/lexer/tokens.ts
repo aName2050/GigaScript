@@ -795,7 +795,7 @@ const tokens: Array<{
 		id: TokenID.Type.__FUNCTION__,
 		type: Node.Special.__TYPE,
 		nodeGroup: 'Special',
-		value: 'function',
+		value: 'Function',
 	},
 	{
 		id: TokenID.Type.__ARRAY__,

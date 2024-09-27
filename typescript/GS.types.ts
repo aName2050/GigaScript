@@ -4,7 +4,7 @@ import { SpecialError } from './Error.types';
 
 export class GSError extends Error {
 	constructor(name: SpecialError, message: string, location: string) {
-		super(`${message}\n\tat (${location})`);
+		super(`${message}\n    at (${location})`);
 		this.name = name;
 	}
 }

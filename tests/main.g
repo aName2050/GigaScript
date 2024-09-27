@@ -1,2 +1,3 @@
-const test = "hello";
-test
+function add(a, b) {
+    const sum = "ab";
+}
