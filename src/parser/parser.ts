@@ -284,6 +284,17 @@ export default class Parser {
 		return func;
 	}
 
+	// private parseReturnStatement(): STATEMENT {
+	// 	const tokenPos = this.advance().__GSC._POS;
+	// 	const returnValue = this.parseExpr();
+
+	// 	const endPos = this.expect(Node.Symbol.Semicolon, 'Symbol', 'following return statement').__GSC._POS;
+
+	// 	return {
+
+	// 	} as ReturnSta
+	// }
+
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
 		return this.parsePrimaryExpression();
