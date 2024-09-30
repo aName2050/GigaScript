@@ -1,3 +1,1 @@
-function add(a, b) {
-    const sum = "ab";
-}
+const sum: number = 32;

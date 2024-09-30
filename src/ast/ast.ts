@@ -47,6 +47,17 @@ export interface GSASTNode {
 	};
 }
 
+export type GSTypes =
+	| 'string'
+	| 'number'
+	| 'boolean'
+	| 'nil'
+	| 'object'
+	| 'Function'
+	| 'Array'
+	| 'Class'
+	| 'any';
+
 /**
  * Statements don't return a value at runtime.
  * They can contain multiple expressions

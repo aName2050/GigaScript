@@ -204,6 +204,7 @@ export namespace TokenID {
 		__FUNCTION__ = 83,
 		__ARRAY__ = 84,
 		__CLASS__ = 85,
+		__ANY__ = 89,
 	}
 
 	export enum Special {
@@ -801,13 +802,19 @@ const tokens: Array<{
 		id: TokenID.Type.__ARRAY__,
 		type: Node.Special.__TYPE,
 		nodeGroup: 'Special',
-		value: 'array',
+		value: 'Array',
 	},
 	{
 		id: TokenID.Type.__CLASS__,
 		type: Node.Special.__TYPE,
 		nodeGroup: 'Special',
-		value: 'class',
+		value: 'Class',
+	},
+	{
+		id: TokenID.Type.__ANY__,
+		type: Node.Special.__TYPE,
+		nodeGroup: 'Special',
+		value: 'any',
 	},
 
 	{

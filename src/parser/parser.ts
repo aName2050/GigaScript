@@ -11,6 +11,7 @@ import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../ast/statements/declarations.ast';
+import { ReturnStatement } from '../ast/statements/statements.ast';
 import { tokenize } from '../lexer/tokenizer';
 import { getErrorLocation, getNodeTypeStringName } from '../util/parser.util';
 import { Node } from './nodes';
@@ -117,8 +118,12 @@ export default class Parser {
 			case Node.Keyword.Var:
 			case Node.Keyword.Const:
 				return this.parseVariableDeclaration();
-			case Node.Keyword.Function:
-				return this.parseFunctionDeclaration();
+
+			// case Node.Keyword.Function:
+			// 	return this.parseFunctionDeclaration();
+			case Node.Keyword.Return:
+				return this.parseReturnStatement();
+
 			default:
 				return this.parseExpr();
 		}
@@ -176,6 +181,15 @@ export default class Parser {
 		).value;
 
 		if (
+			this.current().type == Node.Symbol.Colon &&
+			this.current().nodeGroup == 'Symbol'
+		) {
+			this.advance();
+			const type = this.advance();
+			console.log(type.value);
+		}
+
+		if (
 			this.current().type == Node.Symbol.Semicolon &&
 			this.current().nodeGroup == 'Symbol'
 		) {
@@ -192,6 +206,7 @@ export default class Parser {
 				kind: 'VariableDeclaration',
 				constant: false,
 				identifier,
+				valueType: 'any',
 				start: tokenPos.start,
 				end: semicolonPos.end,
 			} as VariableDeclaration;
@@ -246,54 +261,61 @@ export default class Parser {
 		return args;
 	}
 
-	private parseFunctionDeclaration(): STATEMENT {
-		const tokenPos = this.advance().__GSC._POS;
-
-		const name = this.expect(
-			Node.Literal.IDENTIFIER,
-			'Literal',
-			'following "function" keyword'
-		).value;
-
-		const args = this.parseArgs();
-		const params: string[] = [];
-
-		for (const arg of args) {
-			if (arg.kind !== 'Identifier') {
-				throw new GSError(
-					SpecialError.ParseError,
-					`Expected arguments to be identifiers: ${arg.kind}`,
-					`${SOURCE_FILE}:${getErrorLocation(this.current())}`
-				);
-			}
-
-			params.push((arg as Identifer).symbol);
-		}
-
-		const body = this.parseCodeBlock();
-
-		const func = {
-			kind: 'FunctionDeclaration',
-			name,
-			body,
-			parameters: params,
-			start: tokenPos.start,
-			end: body.end,
-		} as FunctionDeclaration;
-
-		return func;
-	}
-
-	// private parseReturnStatement(): STATEMENT {
+	// private parseFunctionDeclaration(): STATEMENT {
 	// 	const tokenPos = this.advance().__GSC._POS;
-	// 	const returnValue = this.parseExpr();
 
-	// 	const endPos = this.expect(Node.Symbol.Semicolon, 'Symbol', 'following return statement').__GSC._POS;
+	// 	const name = this.expect(
+	// 		Node.Literal.IDENTIFIER,
+	// 		'Literal',
+	// 		'following "function" keyword'
+	// 	).value;
 
-	// 	return {
+	// 	const args = this.parseArgs();
+	// 	const params: string[] = [];
 
-	// 	} as ReturnSta
+	// 	for (const arg of args) {
+	// 		if (arg.kind !== 'Identifier') {
+	// 			throw new GSError(
+	// 				SpecialError.ParseError,
+	// 				`Expected arguments to be identifiers: ${arg.kind}`,
+	// 				`${SOURCE_FILE}:${getErrorLocation(this.current())}`
+	// 			);
+	// 		}
+
+	// 		params.push((arg as Identifer).symbol);
+	// 	}
+
+	// 	const body = this.parseCodeBlock();
+
+	// 	const func = {
+	// 		kind: 'FunctionDeclaration',
+	// 		name,
+	// 		body,
+	// 		parameters: params,
+	// 		start: tokenPos.start,
+	// 		end: body.end,
+	// 	} as FunctionDeclaration;
+
+	// 	return func;
 	// }
+
+	private parseReturnStatement(): STATEMENT {
+		const tokenPos = this.advance().__GSC._POS;
+		const returnValue = this.parseExpr();
+
+		const endPos = this.expect(
+			Node.Symbol.Semicolon,
+			'Symbol',
+			'following return statement'
+		).__GSC._POS;
+
+		return {
+			kind: 'ReturnStatement',
+			value: returnValue,
+			start: tokenPos.start,
+			end: endPos.end,
+		} as ReturnStatement;
+	}
 
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
