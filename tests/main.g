@@ -1,1 +1,3 @@
-const sum: number = 32;
+function add(a: number, b: number): number {
+    var sum: number;
+}

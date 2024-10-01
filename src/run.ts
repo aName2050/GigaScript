@@ -17,7 +17,7 @@ export function run(filename: string, location: string) {
 		parser.tokenizeSourceFile(file);
 		const program: Program = parser.generateAST();
 		// console.log(parser.Tokens);
-		// console.log(program);
+		console.log(program);
 	} else {
 		throw new GSError(
 			SpecialError.ImportError,

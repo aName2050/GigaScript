@@ -1,7 +1,13 @@
 import { SOURCE_FILE } from '..';
 import { SpecialError } from '../../typescript/Error.types';
 import { GSError, NodeType, Token } from '../../typescript/GS.types';
-import { CodeBlockNode, EXPRESSION, Program, STATEMENT } from '../ast/ast';
+import {
+	CodeBlockNode,
+	EXPRESSION,
+	GSTypes,
+	Program,
+	STATEMENT,
+} from '../ast/ast';
 import {
 	Identifer,
 	NumberLiteral,
@@ -179,14 +185,18 @@ export default class Parser {
 			'Literal',
 			`following ${isConst ? 'const' : 'var'} keyword`
 		).value;
+		let type: GSTypes = 'any';
 
 		if (
 			this.current().type == Node.Symbol.Colon &&
 			this.current().nodeGroup == 'Symbol'
 		) {
 			this.advance();
-			const type = this.advance();
-			console.log(type.value);
+			type = this.expect(
+				Node.Special.__TYPE,
+				'Special',
+				'following ":" in variable declaration'
+			).value as GSTypes;
 		}
 
 		if (
@@ -206,7 +216,7 @@ export default class Parser {
 				kind: 'VariableDeclaration',
 				constant: false,
 				identifier,
-				valueType: 'any',
+				valueType: type,
 				start: tokenPos.start,
 				end: semicolonPos.end,
 			} as VariableDeclaration;
@@ -223,6 +233,7 @@ export default class Parser {
 			value: this.parseExpr(),
 			identifier,
 			constant: isConst,
+			valueType: type,
 			start: tokenPos.start,
 			end: this.next().__GSC._POS.end,
 		} as VariableDeclaration;
