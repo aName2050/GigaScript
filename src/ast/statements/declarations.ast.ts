@@ -1,17 +1,17 @@
-import { CodeBlockNode, EXPRESSION, GSTypes, STATEMENT } from '../ast';
+import { CodeBlockNode, EXPRESSION, GSType, STATEMENT } from '../ast';
 
 export interface VariableDeclaration extends STATEMENT {
 	kind: 'VariableDeclaration';
 	constant: boolean;
 	identifier: string;
 	value?: EXPRESSION;
-	valueType?: GSTypes;
+	valueType?: GSType;
 }
 
 export interface FunctionDeclaration extends STATEMENT {
 	kind: 'FunctionDeclaration';
-	parameters: Record<string, GSTypes>;
+	parameters: { [key: string]: GSType };
 	name: string;
 	body: CodeBlockNode;
-	returnType?: GSTypes;
+	returnType?: GSType;
 }

@@ -47,7 +47,7 @@ export interface GSASTNode {
 	};
 }
 
-export type GSTypes =
+export type GSType =
 	| 'string'
 	| 'number'
 	| 'boolean'
