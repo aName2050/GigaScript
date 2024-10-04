@@ -247,31 +247,6 @@ export default class Parser {
 		return declaration;
 	}
 
-	// // argument list declaration helper function
-	// private parseArgumentsList(): EXPRESSION[] {
-	// 	const args = [this.parseExpr()];
-
-	// 	while (this.current().type == Node.Symbol.Comma && this.advance()) {
-	// 		args.push(this.parseExpr());
-	// 	}
-
-	// 	return args;
-	// }
-
-	// // function declaration helper function
-	// private parseArgs(): EXPRESSION[] {
-	// 	this.expect(Node.Group.OpenParen, 'Group', 'before parameter list');
-
-	// 	const args =
-	// 		this.current().type == Node.Group.CloseParen
-	// 			? []
-	// 			: this.parseArgumentsList();
-
-	// 	this.expect(Node.Group.CloseParen, 'Group', 'following parameter list');
-
-	// 	return args;
-	// }
-
 	private parseFunctionDeclaration(): STATEMENT {
 		const tokenPos = this.advance().__GSC._POS;
 
@@ -281,20 +256,41 @@ export default class Parser {
 			'following "function" keyword'
 		).value;
 
-		// const args = this.parseArgs();
+		// get function parameters and parse types if included
 		const params: FunctionDeclaration['parameters'] = {};
+		this.expect(Node.Group.OpenParen, 'Group', 'before parameter list');
+		while (this.current().type !== Node.Group.CloseParen) {
+			const paramIdentifier = this.expect(
+				Node.Literal.IDENTIFIER,
+				'Literal',
+				'following parameter list'
+			).value;
+			let paramType: GSType = 'any';
+			if (this.current().type === Node.Symbol.Colon) {
+				this.advance();
+				paramType = this.expect(Node.Special.__TYPE, 'Special')
+					.value as GSType;
+			}
 
-		// for (const arg of args) {
-		// 	if (arg.kind !== 'Identifier') {
-		// 		throw new GSError(
-		// 			SpecialError.ParseError,
-		// 			`Expected arguments to be identifiers: ${arg.kind}`,
-		// 			`${SOURCE_FILE}:${getErrorLocation(this.current())}`
-		// 		);
-		// 	}
+			params[paramIdentifier] = paramType;
 
-		// 	params.push((arg as Identifer).symbol);
-		// }
+			if (this.current().type === Node.Symbol.Comma) {
+				this.advance();
+			} else if (this.current().type === Node.Group.CloseParen) {
+				break;
+			}
+		}
+
+		this.expect(Node.Group.CloseParen, 'Group', 'following parameter list');
+
+		let returnType: GSType = 'any';
+
+		// parse function return type if included
+		if (this.current().type === Node.Symbol.Colon) {
+			this.advance();
+			returnType = this.expect(Node.Special.__TYPE, 'Special')
+				.value as GSType;
+		}
 
 		const body = this.parseCodeBlock();
 
@@ -303,7 +299,7 @@ export default class Parser {
 			name,
 			body,
 			parameters: params,
-			returnType: 'any',
+			returnType,
 			start: tokenPos.start,
 			end: body.end,
 		} as FunctionDeclaration;
