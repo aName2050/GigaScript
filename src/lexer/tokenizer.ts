@@ -16,7 +16,7 @@ export function tokenize(source: string): Token[] {
 	const tokens: Token[] = [];
 	const src = source.split('');
 
-	let currPos = { Line: 1, Column: 1 };
+	let currPos = { Line: 1, Column: 0 };
 
 	while (src.length > 0) {
 		const currentToken = src[0];

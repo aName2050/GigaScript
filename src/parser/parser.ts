@@ -9,6 +9,7 @@ import {
 	STATEMENT,
 } from '../ast/ast';
 import { BinaryExpr } from '../ast/expressions/binop.ast';
+import { CallExpr } from '../ast/expressions/expressions.ast';
 import {
 	Identifer,
 	NumberLiteral,
@@ -328,15 +329,35 @@ export default class Parser {
 
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
-		return this.parsePrimaryExpression();
+		return this.parseMultiplicativeExpr();
 	}
 
 	private parseMultiplicativeExpr(): EXPRESSION {
-		let lhs;
+		let lhs = this.parseAdditiveExpr();
+
+		while (
+			[Node.Symbol.Multiply, Node.Symbol.Divide].includes(
+				//@ts-expect-error
+				this.current().type
+			)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseMultiplicativeExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
+
+		return lhs;
 	}
 
 	private parseAdditiveExpr(): EXPRESSION {
-		let lhs = this.parsePrimaryExpression();
+		let lhs = this.parseCallMemberExpr();
 
 		while (
 			//@ts-expect-error
@@ -353,6 +374,59 @@ export default class Parser {
 				end: rhs.end,
 			} as BinaryExpr;
 		}
+
+		return lhs;
+	}
+
+	// MEMBER/CALL EXPRESSIONS
+	private parseCallMemberExpr(): EXPRESSION {
+		const member = this.parsePrimaryExpression();
+
+		if (this.current().type == Node.Group.OpenParen) {
+			return this.parseCallExpr(member);
+		}
+
+		return member;
+	}
+
+	private parseCallExpr(caller: EXPRESSION): EXPRESSION {
+		const args = this.parseArgs();
+		let callExpr: EXPRESSION = {
+			kind: 'CallExpr',
+			caller,
+			args,
+			start: caller.start,
+			end: args[args.length - 1]?.end || caller.end,
+		} as CallExpr;
+
+		if (this.current().type == Node.Group.OpenParen)
+			callExpr = this.parseCallExpr(callExpr);
+
+		return callExpr;
+	}
+
+	// helper function
+	private parseArgs(): EXPRESSION[] {
+		this.expect(Node.Group.OpenParen, 'Group', 'before argument list');
+
+		const args =
+			this.current().type == Node.Group.CloseParen
+				? []
+				: this.parseArgumentList();
+
+		this.expect(Node.Group.CloseParen, 'Group', 'following argument list');
+
+		return args;
+	}
+
+	private parseArgumentList(): EXPRESSION[] {
+		const args = [this.parseExpr()];
+
+		while (this.current().type == Node.Symbol.Comma && this.advance()) {
+			args.push(this.parseExpr());
+		}
+
+		return args;
 	}
 
 	// Fall back to primary expression parsing

@@ -10,6 +10,7 @@ export enum SpecialError {
 	RuntimeError = 'RuntimeError',
 	ZeroDivisionError = 'ZeroDivisionError',
 	FileReadError = 'FileReadError',
+	EvalError = 'EvalError',
 
 	// TypeScript Errors
 	ImportError = 'ImportError',
