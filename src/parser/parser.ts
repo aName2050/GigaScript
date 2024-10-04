@@ -8,6 +8,7 @@ import {
 	Program,
 	STATEMENT,
 } from '../ast/ast';
+import { BinaryExpr } from '../ast/expressions/binop.ast';
 import {
 	Identifer,
 	NumberLiteral,
@@ -328,6 +329,30 @@ export default class Parser {
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
 		return this.parsePrimaryExpression();
+	}
+
+	private parseMultiplicativeExpr(): EXPRESSION {
+		let lhs;
+	}
+
+	private parseAdditiveExpr(): EXPRESSION {
+		let lhs = this.parsePrimaryExpression();
+
+		while (
+			//@ts-expect-error
+			[Node.Symbol.Plus, Node.Symbol.Minus].includes(this.current().type)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseAdditiveExpr();
+			lhs = {
+				kind: 'BinaryExpr',
+				lhs,
+				rhs,
+				op,
+				start: lhs.start,
+				end: rhs.end,
+			} as BinaryExpr;
+		}
 	}
 
 	// Fall back to primary expression parsing

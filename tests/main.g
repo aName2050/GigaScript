@@ -1,3 +1,5 @@
-function add(a: number, b: string): object {
-    var sum: number;
+function add(a: number, b: number): number {
+    var sum: number = a + b;
+
+    return sum;
 }
