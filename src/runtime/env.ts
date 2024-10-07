@@ -1,8 +1,8 @@
 import { SOURCE_FILE } from '..';
 import { SpecialError } from '../../typescript/Error.types';
 import { GSError } from '../../typescript/GS.types';
-import { Identifer } from '../ast/literals/literals.ast';
-import { GSAny } from './types';
+import { Identifier } from '../ast/literals/literals.ast';
+import { DataConstructors, GSAny } from './types';
 
 export default class Environment {
 	private parent?: Environment;
@@ -28,8 +28,8 @@ export default class Environment {
 		return this.variables;
 	}
 
-	public declareVar(
-		identifier: Identifer,
+	public declareVariable(
+		identifier: Identifier,
 		value: GSAny,
 		isConstant: boolean
 	): GSAny {
@@ -45,5 +45,55 @@ export default class Environment {
 		if (isConstant) this.constants.add(identifier.symbol);
 
 		return value;
+	}
+
+	public assignVariable(
+		identifier: Identifier,
+		value: GSAny,
+		overrideConstant = false
+	): GSAny {
+		if (identifier.symbol == 'this' && !this.parent && !overrideConstant) {
+			throw new GSError(
+				SpecialError.RuntimeError,
+				'Cannot override "this" keyword',
+				`${SOURCE_FILE}:${identifier.start.Line}:${identifier.start.Column}`
+			);
+		}
+
+		const env = this.resolve(identifier);
+
+		if (env.constants.has(identifier.symbol) && !overrideConstant)
+			throw new GSError(
+				SpecialError.EvalError,
+				`Cannot reassign "${identifier.symbol}" because it is a constant`,
+				`${SOURCE_FILE}:${identifier.start.Line}:${identifier.start.Column}`
+			);
+
+		env.variables.set(identifier.symbol, value);
+
+		return value;
+	}
+
+	public lookupVar(identifier: Identifier): GSAny {
+		if (identifier.symbol == 'this' && !this.parent) {
+			return DataConstructors.UNDEFINED();
+		}
+
+		const env = this.resolve(identifier);
+		return (
+			env.variables.get(identifier.symbol) ?? DataConstructors.UNDEFINED()
+		);
+	}
+
+	public resolve(identifier: Identifier): Environment {
+		if (this.variables.has(identifier.symbol)) return this;
+		if (this.parent == undefined)
+			throw new GSError(
+				SpecialError.EvalError,
+				`Unable to resolve variable "${identifier.symbol}" as it doesn't exist`,
+				`${SOURCE_FILE}:${identifier.start.Line}:${identifier.start.Column}`
+			);
+
+		return this.parent.resolve(identifier);
 	}
 }

@@ -1,6 +1,6 @@
 import { EXPRESSION } from '../ast';
 
-export interface Identifer extends EXPRESSION {
+export interface Identifier extends EXPRESSION {
 	kind: 'Identifier';
 	symbol: string;
 }

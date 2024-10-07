@@ -11,7 +11,7 @@ import {
 import { BinaryExpr } from '../ast/expressions/binop.ast';
 import { CallExpr } from '../ast/expressions/expressions.ast';
 import {
-	Identifer,
+	Identifier,
 	NumberLiteral,
 	StringLiteral,
 } from '../ast/literals/literals.ast';
@@ -446,7 +446,7 @@ export default class Parser {
 						Line: token.__GSC._POS.end.Line,
 						Column: token.__GSC._POS.end.Column,
 					},
-				} as Identifer;
+				} as Identifier;
 
 			case Node.Literal.NUMBER:
 				return {
