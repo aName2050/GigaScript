@@ -64,4 +64,7 @@ export const DataConstructors = {
 	UNDEFINED,
 	STRING,
 	NUMBER,
+	BOOLEAN,
+	NULL,
+	OBJECT,
 };

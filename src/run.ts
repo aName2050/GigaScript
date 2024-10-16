@@ -9,7 +9,7 @@ import { Program } from './ast/ast';
 
 export function run(filename: string, location: string) {
 	const parser = new Parser(); // TODO:
-	const env = undefined; // TODO:
+	// const env = createGlo; // TODO:
 
 	let file = readFileSync(filename, { encoding: 'utf-8' });
 
