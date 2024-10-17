@@ -6,10 +6,11 @@ import { tokenize } from './lexer/tokenizer';
 import Parser from './parser/parser';
 import { Node } from './parser/nodes';
 import { Program } from './ast/ast';
+import { createNewGlobalScope } from './runtime/env';
 
 export function run(filename: string, location: string) {
-	const parser = new Parser(); // TODO:
-	// const env = createGlo; // TODO:
+	const parser = new Parser();
+	const env = createNewGlobalScope(location);
 
 	let file = readFileSync(filename, { encoding: 'utf-8' });
 

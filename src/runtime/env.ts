@@ -11,6 +11,8 @@ export function createNewGlobalScope(cwd: string): Environment {
 	env.declareVariable({ symbol: 'true' } as Identifier, TRUE, true);
 	env.declareVariable({ symbol: 'false' } as Identifier, FALSE, true);
 	env.declareVariable({ symbol: 'nil' } as Identifier, NIL, true);
+	env.declareVariable({ symbol: 'undefined' } as Identifier, UNDEFINED, true);
+	env.declareVariable({ symbol: 'error' } as Identifier, __ERROR, true);
 
 	return env;
 }
