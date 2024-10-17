@@ -1,15 +1,25 @@
 import { SOURCE_FILE } from '../..';
 import { SpecialError } from '../../../typescript/Error.types';
 import { GSError } from '../../../typescript/GS.types';
-import { STATEMENT } from '../../ast/ast';
+import { Program, STATEMENT } from '../../ast/ast';
+import { BinaryExpr } from '../../ast/expressions/binop.ast';
 import {
 	Identifier,
 	NumberLiteral,
 	StringLiteral,
 } from '../../ast/literals/literals.ast';
+import {
+	FunctionDeclaration,
+	VariableDeclaration,
+} from '../../ast/statements/declarations.ast';
 import Environment from '../env';
 import { GSAny, GSNumber, GSString } from '../types';
-import { evalIdentifier } from './eval/expr';
+import { evalBinaryExpr, evalIdentifier } from './eval/expr';
+import {
+	evalFunctionDeclaration,
+	evalProgram,
+	evalVariableDeclaration,
+} from './eval/stmt';
 
 export function evaluate(node: STATEMENT, env: Environment): GSAny {
 	if (!node || !node.kind)
@@ -37,12 +47,20 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 			return evalIdentifier(node as Identifier, env);
 
 		// expressions
-		// TODO: binop
+		case 'BinaryExpr':
+			return evalBinaryExpr(node as BinaryExpr, env);
+
+		// TODO: call expr
 
 		// statements
-		// TODO: program
-		// TODO: variable declaration
-		// TODO: function declaration
+		case 'Program':
+			return evalProgram(node as Program, env);
+
+		case 'VariableDeclaration':
+			return evalVariableDeclaration(node as VariableDeclaration, env);
+
+		case 'FunctionDeclaration':
+			return evalFunctionDeclaration(node as FunctionDeclaration, env);
 
 		default:
 			throw new GSError(

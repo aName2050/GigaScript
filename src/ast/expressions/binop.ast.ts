@@ -10,5 +10,13 @@ export interface BinaryExpr extends EXPRESSION {
 		| Node.Symbol.Minus
 		| Node.Symbol.Multiply
 		| Node.Symbol.Divide
-		| Node.Symbol.Modulo;
+		| Node.Symbol.Modulo
+		| Node.LogicalOperator.LogicalAND
+		| Node.LogicalOperator.LogicalOR
+		| Node.ComparisonOperator.NotEqual
+		| Node.ComparisonOperator.IsEqual
+		| Node.ComparisonOperator.LessThan
+		| Node.ComparisonOperator.GreaterThan
+		| Node.ComparisonOperator.LessThanOrEquals
+		| Node.ComparisonOperator.GreaterThanOrEquals;
 }

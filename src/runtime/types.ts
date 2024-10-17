@@ -1,4 +1,4 @@
-import { CodeBlockNode } from '../ast/ast';
+import { CodeBlockNode, GSType } from '../ast/ast';
 import Environment from './env';
 
 export type DataType =
@@ -27,12 +27,20 @@ export interface ObjectValue extends Value<'object', object> {
 export type FunctionCall = (args: GSAny[], env: Environment) => GSAny;
 // export interface NativeFunction
 
+export interface FunctionValue extends Value<'Function', any> {
+	type: 'Function';
+	name: string;
+	params: { [key: string]: GSType };
+	declarationEnvironment: Environment;
+	body: CodeBlockNode;
+}
+
 export interface GSString extends Value<'string', string> {}
 export interface GSNumber extends Value<'number', number> {}
 export interface GSBoolean extends Value<'boolean', boolean> {}
 export interface GSNil extends Value<'nil', null> {}
 export interface GSObject extends ObjectValue {}
-// export interface GSFunction extends
+export interface GSFunction extends FunctionValue {}
 export interface GSAny extends Value<'any' | DataType, any> {}
 export interface GSUndefined extends Value<'undefined', undefined> {}
 

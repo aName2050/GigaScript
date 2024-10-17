@@ -7,6 +7,9 @@ import Parser from './parser/parser';
 import { Node } from './parser/nodes';
 import { Program } from './ast/ast';
 import { createNewGlobalScope } from './runtime/env';
+import { args } from './cli';
+import { evaluate } from './runtime/interpreter/interpreter';
+import { DataConstructors, GSAny } from './runtime/types';
 
 export function run(filename: string, location: string) {
 	const parser = new Parser();
@@ -17,8 +20,19 @@ export function run(filename: string, location: string) {
 	if (filename.endsWith('.g')) {
 		parser.tokenizeSourceFile(file);
 		const program: Program = parser.generateAST();
-		// console.log(parser.Tokens);
-		console.log(program);
+
+		let res: GSAny = DataConstructors.UNDEFINED();
+
+		if (args.NoCrashOnError) {
+			try {
+				res = evaluate(program, env);
+			} catch (e) {
+				console.log(e);
+			}
+		} else res = evaluate(program, env);
+
+		console.log(res);
+		return res;
 	} else {
 		throw new GSError(
 			SpecialError.ImportError,
