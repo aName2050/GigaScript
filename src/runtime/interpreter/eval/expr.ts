@@ -178,6 +178,16 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 					`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
 				);
 			}
+			console.log(func.params[Object.keys(func.name)[i]]);
+			if (func.params[Object.keys(func.name)[i]] != args[i].type) {
+				throw new GSError(
+					SpecialError.TypeError,
+					`Expected type ${
+						func.params[Object.keys(func.name)[i]]
+					}, instead got ${args[i].type}`,
+					`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
+				);
+			}
 
 			const varName = Object.keys(func.params)[i];
 			scope.declareVariable(
