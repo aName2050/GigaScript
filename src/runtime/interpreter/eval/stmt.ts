@@ -4,6 +4,7 @@ import {
 	FunctionDeclaration,
 	VariableDeclaration,
 } from '../../../ast/statements/declarations.ast';
+import { ReturnStatement } from '../../../ast/statements/statements.ast';
 import Environment from '../../env';
 import {
 	DataConstructors,
@@ -55,4 +56,12 @@ export function evalFunctionDeclaration(
 		func,
 		true
 	) as GSFunction;
+}
+
+export function evalReturnStatement(
+	statement: ReturnStatement,
+	env: Environment
+): GSAny {
+	const value = evaluate(statement.value, env);
+	return value;
 }

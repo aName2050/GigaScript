@@ -2,11 +2,13 @@ import { SOURCE_FILE } from '../../..';
 import { SpecialError } from '../../../../typescript/Error.types';
 import { GSError } from '../../../../typescript/GS.types';
 import { BinaryExpr } from '../../../ast/expressions/binop.ast';
+import { CallExpr } from '../../../ast/expressions/expressions.ast';
 import { Identifier } from '../../../ast/literals/literals.ast';
 import { Node } from '../../../parser/nodes';
 import Environment from '../../env';
 import {
 	DataConstructors,
+	FunctionValue,
 	GSAny,
 	GSBoolean,
 	GSNil,
@@ -153,4 +155,55 @@ function equals(lhs: GSAny, rhs: GSAny, strict: boolean): GSAny {
 	}
 }
 
-// TODO: call expr
+export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
+	const args = expr.args.map(arg => evaluate(arg, env));
+	const fn = evaluate(expr.caller, env);
+
+	if (fn.type == 'nativeFn') {
+		// TODO: native functions
+		return DataConstructors.UNDEFINED();
+	}
+
+	if (fn.type == 'Function') {
+		const func = fn as FunctionValue;
+		const scope = new Environment(env.cwd, func.declarationEnvironment);
+
+		for (let i = 0; i < Object.keys(func.params).length; i++) {
+			if (Object.keys(func.params).length != args.length) {
+				throw new GSError(
+					SpecialError.EvalError,
+					`Expected ${
+						Object.keys(func.params).length
+					} arguments, got ${args.length}`,
+					`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
+				);
+			}
+
+			const varName = Object.keys(func.params)[i];
+			scope.declareVariable(
+				{ symbol: varName } as Identifier,
+				args[i],
+				false
+			);
+		}
+
+		let result: GSAny = DataConstructors.UNDEFINED();
+
+		for (const stmt of func.body.body) {
+			if (stmt.kind == 'ReturnStatement') {
+				result = evaluate(stmt, scope);
+				break;
+			}
+
+			evaluate(stmt, scope);
+		}
+
+		return result;
+	}
+
+	throw new GSError(
+		SpecialError.EvalError,
+		`Cannot call a non-function value: ${JSON.stringify(fn)}`,
+		`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
+	);
+}

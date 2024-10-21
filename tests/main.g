@@ -4,4 +4,4 @@ function add(a: number, b: number): number {
     return sum;
 }
 
-add(1, 4)
+add(2, 2)
