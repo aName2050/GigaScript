@@ -178,12 +178,11 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 					`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
 				);
 			}
-			console.log(func.params[Object.keys(func.name)[i]]);
-			if (func.params[Object.keys(func.name)[i]] != args[i].type) {
+			if (func.params[`${Object.keys(func.params)[i]}`] != args[i].type) {
 				throw new GSError(
 					SpecialError.TypeError,
-					`Expected type ${
-						func.params[Object.keys(func.name)[i]]
+					`Expected ${
+						func.params[`${Object.keys(func.params)[i]}`]
 					}, instead got ${args[i].type}`,
 					`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
 				);
@@ -202,6 +201,7 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 		for (const stmt of func.body.body) {
 			if (stmt.kind == 'ReturnStatement') {
 				result = evaluate(stmt, scope);
+				// TODO: add return type check
 				break;
 			}
 
