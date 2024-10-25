@@ -1,3 +1,6 @@
+import { SOURCE_FILE } from '../../..';
+import { SpecialError } from '../../../../typescript/Error.types';
+import { GSError } from '../../../../typescript/GS.types';
 import { Program } from '../../../ast/ast';
 import { Identifier } from '../../../ast/literals/literals.ast';
 import {
@@ -31,6 +34,14 @@ export function evalVariableDeclaration(
 	const value = declaration.value
 		? evaluate(declaration.value, env)
 		: DataConstructors.UNDEFINED();
+
+	if (value.type != declaration.valueType) {
+		throw new GSError(
+			SpecialError.TypeError,
+			`Expected ${declaration.valueType}, instead got ${value.type}`,
+			`${SOURCE_FILE}:${declaration.start.Line}:${declaration.start.Column}`
+		);
+	}
 
 	return env.declareVariable(
 		{ symbol: declaration.identifier } as Identifier,
