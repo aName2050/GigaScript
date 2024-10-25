@@ -8,6 +8,7 @@ import {
 	Program,
 	STATEMENT,
 } from '../ast/ast';
+import { AssignmentExpression } from '../ast/expressions/assignemts.ast';
 import { BinaryExpr } from '../ast/expressions/binop.ast';
 import { CallExpr } from '../ast/expressions/expressions.ast';
 import {
@@ -329,7 +330,43 @@ export default class Parser {
 
 	// [EXPRESSIONS]
 	private parseExpr(): EXPRESSION {
-		return this.parseMultiplicativeExpr();
+		return this.parseAsgExpr();
+	}
+
+	private parseAsgExpr(): EXPRESSION {
+		const lhs = this.parseMultiplicativeExpr();
+
+		if (
+			[
+				Node.AssignmentOperator.Equals,
+				Node.AssignmentOperator.AsgAdd,
+				Node.AssignmentOperator.AsgMin,
+				Node.AssignmentOperator.AsgMult,
+				Node.AssignmentOperator.AsgDiv,
+				Node.AssignmentOperator.AsgMod,
+			].includes(
+				//@ts-expect-error
+				this.current().type
+			)
+		) {
+			const op = this.advance().type;
+			const rhs = this.parseAsgExpr();
+			this.expect(
+				Node.Symbol.Semicolon,
+				'Symbol',
+				'following assignment expression'
+			);
+			return {
+				kind: 'AssignmentExpr',
+				value: rhs,
+				assigne: lhs,
+				AsgOp: op,
+				start: lhs.start,
+				end: rhs.end,
+			} as AssignmentExpression;
+		}
+
+		return lhs;
 	}
 
 	private parseMultiplicativeExpr(): EXPRESSION {

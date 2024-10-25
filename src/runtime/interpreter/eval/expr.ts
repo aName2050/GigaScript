@@ -1,6 +1,7 @@
 import { SOURCE_FILE } from '../../..';
 import { SpecialError } from '../../../../typescript/Error.types';
 import { GSError } from '../../../../typescript/GS.types';
+import { AssignmentExpression } from '../../../ast/expressions/assignemts.ast';
 import { BinaryExpr } from '../../../ast/expressions/binop.ast';
 import { CallExpr } from '../../../ast/expressions/expressions.ast';
 import { Identifier } from '../../../ast/literals/literals.ast';
@@ -216,4 +217,88 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 		`Cannot call a non-function value: ${JSON.stringify(fn)}`,
 		`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
 	);
+}
+
+export function evalAssignment(
+	node: AssignmentExpression,
+	env: Environment
+): GSAny {
+	// if (node.assigne.kind === 'MemberExpr') return eval member expr TODO:
+	if (node.assigne.kind !== 'Identifier') {
+		throw new GSError(
+			SpecialError.EvalError,
+			`Invalid LHS expression: ${JSON.stringify(node.assigne)}`,
+			`${SOURCE_FILE}:${node.start.Line}:${node.start.Column}`
+		);
+	}
+
+	const op = node.AsgOp;
+	if (op == Node.AssignmentOperator.Equals)
+		return env.assignVariable(
+			node.assigne as Identifier,
+			evaluate(node.value, env)
+		);
+
+	const value = evaluate(node.value, env);
+	let variable = env.lookupVar(node.assigne as Identifier);
+	let type: 'number' | 'string' | 'boolean' | 'any';
+
+	// eval type conversions
+	if (value.type == 'number') {
+		variable = DataConstructors.NUMBER(variable.value);
+		type = 'number';
+	} else if (value.type == 'string') {
+		variable = DataConstructors.STRING(variable.value);
+		type = 'string';
+	} else if (value.type == 'boolean') {
+		variable = DataConstructors.BOOLEAN(variable.value);
+		type = 'boolean';
+	} else type = 'any';
+
+	if (type == 'number') {
+		// TODO: finish
+		switch (op) {
+			case Node.AssignmentOperator.AsgAdd:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(variable.value + value.value)
+				);
+
+			case Node.AssignmentOperator.AsgMin:
+				return env.assignVar(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(variable.value - value.value)
+				);
+			case Node.AssignmentOperator.AsgMult:
+				return env.assignVar(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(
+						variable.value * evaluate(node.value, env).value
+					)
+				);
+			case NodeType.AsgDiv:
+				return env.assignVar(
+					varName,
+					DataConstructors.NUMBER(
+						env.lookupVar(varName).value /
+							evaluate(node.value, env).value
+					)
+				);
+			case NodeType.AsgMod:
+				return env.assignVar(
+					varName,
+					DataConstructors.NUMBER(
+						env.lookupVar(varName).value %
+							evaluate(node.value, env).value
+					)
+				);
+
+			default:
+				throw new GSError(
+					'RuntimeError',
+					`Unknown operator "${op}"`,
+					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+				);
+		}
+	}
 }
