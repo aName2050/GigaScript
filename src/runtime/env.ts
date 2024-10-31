@@ -4,15 +4,27 @@ import { GSError } from '../../typescript/GS.types';
 import { Identifier } from '../ast/literals/literals.ast';
 import { DataConstructors, GSAny } from './types';
 import { TRUE, FALSE, NIL, UNDEFINED, __ERROR } from '../native/valueKeywords';
+import * as NATIVE_FUNCTIONS from '../native/functions';
 
 export function createNewGlobalScope(cwd: string): Environment {
 	const env = new Environment(cwd);
 
+	// Native values
 	env.declareVariable({ symbol: 'true' } as Identifier, TRUE, true);
 	env.declareVariable({ symbol: 'false' } as Identifier, FALSE, true);
 	env.declareVariable({ symbol: 'nil' } as Identifier, NIL, true);
 	env.declareVariable({ symbol: 'undefined' } as Identifier, UNDEFINED, true);
 	env.declareVariable({ symbol: 'error' } as Identifier, __ERROR, true);
+
+	// native variables
+	// TODO: error
+
+	// Native functions
+	env.declareVariable(
+		{ symbol: 'print' } as Identifier,
+		NATIVE_FUNCTIONS.print,
+		true
+	);
 
 	return env;
 }

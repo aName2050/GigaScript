@@ -16,6 +16,7 @@ import {
 	GSNumber,
 	GSString,
 	GSUndefined,
+	NativeFunctionValue,
 } from '../../types';
 import { evaluate } from '../interpreter';
 
@@ -161,8 +162,8 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 	const fn = evaluate(expr.caller, env);
 
 	if (fn.type == 'nativeFn') {
-		// TODO: native functions
-		return DataConstructors.UNDEFINED();
+		const result = (fn as NativeFunctionValue).call(args, env);
+		return result;
 	}
 
 	if (fn.type == 'Function') {

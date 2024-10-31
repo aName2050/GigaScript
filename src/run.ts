@@ -31,7 +31,6 @@ export function run(filename: string, location: string) {
 			}
 		} else res = evaluate(program, env);
 
-		console.log(res);
 		return res;
 	} else {
 		throw new GSError(

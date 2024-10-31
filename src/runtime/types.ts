@@ -35,12 +35,18 @@ export interface FunctionValue extends Value<'Function', any> {
 	body: CodeBlockNode;
 }
 
+export interface NativeFunctionValue extends Value<'nativeFn', any> {
+	type: 'nativeFn';
+	call: (args: Array<GSAny>, env: Environment) => GSAny;
+}
+
 export interface GSString extends Value<'string', string> {}
 export interface GSNumber extends Value<'number', number> {}
 export interface GSBoolean extends Value<'boolean', boolean> {}
 export interface GSNil extends Value<'nil', null> {}
 export interface GSObject extends ObjectValue {}
 export interface GSFunction extends FunctionValue {}
+export interface GSNativeFn extends NativeFunctionValue {}
 export interface GSAny extends Value<'any' | DataType, any> {}
 export interface GSUndefined extends Value<'undefined', undefined> {}
 
@@ -68,6 +74,10 @@ function UNDEFINED(): Value<'undefined', undefined> {
 	return { type: 'undefined', value: undefined } as GSUndefined;
 }
 
+function NATIVEFN(call: NativeFunctionValue['call']): NativeFunctionValue {
+	return { type: 'nativeFn', call } as NativeFunctionValue;
+}
+
 export const DataConstructors = {
 	UNDEFINED,
 	STRING,
@@ -75,4 +85,5 @@ export const DataConstructors = {
 	BOOLEAN,
 	NULL,
 	OBJECT,
+	NATIVEFN,
 };
