@@ -60,6 +60,7 @@ export function evalFunctionDeclaration(
 		params: declaration.parameters,
 		declarationEnvironment: env,
 		body: declaration.body,
+		returnType: declaration.returnType,
 	} as FunctionValue;
 
 	return env.declareVariable(

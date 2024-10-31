@@ -203,7 +203,12 @@ export function evalCallExpr(expr: CallExpr, env: Environment): GSAny {
 		for (const stmt of func.body.body) {
 			if (stmt.kind == 'ReturnStatement') {
 				result = evaluate(stmt, scope);
-				// TODO: add return type check
+				if (result.type !== func.returnType)
+					throw new GSError(
+						SpecialError.TypeError,
+						`Expected to return ${func.returnType}, instead returned ${result.type}`,
+						`${SOURCE_FILE}:${expr.start.Line}:${expr.start.Column}`
+					);
 				break;
 			}
 

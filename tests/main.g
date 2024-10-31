@@ -1,5 +1,5 @@
-const helloWorld: string = 'hello world!';
-const x = 32;
-print(helloWorld, x)
+function add(a: number, b: number): number {
+    return a + b;
+}
 
-print(true, false, print)
+print(add(1, 1))

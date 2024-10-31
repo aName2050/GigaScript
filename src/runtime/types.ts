@@ -33,6 +33,7 @@ export interface FunctionValue extends Value<'Function', any> {
 	params: { [key: string]: GSType };
 	declarationEnvironment: Environment;
 	body: CodeBlockNode;
+	returnType: GSType;
 }
 
 export interface NativeFunctionValue extends Value<'nativeFn', any> {
