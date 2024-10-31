@@ -265,40 +265,116 @@ export function evalAssignment(
 				);
 
 			case Node.AssignmentOperator.AsgMin:
-				return env.assignVar(
+				return env.assignVariable(
 					node.assigne as Identifier,
 					DataConstructors.NUMBER(variable.value - value.value)
 				);
 			case Node.AssignmentOperator.AsgMult:
-				return env.assignVar(
+				return env.assignVariable(
 					node.assigne as Identifier,
 					DataConstructors.NUMBER(
 						variable.value * evaluate(node.value, env).value
 					)
 				);
-			case NodeType.AsgDiv:
-				return env.assignVar(
-					varName,
+			case Node.AssignmentOperator.AsgDiv:
+				return env.assignVariable(
+					node.assigne as Identifier,
 					DataConstructors.NUMBER(
-						env.lookupVar(varName).value /
-							evaluate(node.value, env).value
+						variable.value / evaluate(node.value, env).value
 					)
 				);
-			case NodeType.AsgMod:
-				return env.assignVar(
-					varName,
+			case Node.AssignmentOperator.AsgMod:
+				return env.assignVariable(
+					node.assigne as Identifier,
 					DataConstructors.NUMBER(
-						env.lookupVar(varName).value %
-							evaluate(node.value, env).value
+						variable.value % evaluate(node.value, env).value
 					)
 				);
 
 			default:
 				throw new GSError(
-					'RuntimeError',
+					SpecialError.RuntimeError,
 					`Unknown operator "${op}"`,
-					`${sourceFile}:${node.start.Line}:${node.start.Column}`
+					`${SOURCE_FILE}:${node.start.Line}:${node.start.Column}`
 				);
 		}
+	} else if (type == 'string') {
+		switch (op) {
+			case Node.AssignmentOperator.AsgAdd:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.BOOLEAN(
+						variable.value + evaluate(node.value, env).value
+					)
+				);
+			case Node.AssignmentOperator.AsgMin:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			case Node.AssignmentOperator.AsgMult:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			case Node.AssignmentOperator.AsgDiv:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			case Node.AssignmentOperator.AsgMod:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			default:
+				throw new GSError(
+					SpecialError.RuntimeError,
+					`Unknown operator "${op}"`,
+					`${SOURCE_FILE}:${node.start.Line}:${node.start.Column}`
+				);
+		}
+	} else if (type == 'boolean') {
+		switch (op) {
+			case Node.AssignmentOperator.AsgAdd:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.BOOLEAN(
+						variable.value + evaluate(node.value, env).value
+					)
+				);
+			case Node.AssignmentOperator.AsgMin:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			case Node.AssignmentOperator.AsgMult:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			case Node.AssignmentOperator.AsgDiv:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			case Node.AssignmentOperator.AsgMod:
+				return env.assignVariable(
+					node.assigne as Identifier,
+					DataConstructors.NUMBER(NaN)
+				);
+			default:
+				throw new GSError(
+					SpecialError.RuntimeError,
+					`Unknown operator "${op}"`,
+					`${SOURCE_FILE}:${node.start.Line}:${node.start.Column}`
+				);
+		}
+	} else {
+		throw new GSError(
+			SpecialError.RuntimeError,
+			`Type ${type} cannot be used with special assignment operators. Only types number, string, and boolean can be used.`,
+			`${SOURCE_FILE}:${node.start.Line}:${node.start.Column}`
+		);
 	}
 }

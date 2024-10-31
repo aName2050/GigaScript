@@ -2,6 +2,7 @@ import { SOURCE_FILE } from '../..';
 import { SpecialError } from '../../../typescript/Error.types';
 import { GSError } from '../../../typescript/GS.types';
 import { Program, STATEMENT } from '../../ast/ast';
+import { AssignmentExpression } from '../../ast/expressions/assignemts.ast';
 import { BinaryExpr } from '../../ast/expressions/binop.ast';
 import { CallExpr } from '../../ast/expressions/expressions.ast';
 import {
@@ -16,7 +17,12 @@ import {
 import { ReturnStatement } from '../../ast/statements/statements.ast';
 import Environment from '../env';
 import { GSAny, GSNumber, GSString } from '../types';
-import { evalBinaryExpr, evalCallExpr, evalIdentifier } from './eval/expr';
+import {
+	evalAssignment,
+	evalBinaryExpr,
+	evalCallExpr,
+	evalIdentifier,
+} from './eval/expr';
 import {
 	evalFunctionDeclaration,
 	evalProgram,
@@ -55,6 +61,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'CallExpr':
 			return evalCallExpr(node as CallExpr, env);
+
+		case 'AssignmentExpr':
+			return evalAssignment(node as AssignmentExpression, env);
 
 		// statements
 		case 'Program':

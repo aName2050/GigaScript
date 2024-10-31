@@ -35,7 +35,7 @@ export function evalVariableDeclaration(
 		? evaluate(declaration.value, env)
 		: DataConstructors.UNDEFINED();
 
-	if (value.type != declaration.valueType) {
+	if (value.type != declaration.valueType && declaration.valueType != 'any') {
 		throw new GSError(
 			SpecialError.TypeError,
 			`Expected ${declaration.valueType}, instead got ${value.type}`,
