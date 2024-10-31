@@ -23,6 +23,10 @@ export function run(filename: string, location: string) {
 
 		let res: GSAny = DataConstructors.UNDEFINED();
 
+		if (args.ASTOnly) {
+			return console.log(JSON.stringify(program));
+		}
+
 		if (args.NoCrashOnError) {
 			try {
 				res = evaluate(program, env);
