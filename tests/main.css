@@ -1,0 +1,61 @@
+body {
+	font-family: Arial;
+	padding: 0;
+	background-color: #0e0f0f;
+	color: #f5edde;
+	font-size: 14px;
+}
+
+ul {
+	list-style-type: none;
+	font-family: monospace;
+	cursor: default;
+	text-decoration: none;
+	user-select: none;
+}
+
+.entry {
+	cursor: default;
+	text-decoration: none;
+}
+
+.entry.toggleable::before {
+	content: '+';
+	color: #129918;
+}
+
+.entry.toggleable:hover:not(.value-body) {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+#program {
+	color: #1313ff;
+}
+
+.p {
+	color: #aca290;
+}
+
+.name {
+	color: #ffd862;
+}
+
+.s {
+	color: #7fd3c2;
+	user-select: text;
+	cursor: text;
+}
+
+/* debug */
+.key {
+	border: solid 1px red;
+	margin: 0;
+	padding: 0;
+}
+
+.value {
+	border: solid 1px red;
+	margin: 0;
+	padding: 0;
+}

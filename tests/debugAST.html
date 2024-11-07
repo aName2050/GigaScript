@@ -4,33 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>AST Viewer</title>
-		<style>
-			body {
-				font-family: Arial;
-				padding: 0;
-				background-color: #2f2f2f;
-			}
-
-			ul {
-				list-style-type: none;
-			}
-
-			.nodeKey {
-				color: yellow;
-			}
-
-			.groupSymbol {
-				color: #9f9f9f;
-			}
-
-			.program {
-				color: #4f4fff;
-			}
-
-			.nodeValue {
-				color: #afafff;
-			}
-		</style>
+		<link rel="stylesheet" href="main.css" />
 	</head>
 	<body>
 		<div id="astBuilder">
@@ -47,63 +21,28 @@
 		</div>
 		<h2>AST Tree</h2>
 		<div id="ast-container">
-			<span class="program">Program</span>
 			<ul>
-				<li>
-					<span class="nodeKey">body</span>:&nbsp;<span
-						class="nodeValue"
-					>
-						<ul>
-							<li>
-								<span class="nodeKey">key</span>:&nbsp;<span
-									class="nodeValue"
-									>node</span
-								>
-							</li>
-						</ul>
-					</span>
+				<li class="entry toggleable">
+					<span class="value" id="program">Program</span>
+					<span class="p">&#123;</span>
+					<ul class="value-body">
+						<li class="entry">
+							<span class="key">
+								<span class="name">kind</span>
+								<span class="p">:&nbsp;</span>
+							</span>
+							<span class="value">
+								<span class="s">"Program"</span>
+							</span>
+						</li>
+					</ul>
+					<span class="p">&#125;</span>
 				</li>
 			</ul>
 		</div>
-		<script>
-			var btn = document.getElementById('buildTree');
-			var txtarea = document.getElementById('ASTInput');
-
-			var clear = document.getElementById('clear');
-
-			var container = document.getElementById('ast-container');
-
-			btn.addEventListener(
-				'click',
-				function () {
-					if (!txtarea.value) return alert('an input is required');
-					container.innerHTML = buildHTMLFromAST(
-						JSON.parse(txtarea.value)
-					);
-				},
-				false
-			);
-
-			clear.addEventListener(
-				'click',
-				function () {
-					container.innerHTML = '';
-					txtarea.value = '';
-				},
-				false
-			);
-
-			function buildHTMLFromAST(ast) {
-				alert('not implemented');
-				throw 'not implemented';
-			}
-		</script>
-		<!-- <p>
-			NOTE: Maps, Sets, and Records will appear as empty objects in this
-			view
-		</p> -->
 		<br />
 		<br />
 		<br />
+		<script src="script.js"></script>
 	</body>
 </html>
