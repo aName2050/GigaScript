@@ -22,15 +22,23 @@ ul {
 .entry.toggleable::before {
 	content: '+';
 	color: #129918;
+	margin-left: -15px;
 }
 
-.entry.toggleable:hover:not(.value-body) {
+.entry.toggleable.open::before {
+	content: '-';
+	color: #ff1212;
+}
+
+.entry.toggleable > span:first-of-type > span.name:hover,
+#program:hover {
 	text-decoration: underline;
 	cursor: pointer;
 }
 
 #program {
 	color: #1313ff;
+	margin-right: 8px;
 }
 
 .p {
@@ -47,15 +55,18 @@ ul {
 	cursor: text;
 }
 
-/* debug */
-.key {
-	border: solid 1px red;
-	margin: 0;
-	padding: 0;
+.prefix {
+	margin-left: -5px;
 }
 
-.value {
-	border: solid 1px red;
-	margin: 0;
-	padding: 0;
+.key {
+	margin-right: 5px;
+}
+
+.value:not(#program) {
+	margin-left: -2px;
+}
+
+.key > span {
+	margin-right: -9px;
 }

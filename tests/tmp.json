@@ -1,0 +1,83 @@
+{
+	"kind": "Program",
+	"body": [
+		{
+			"kind": "FunctionDeclaration",
+			"name": "add",
+			"body": {
+				"kind": "CodeBlockNode",
+				"body": [
+					{
+						"kind": "ReturnStatement",
+						"value": {
+							"kind": "BinaryExpr",
+							"lhs": {
+								"kind": "Identifier",
+								"symbol": "a",
+								"start": { "Line": 2, "Column": 12 },
+								"end": { "Line": 2, "Column": 13 }
+							},
+							"rhs": {
+								"kind": "Identifier",
+								"symbol": "b",
+								"start": { "Line": 2, "Column": 16 },
+								"end": { "Line": 2, "Column": 17 }
+							},
+							"op": 35,
+							"start": { "Line": 2, "Column": 12 },
+							"end": { "Line": 2, "Column": 17 }
+						},
+						"start": { "Line": 2, "Column": 5 },
+						"end": { "Line": 2, "Column": 18 }
+					}
+				],
+				"start": { "Line": 1, "Column": 43 },
+				"end": { "Line": 3, "Column": 2 }
+			},
+			"parameters": { "a": "number", "b": "number" },
+			"returnType": "number",
+			"start": { "Line": 1, "Column": 0 },
+			"end": { "Line": 3, "Column": 2 }
+		},
+		{
+			"kind": "CallExpr",
+			"caller": {
+				"kind": "Identifier",
+				"symbol": "print",
+				"start": { "Line": 5, "Column": 1 },
+				"end": { "Line": 5, "Column": 6 }
+			},
+			"args": [
+				{
+					"kind": "CallExpr",
+					"caller": {
+						"kind": "Identifier",
+						"symbol": "add",
+						"start": { "Line": 5, "Column": 7 },
+						"end": { "Line": 5, "Column": 10 }
+					},
+					"args": [
+						{
+							"kind": "NumberLiteral",
+							"value": 1,
+							"start": { "Line": 5, "Column": 11 },
+							"end": { "Line": 5, "Column": 12 }
+						},
+						{
+							"kind": "NumberLiteral",
+							"value": 1,
+							"start": { "Line": 5, "Column": 14 },
+							"end": { "Line": 5, "Column": 15 }
+						}
+					],
+					"start": { "Line": 5, "Column": 7 },
+					"end": { "Line": 5, "Column": 15 }
+				}
+			],
+			"start": { "Line": 5, "Column": 1 },
+			"end": { "Line": 5, "Column": 15 }
+		}
+	],
+	"start": { "Line": 1, "Column": 1 },
+	"end": { "Line": 6, "Column": 2 }
+}
