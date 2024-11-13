@@ -13,16 +13,24 @@ btn.addEventListener(
 		if (!txtarea.value) return alert('an input is required');
 		HTML_BUILD_STARTED = true;
 		container.innerHTML =
-			`<ul>	
+			`<ul class="outer">	
 			<li class="entry toggleable open">
 			<span class="value" id="program">Program</span>
 			<span class="prefix p">${OPEN_BRACE}</span>
-			<ul class="value-body">` +
+			` +
 			buildHTMLFromAST(JSON.parse(txtarea.value)) +
-			`</ul>
+			`
 			<span class="suffix p">${CLOSE_BRACE}</span>
 			</li>
 			</ul>`;
+		var toggleableNodes = document.getElementsByClassName('toggleable');
+		for (var i = 0; i < toggleableNodes.length; i++) {
+			toggleableNodes[i].addEventListener(
+				'click',
+				onClickCallback,
+				false
+			);
+		}
 	},
 	false
 );
@@ -36,6 +44,16 @@ clear.addEventListener(
 	},
 	false
 );
+
+function onClickCallback() {
+	if (this.classList.contains('toggleable')) {
+		if (this.classList.contains('open')) {
+			this.classList.remove('open');
+		} else {
+			this.classList.add('open');
+		}
+	}
+}
 
 var OPEN_BRACE = '&#123;';
 var CLOSE_BRACE = '&#125;';
@@ -55,7 +73,7 @@ function buildHTMLFromAST(rawAST, includeKey) {
 				// if there is an array of nodes within
 				// the current node
 				html += `
-					<li class="entry toggleable open">
+					<li class="entry toggleable">
 						<span class="key">
 							<span class="name">${key}</span>
 							<span class="p">:&nbsp;</span>
@@ -70,7 +88,7 @@ function buildHTMLFromAST(rawAST, includeKey) {
 			} else {
 				// if the node is just an object
 				html += `
-					<li class="entry toggleable open">
+					<li class="entry toggleable">
 						<span class="key">
 							<span class="name">${includeKey ? key : `Element (${key})`}</span>
 							<span class="p">:&nbsp;</span>

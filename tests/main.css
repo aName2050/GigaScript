@@ -25,6 +25,14 @@ ul {
 	margin-left: -15px;
 }
 
+.entry.toggleable:not(.open) > span:not(.key, .outer) {
+	display: none;
+}
+
+.entry.toggleable:not(.open)::after {
+	content: '...';
+}
+
 .entry.toggleable.open::before {
 	content: '-';
 	color: #ff1212;
