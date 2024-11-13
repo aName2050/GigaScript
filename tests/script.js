@@ -45,7 +45,8 @@ clear.addEventListener(
 	false
 );
 
-function onClickCallback() {
+function onClickCallback(e) {
+	e.stopPropagation();
 	if (this.classList.contains('toggleable')) {
 		if (this.classList.contains('open')) {
 			this.classList.remove('open');
