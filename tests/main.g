@@ -1,6 +1,15 @@
 const test: object = {
     hello: {
-        word: 'nested!'
+        word: 'nested!',
+        how: {
+            nested: {
+                can: {
+                    I: {
+                        go: '?'
+                    }
+                }
+            }
+        }
     }
 };
 
