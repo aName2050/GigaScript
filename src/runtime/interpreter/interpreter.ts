@@ -8,6 +8,7 @@ import { CallExpr } from '../../ast/expressions/expressions.ast';
 import {
 	Identifier,
 	NumberLiteral,
+	ObjectLiteral,
 	StringLiteral,
 } from '../../ast/literals/literals.ast';
 import {
@@ -22,6 +23,7 @@ import {
 	evalBinaryExpr,
 	evalCallExpr,
 	evalIdentifier,
+	evalObjectExpr,
 } from './eval/expr';
 import {
 	evalFunctionDeclaration,
@@ -54,6 +56,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'Identifier':
 			return evalIdentifier(node as Identifier, env);
+
+		case 'ObjectLiteral':
+			return evalObjectExpr(node as ObjectLiteral, env);
 
 		// expressions
 		case 'BinaryExpr':

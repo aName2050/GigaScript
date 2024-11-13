@@ -4,7 +4,7 @@ import { GSError } from '../../../../typescript/GS.types';
 import { AssignmentExpression } from '../../../ast/expressions/assignemts.ast';
 import { BinaryExpr } from '../../../ast/expressions/binop.ast';
 import { CallExpr } from '../../../ast/expressions/expressions.ast';
-import { Identifier } from '../../../ast/literals/literals.ast';
+import { Identifier, ObjectLiteral } from '../../../ast/literals/literals.ast';
 import { Node } from '../../../parser/nodes';
 import Environment from '../../env';
 import {
@@ -17,6 +17,7 @@ import {
 	GSString,
 	GSUndefined,
 	NativeFunctionValue,
+	ObjectValue,
 } from '../../types';
 import { evaluate } from '../interpreter';
 
@@ -383,4 +384,19 @@ export function evalAssignment(
 			`${SOURCE_FILE}:${node.start.Line}:${node.start.Column}`
 		);
 	}
+}
+
+export function evalObjectExpr(obj: ObjectLiteral, env: Environment): GSAny {
+	const object = { type: 'object', properties: new Map() } as ObjectValue;
+
+	for (const { key, value } of obj.properties) {
+		const val =
+			value == undefined
+				? env.lookupVar({ symbol: key } as Identifier)
+				: evaluate(value, env);
+
+		object.properties.set(key, val);
+	}
+
+	return object;
 }

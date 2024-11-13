@@ -5,6 +5,7 @@ import {
 	GSNativeFn,
 	GSNil,
 	GSNumber,
+	GSObject,
 	GSString,
 	GSUndefined,
 } from '../runtime/types';
@@ -36,6 +37,14 @@ export function getValue(
 				name: 'nativeFn',
 				isNative: true,
 			};
+		case 'object':
+			let obj: { [key: string]: any } = {};
+			const gsobj = value as GSObject;
+			gsobj.properties.forEach((v, k) => {
+				obj[k] = getValue(v);
+			});
+
+			return obj;
 		default:
 			return value;
 	}

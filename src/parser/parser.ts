@@ -14,6 +14,8 @@ import { CallExpr } from '../ast/expressions/expressions.ast';
 import {
 	Identifier,
 	NumberLiteral,
+	ObjectLiteral,
+	ObjectProperty,
 	StringLiteral,
 } from '../ast/literals/literals.ast';
 import {
@@ -334,7 +336,7 @@ export default class Parser {
 	}
 
 	private parseAsgExpr(): EXPRESSION {
-		const lhs = this.parseMultiplicativeExpr();
+		const lhs = this.parseObjectExpr();
 
 		if (
 			[
@@ -367,6 +369,105 @@ export default class Parser {
 		}
 
 		return lhs;
+	}
+
+	private parseObjectExpr(): EXPRESSION {
+		if (this.current().type !== Node.Group.OpenBrace)
+			return this.parseMultiplicativeExpr();
+
+		const startTokenPos = this.advance().__GSC._POS.start;
+		const properties = new Array<ObjectProperty>();
+
+		while (!this.isEOF() && this.current().type != Node.Group.CloseBrace) {
+			let key: Token;
+			if (this.current().type == Node.Literal.STRING) {
+				// if key is a string
+				key = this.expect(
+					Node.Literal.STRING,
+					'Literal',
+					'as key for KEY-VALUE pair declaration on object expression'
+				);
+			} else {
+				// if the key isn't a string
+				key = this.expect(
+					Node.Literal.IDENTIFIER,
+					'Literal',
+					'as key for KEY-VALUE pair declaration on object expression'
+				);
+			}
+
+			if (this.current().type == Node.Symbol.Comma) {
+				// { key, }
+				this.advance();
+				properties.push({
+					key: key.value,
+					kind: 'ObjectProperty',
+					start: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+					end: {
+						Line: key.__GSC._POS.end.Line!,
+						Column: key.__GSC._POS.end.Column!,
+					},
+				});
+				continue;
+			} else if (this.current().type == Node.Group.CloseBrace) {
+				// { key }
+				properties.push({
+					key: key.value,
+					kind: 'ObjectProperty',
+					start: {
+						Line: key.__GSC._POS.start.Line!,
+						Column: key.__GSC._POS.start.Column!,
+					},
+					end: {
+						Line: key.__GSC._POS.end.Line!,
+						Column: key.__GSC._POS.end.Column!,
+					},
+				});
+				continue;
+			}
+
+			// { key: value }
+			this.expect(Node.Symbol.Colon, 'Symbol', 'after identifier');
+			const value = this.parseExpr();
+
+			properties.push({
+				kind: 'ObjectProperty',
+				value,
+				key: key.value,
+				start: {
+					Line: key.__GSC._POS.start.Line!,
+					Column: key.__GSC._POS.start.Column!,
+				},
+				end: {
+					Line: key.__GSC._POS.end.Line!,
+					Column: key.__GSC._POS.end.Column!,
+				},
+			});
+
+			if (this.current().type != Node.Group.CloseBrace) {
+				this.expect(
+					Node.Symbol.Comma,
+					'Symbol',
+					'or closing brace following property declaration'
+				);
+			}
+		}
+
+		const endPos = this.expect(
+			Node.Group.CloseBrace,
+			'Group',
+			'at end of object declaration expression'
+		).__GSC._POS.end;
+
+		return {
+			kind: 'ObjectLiteral',
+			properties,
+			start: startTokenPos,
+			end: endPos,
+		} as ObjectLiteral;
 	}
 
 	private parseMultiplicativeExpr(): EXPRESSION {
