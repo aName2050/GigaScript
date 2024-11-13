@@ -10,7 +10,7 @@ import {
 } from '../ast/ast';
 import { AssignmentExpression } from '../ast/expressions/assignemts.ast';
 import { BinaryExpr } from '../ast/expressions/binop.ast';
-import { CallExpr } from '../ast/expressions/expressions.ast';
+import { CallExpr, MemberExpr } from '../ast/expressions/expressions.ast';
 import {
 	Identifier,
 	NumberLiteral,
@@ -543,7 +543,66 @@ export default class Parser {
 		return callExpr;
 	}
 
-	// helper function
+	private parseMemberExpr(): EXPRESSION {
+		let object = this.parsePrimaryExpression();
+
+		while (
+			this.current().type == Node.Symbol.Dot ||
+			this.current().type == Node.Group.OpenBracket
+		) {
+			const op = this.advance();
+			let property: EXPRESSION;
+			let computed: boolean;
+
+			if (op.type == Node.Symbol.Dot) {
+				// "foo.bar" (non-computed)
+				computed = false;
+				property = this.parsePrimaryExpression();
+
+				if (property.kind != 'Identifier') {
+					throw new GSError(
+						SpecialError.ParseError,
+						'A dot operator must be used with a valid identifier',
+						`${SOURCE_FILE}:${property.start.Line}:${property.start.Column}`
+					);
+				}
+			} else {
+				// "foo['bar']" / "foo[ident]" (computed)
+				computed = true;
+				property = this.parseExpr();
+
+				if (
+					property.kind != 'StringLiteral' &&
+					property.kind != 'Identifier'
+				) {
+					throw new GSError(
+						SpecialError.ParseError,
+						'ComputeObjectError: computed objects can only use types STRING or IDENTIFIER',
+						`${SOURCE_FILE}:${getErrorLocation(this.current())}`
+					);
+				}
+
+				this.expect(
+					Node.Group.CloseBracket,
+					'Group',
+					'following computed object member expression'
+				);
+			}
+
+			object = {
+				kind: 'MemberExpr',
+				object,
+				property,
+				computed,
+				start: object.start,
+				end: object.end,
+			} as MemberExpr;
+		}
+
+		return object;
+	}
+
+	// helper functions
 	private parseArgs(): EXPRESSION[] {
 		this.expect(Node.Group.OpenParen, 'Group', 'before argument list');
 

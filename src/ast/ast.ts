@@ -26,8 +26,8 @@ export type ASTNodeType =
 	| 'BitwiseExpr'
 	| 'AssignmentExpr'
 	| 'CallExpr'
-	| 'ChildExpr'
 	| 'ObjectProperty'
+	| 'MemberExpr'
 	// Literals
 	| 'StringLiteral'
 	| 'NumberLiteral'
