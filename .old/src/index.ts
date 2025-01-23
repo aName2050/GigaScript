@@ -1,6 +1,6 @@
 import path from 'path';
 
-import Config from '../.config/gs.json';
+import Config from '../../.config/gs.json';
 
 import { GSError, TSError } from '../typescript/GS.types';
 import { SpecialError } from '../typescript/Error.types';

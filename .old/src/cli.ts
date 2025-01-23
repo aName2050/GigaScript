@@ -1,5 +1,5 @@
 import { ArgumentParser } from 'argparse';
-import { version } from '../package.json';
+import { version } from '../../package.json';
 import { CLIArgs } from '../typescript/CLI.types';
 
 const argParser = new ArgumentParser({
