@@ -1,12 +1,6 @@
-const test: object = {
-    hello: {
-        word: 'nested!',
-        how: {
-            nested: '?'
-        }
-    }
-};
+declare (constant/mutable) (type[string|number|boolean|undefined|any]) VARIABLE_NAME.
+declare (constant/mutable) (type[string|number|boolean|undefined|any]) VARIABLE_NAME to VALUE.
 
-print(test)
-print(test.hello.word)
-print(test.hello['how'])
+set MUTABLE_VARIABLE_NAME to VALUE.
+
+#! comment
