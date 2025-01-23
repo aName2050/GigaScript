@@ -4,7 +4,7 @@ import { GSError } from '../../../typescript/GS.types';
 import { Program, STATEMENT } from '../../ast/ast';
 import { AssignmentExpression } from '../../ast/expressions/assignemts.ast';
 import { BinaryExpr } from '../../ast/expressions/binop.ast';
-import { CallExpr } from '../../ast/expressions/expressions.ast';
+import { CallExpr, MemberExpr } from '../../ast/expressions/expressions.ast';
 import {
 	Identifier,
 	NumberLiteral,
@@ -23,6 +23,7 @@ import {
 	evalBinaryExpr,
 	evalCallExpr,
 	evalIdentifier,
+	evalMemberExpr,
 	evalObjectExpr,
 } from './eval/expr';
 import {
@@ -69,6 +70,9 @@ export function evaluate(node: STATEMENT, env: Environment): GSAny {
 
 		case 'AssignmentExpr':
 			return evalAssignment(node as AssignmentExpression, env);
+
+		case 'MemberExpr':
+			return evalMemberExpr(node as MemberExpr, env);
 
 		// statements
 		case 'Program':

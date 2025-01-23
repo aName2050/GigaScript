@@ -121,4 +121,106 @@ export default class Environment {
 
 		return this.parent.resolve(identifier);
 	}
+
+	// OBJECTS
+	public lookupObjectValue(expr: MemberExpr): GSAny {}
+
+	// public lookupObjectValue(expr: MemberExpr): GSAny {
+	// 	if (expr.object.kind == 'MemberExpr') {
+	// 		const value = this.lookupObjectValue(expr.object as MemberExpr);
+	// 		const property: string = expr.computed
+	// 			? evaluate(expr.property, this).value
+	// 			: (expr.property as Identifier).symbol;
+
+	// 		if (value == undefined) {
+	// 			throw `EvalError: Property "${property}" does't exist on object "${
+	// 				(expr.object as Identifier).symbol
+	// 			}"`;
+	// 		}
+
+	// 		if (value.type == 'object')
+	// 			return (value as GSObject).properties.get(property)!;
+	// 		else return value;
+	// 	}
+
+	// 	const varName = (expr.object as Identifier).symbol;
+	// 	const env = this.resolve(varName);
+
+	// 	const property: string = expr.computed
+	// 		? evaluate(expr.property, env).value
+	// 		: (expr.property as Identifier).symbol;
+
+	// 	let object = env.variables.get(varName) as GSObject;
+
+	// 	const prop = object.properties.get(property);
+
+	// 	if (!prop)
+	// 		throw `EvalError: Property ${property} does not exist on object "${
+	// 			(expr.object as Identifier).symbol
+	// 		}"`;
+
+	// 	return prop;
+	// }
+
+	// public modifyObject(expr: MemberExpr, newValue: GSAny): GSAny {
+	// 	if (expr.object.kind == 'MemberExpr') {
+	// 		const obj = this.getObject(expr.object as MemberExpr);
+	// 		const property: string = expr.computed
+	// 			? evaluate(expr.property, this).value
+	// 			: (expr.property as Identifier).symbol;
+
+	// 		if (obj.type == 'object') {
+	// 			(obj as GSObject).properties.set(property, newValue);
+	// 		}
+
+	// 		return obj;
+	// 	}
+
+	// 	const objectIdentifer = (expr.object as Identifier).symbol;
+	// 	const env = this.resolve(objectIdentifer);
+
+	// 	const object = env.variables.get(objectIdentifer) as GSObject;
+	// 	const property: string = expr.computed
+	// 		? evaluate(expr.property, env).value
+	// 		: (expr.property as Identifier).symbol;
+
+	// 	object.properties.set(property, newValue);
+
+	// 	return object;
+	// }
+
+	// private getObject(expr: MemberExpr): GSAny {
+	// 	if (expr.object.kind == 'MemberExpr') {
+	// 		const value = this.lookupObjectValue(expr.object as MemberExpr);
+	// 		const property: string = expr.computed
+	// 			? evaluate(expr.property, this).value
+	// 			: (expr.property as Identifier).symbol;
+
+	// 		if (value == undefined) {
+	// 			throw `EvalError: Property "${property}" does't exist on object "${
+	// 				(expr.object as Identifier).symbol
+	// 			}"`;
+	// 		}
+
+	// 		if (value.type == 'object')
+	// 			return (value as GSObject).properties.get(property)!;
+	// 	}
+
+	// 	const varName = (expr.object as Identifier).symbol;
+	// 	const env = this.resolve(varName);
+
+	// 	let object = env.variables.get(varName) as GSObject;
+	// 	const property: string = expr.computed
+	// 		? evaluate(expr.property, env).value
+	// 		: (expr.property as Identifier).symbol;
+
+	// 	const prop = object.properties.get(property);
+
+	// 	if (!prop)
+	// 		throw `EvalError: Property ${property} does not exist on object "${
+	// 			(expr.object as Identifier).symbol
+	// 		}"`;
+
+	// 	return prop;
+	// }
 }

@@ -3,7 +3,7 @@ import { SpecialError } from '../../../../typescript/Error.types';
 import { GSError } from '../../../../typescript/GS.types';
 import { AssignmentExpression } from '../../../ast/expressions/assignemts.ast';
 import { BinaryExpr } from '../../../ast/expressions/binop.ast';
-import { CallExpr } from '../../../ast/expressions/expressions.ast';
+import { CallExpr, MemberExpr } from '../../../ast/expressions/expressions.ast';
 import { Identifier, ObjectLiteral } from '../../../ast/literals/literals.ast';
 import { Node } from '../../../parser/nodes';
 import Environment from '../../env';
@@ -400,3 +400,34 @@ export function evalObjectExpr(obj: ObjectLiteral, env: Environment): GSAny {
 
 	return object;
 }
+
+export function evalMemberExpr(expr: MemberExpr, env: Environment): GSAny {
+	if (expr) {
+		const Var = env;
+	}
+}
+
+// export function evalMemberExpr(
+// 	env: Environment,
+// 	node?: AssignmentExpr | null,
+// 	expr?: MemberExpr | null
+// ): GSAny {
+// 	if (expr) {
+// 		const Var = env.lookupObjectValue(expr);
+
+// 		return Var;
+// 	} else if (node) {
+// 		const Var = env.modifyObject(
+// 			node.assigne as MemberExpr,
+// 			evaluate(node.value, env)
+// 		);
+
+// 		return Var;
+// 	} else {
+// 		throw new GSError(
+// 			'EvalError',
+// 			'A member expression cannot be evaluated without a member or assignment expression.',
+// 			`${sourceFile}`
+// 		);
+// 	}
+// }

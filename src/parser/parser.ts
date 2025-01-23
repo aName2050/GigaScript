@@ -518,7 +518,7 @@ export default class Parser {
 
 	// MEMBER/CALL EXPRESSIONS
 	private parseCallMemberExpr(): EXPRESSION {
-		const member = this.parsePrimaryExpression();
+		const member = this.parseMemberExpr();
 
 		if (this.current().type == Node.Group.OpenParen) {
 			return this.parseCallExpr(member);
