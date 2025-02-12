@@ -1,3 +1,5 @@
+import { Token } from '../types';
+
 /**
  * GigaScript tokens
  *
@@ -63,3 +65,7 @@ export enum TokenType {
 	// Special
 	___EOF___,
 }
+
+let Tokens: Record<string, Token> = {};
+
+export { Tokens };
