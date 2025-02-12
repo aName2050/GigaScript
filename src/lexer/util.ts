@@ -13,5 +13,3 @@ export function createToken(data: TokenData): Token {
 export function getTokenByValue(value: string): Token | undefined {
 	return Tokens[value];
 }
-
-// export function setTokenData

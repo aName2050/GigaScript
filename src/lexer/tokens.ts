@@ -68,4 +68,33 @@ export enum TokenType {
 
 let Tokens: Record<string, Token> = {};
 
+export function setTokenData(id: TokenType, raw: string): Token {
+	const token = {
+		ID: id,
+		Raw: raw,
+		_GSC: {
+			POS: {
+				Start: {
+					Line: 0,
+					Column: 0,
+				},
+				End: {
+					Line: 0,
+					Column: 0,
+				},
+			},
+		},
+	} as Token;
+
+	Tokens[raw] = token;
+
+	return token;
+}
+
+export function getTokenByValue(raw: string): Token | undefined {
+	return Tokens[raw];
+}
+
+const tokens: Array<{ id: TokenType; raw: string }> = [];
+
 export { Tokens };
