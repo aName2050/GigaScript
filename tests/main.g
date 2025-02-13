@@ -1,11 +1,11 @@
-declare (constant/mutable) (type<any>) VARIABLE_NAME.
-declare (constant/mutable) (type<any>) VARIABLE_NAME to VALUE.
+declare (constant/mutable) (type<any>) called VARIABLE_NAME.
+declare (constant/mutable) (type<any>) called VARIABLE_NAME set to VALUE.
 
 set MUTABLE_VARIABLE_NAME to VALUE.
 
-declare a function with parameters (...args<any>). When called do:
+declare a function with parameters (...args<any>). when called do:
 #! do stuff within function
-Return (VALUE).
+return (VALUE).
 
 #! comment
 #! types: string|number|boolean|undefined|any
