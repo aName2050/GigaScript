@@ -8,12 +8,21 @@ import { Tokens, TokenType } from './tokens';
  * @param pos The position of the token within the file
  * @returns A token object
  */
-export function createToken(id: TokenType, raw: string, pos: TokenPos): Token {
+export function createToken(
+	id: TokenType,
+	raw: string,
+	pos: TokenPos,
+	src?: string,
+	metadata?: Token['_GSC']['Metadata']
+): Token {
 	return {
 		id,
 		raw,
 		_GSC: {
-			POS: pos,
+			Position: pos,
+			Length: raw.length,
+			SourceFile: src,
+			Metadata: metadata,
 		},
 	} as Token;
 }

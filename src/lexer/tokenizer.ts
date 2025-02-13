@@ -1,3 +1,4 @@
+import { SOURCE_FILE } from '..';
 import { Token, TokenPos } from '../types';
 import { getTokenByRawValue, TokenType } from './tokens';
 import * as GSLexerUtil from './util';
@@ -47,7 +48,8 @@ export function tokenize(source: string): Token[] {
 						// contains the current position the tokenizer is at,
 						// which should be the last character of the token
 						{ ...currentPosition }
-					)
+					),
+					SOURCE_FILE
 				)
 			);
 		} else if (typeof token == 'object') {
@@ -57,6 +59,7 @@ export function tokenize(source: string): Token[] {
 				case '#':
 				case '!':
 				case ':':
+					// all multi-character tokens using symbols
 					const multiCharacterTokens: { [key: string]: string[] } = {
 						'.': ['.'],
 						'#': ['#', '#!'],
@@ -66,7 +69,8 @@ export function tokenize(source: string): Token[] {
 
 					let multiCharacterToken: string = token.raw;
 
-					const possibleTokens =
+					// list all possible tokens that may match
+					const possibleTokens: string[] =
 						multiCharacterTokens[token.raw] || [];
 					possibleTokens.sort((a, b) => b.length - a.length);
 
@@ -77,6 +81,7 @@ export function tokenize(source: string): Token[] {
 						) {
 							multiCharacterToken =
 								possibleToken as typeof token.raw;
+							// remove characters from source array
 							src.splice(0, possibleToken.length);
 							// increment column by number of characters in the token
 							currentPosition.Column += possibleToken.length;
@@ -94,9 +99,62 @@ export function tokenize(source: string): Token[] {
 							GSLexerUtil.tokenPosition(
 								{ ...tokenPosition },
 								{ ...currentPosition }
-							)
+							),
+							SOURCE_FILE
 						)
 					);
+
+					break;
+
+				case '"':
+				case "'":
+					// handle strings
+					let str = '';
+					// move past opening quote storing to compare
+					// it to the closing quotes
+					const quoteType = src.shift();
+					currentPosition.Column++; // increment column
+
+					// only loop if their are still more characters in the src array
+					// and the end of the string has not been reached
+					// and there isn't the end of the line
+					// multiline strings are not supported in GigaScript
+					while (
+						src.length > 0 &&
+						src[0] !== quoteType &&
+						!GSLexerUtil.isEOL(src[0])
+					) {
+						// check for an escape sequence
+						if (src[0] == '\\') {
+							src.shift();
+							currentPosition.Column++;
+
+							let escSeq: string = '\\';
+
+							while (
+								src.length > 0 &&
+								!GSLexerUtil.isEOL(src[0])
+							) {
+								const nextChar = src.shift();
+								currentPosition.Column++;
+								escSeq += nextChar;
+
+								if (
+									!GSLexerUtil.isAllowedEscapeCharacter(
+										escSeq
+									)
+								)
+									break;
+							}
+
+							str += GSLexerUtil.handleEscapeSequence(escSeq);
+						} else {
+							str += src.shift();
+							currentPosition.Column++;
+						}
+
+						if (GSLexerUtil.isEOL(src[0])) throw new
+					}
 			}
 		}
 	}

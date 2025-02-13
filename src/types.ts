@@ -19,7 +19,10 @@ export interface Token {
 		/**
 		 * Position of the token within the file
 		 */
-		POS: TokenPos;
+		Position: TokenPos;
+		Length?: number;
+		SourceFile?: string;
+		Metadata?: Record<string, any>;
 	};
 }
 
@@ -36,11 +39,19 @@ export interface TokenPos {
 		Column: number;
 	};
 	/**
-	 * Posiiton of last character of the token
+	 * Position of last character of the token
 	 * within the file
 	 */
 	End: {
 		Line: number;
 		Column: number;
 	};
+}
+
+export class GSError extends Error {
+	constructor(name: SpecialE);
+}
+
+export enum SpecialError {
+	ModuleNotFoundError = 'GSE_ModuleNotFound',
 }
