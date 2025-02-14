@@ -3,7 +3,7 @@ declare (constant/mutable) (type<any>) called VARIABLE_NAME set to VALUE.
 
 set MUTABLE_VARIABLE_NAME to VALUE.
 
-declare a function with parameters (...args<any>). when called do:
+declare a function called FUNCTION_NAME with parameters (...args<any>). when called do:
     #! do stuff within function
 return (VALUE).
 

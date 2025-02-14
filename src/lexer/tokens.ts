@@ -60,6 +60,9 @@ export enum TokenType {
 	SingleQuote,
 	OpenParentheses,
 	CloseParentheses,
+	GreaterThan, // >
+	LessThan, // <
+	Comma,
 
 	// Types
 	/**
@@ -224,6 +227,18 @@ const tokens: Array<{ id: TokenType; raw: string }> = [
 	{
 		id: TokenType.CloseParentheses,
 		raw: ')',
+	},
+	{
+		id: TokenType.GreaterThan,
+		raw: '>',
+	},
+	{
+		id: TokenType.LessThan,
+		raw: '<',
+	},
+	{
+		id: TokenType.Comma,
+		raw: ',',
 	},
 	{
 		id: TokenType.__Any__,
