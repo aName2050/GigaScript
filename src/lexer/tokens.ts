@@ -26,9 +26,14 @@ export enum TokenType {
 	 */
 	__Undefined,
 
+	/**
+	 * Custom keyword defined by user
+	 */
+	__Identifier,
+
 	/// Keywords
-	// Generic delcarations
-	Delcare,
+	// Generic declarations
+	Declare,
 
 	// Variables
 	Constant,
@@ -53,6 +58,8 @@ export enum TokenType {
 	Colon,
 	DoubleQuote,
 	SingleQuote,
+	OpenParentheses,
+	CloseParentheses,
 
 	// Types
 	/**
@@ -85,7 +92,7 @@ function setTokenData(id: TokenType, raw: string): Token {
 		id,
 		raw,
 		_GSC: {
-			POS: {
+			Position: {
 				Start: {
 					Line: 0,
 					Column: 0,
@@ -95,6 +102,9 @@ function setTokenData(id: TokenType, raw: string): Token {
 					Column: 0,
 				},
 			},
+			Length: 0,
+			SourceFile: '',
+			Metadata: {},
 		},
 	} as Token;
 
@@ -131,7 +141,7 @@ const tokens: Array<{ id: TokenType; raw: string }> = [
 	},
 	// Declarations
 	{
-		id: TokenType.Delcare,
+		id: TokenType.Declare,
 		raw: 'declare',
 	},
 	{
@@ -206,6 +216,14 @@ const tokens: Array<{ id: TokenType; raw: string }> = [
 	{
 		id: TokenType.SingleQuote,
 		raw: "'",
+	},
+	{
+		id: TokenType.OpenParentheses,
+		raw: '(',
+	},
+	{
+		id: TokenType.CloseParentheses,
+		raw: ')',
 	},
 	{
 		id: TokenType.__Any__,

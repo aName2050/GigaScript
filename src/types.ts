@@ -49,9 +49,34 @@ export interface TokenPos {
 }
 
 export class GSError extends Error {
-	constructor(name: SpecialE);
+	constructor(name: SpecialError, message: string, location: string) {
+		super(`${message}\n    at (${location})`);
+		this.name = name;
+	}
 }
 
 export enum SpecialError {
-	ModuleNotFoundError = 'GSE_ModuleNotFound',
+	ModuleNotFoundError = 'ModuleNotFoundError',
+	ParseError = 'ParseError',
+	TypeError = 'TypeError',
+	SyntaxError = 'SyntaxError',
+	NotSupportedError = 'GSE_NotSupported',
+	ReferenceError = 'ReferenceError',
+	RangeError = 'RangeError',
+	RuntimeError = 'RuntimeError',
+	ZeroDivisionError = 'ZeroDivisionError',
+	FileReadError = 'FileReadError',
+	EvalError = 'EvalError',
+
+	InternalError = 'TS_InternalError',
+	ImportError = 'TS_ImportError',
+	CLIError = 'NODE_CLI',
+}
+
+export interface CLIArguments {
+	file?: string;
+	debug?: boolean;
+	ASTOnly?: boolean;
+	NoCrashOnError?: boolean;
+	SilenceErrors?: boolean;
 }

@@ -1,6 +1,6 @@
 import { SOURCE_FILE } from '..';
-import { Token, TokenPos } from '../types';
-import { getTokenByRawValue, TokenType } from './tokens';
+import { GSError, SpecialError, Token, TokenPos } from '../types';
+import { getTokenByRawValue, Tokens, TokenType } from './tokens';
 import * as GSLexerUtil from './util';
 
 export function tokenize(source: string): Token[] {
@@ -153,11 +153,147 @@ export function tokenize(source: string): Token[] {
 							currentPosition.Column++;
 						}
 
-						if (GSLexerUtil.isEOL(src[0])) throw new
+						if (GSLexerUtil.isEOL(src[0]) || src.length == 0)
+							throw new GSError(
+								SpecialError.SyntaxError,
+								'Unterminated string literal',
+								`${SOURCE_FILE}:${GSLexerUtil.formatPosition(
+									currentPosition
+								)}`
+							);
 					}
+
+					src.shift();
+					currentPosition.Column++;
+
+					tokens.push(
+						GSLexerUtil.createToken(
+							TokenType.__String,
+							str,
+							GSLexerUtil.tokenPosition(
+								{ ...tokenPosition },
+								{ ...currentPosition }
+							),
+							SOURCE_FILE,
+							{
+								charArray: str.split(''),
+								displayed: quoteType + str + quoteType,
+							}
+						)
+					);
+
+					break;
+
+				default:
+					currentPosition.Column++;
+					tokens.push(
+						GSLexerUtil.createToken(
+							token.id,
+							token.raw,
+							GSLexerUtil.tokenPosition(
+								{ ...tokenPosition },
+								{ ...currentPosition }
+							),
+							SOURCE_FILE
+						)
+					);
+					src.shift();
+					break;
+			}
+		} else {
+			if (GSLexerUtil.isAlpha(currentCharacter)) {
+				let identifier: string = '';
+				identifier += src.shift();
+				currentPosition.Column++;
+
+				while (src.length > 0 && GSLexerUtil.isAlphanumeric(src[0])) {
+					identifier += src.shift();
+					currentPosition.Column++;
+				}
+
+				const reserved: Token = Tokens[identifier];
+				if (typeof reserved == 'object') {
+					tokens.push(
+						GSLexerUtil.createToken(
+							reserved.id,
+							reserved.raw,
+							GSLexerUtil.tokenPosition(
+								{ ...tokenPosition },
+								{ ...currentPosition }
+							),
+							SOURCE_FILE,
+							{
+								isReservedKeyword: true,
+								userCreatedIdentifier: false,
+							}
+						)
+					);
+				} else {
+					tokens.push(
+						GSLexerUtil.createToken(
+							TokenType.__Identifier,
+							identifier,
+							GSLexerUtil.tokenPosition(
+								{ ...tokenPosition },
+								{ ...currentPosition }
+							),
+							SOURCE_FILE,
+							{
+								isReservedKeyword: false,
+								userCreatedIdentifier: true,
+							}
+						)
+					);
+				}
+			} else if (GSLexerUtil.isEOL(currentCharacter)) {
+				// end of line reached
+				// increment current line counter
+				// reset current column counter
+
+				if (src[0] == '\r' && src[1] == '\n') {
+					src.shift();
+					src.shift();
+				} else src.shift();
+				currentPosition.Line++;
+				currentPosition.Column = 1;
+				tokenPosition.Column = 1;
+			} else if (GSLexerUtil.isWhitespace(currentCharacter)) {
+				// whitespace characters can be ignored
+				// whitespace characters do not provide anything
+				// to the program
+				src.shift();
+				currentPosition.Column++;
+			} else {
+				throw new GSError(
+					SpecialError.SyntaxError,
+					`Unknown character: ${currentCharacter} (U-${currentCharacter.charCodeAt(
+						0
+					)})`,
+					`${SOURCE_FILE}:${GSLexerUtil.formatPosition(
+						currentPosition
+					)}`
+				);
 			}
 		}
 	}
+
+	// push the EndOfFile token at the end to indicate the end of the file
+	// as well as the expected end of the tokens list
+	tokens.push(
+		GSLexerUtil.createToken(
+			TokenType.___EOF___,
+			'<EOF>',
+			GSLexerUtil.tokenPosition(
+				{ ...currentPosition },
+				{
+					Line: currentPosition.Line,
+					Column: currentPosition.Column + 1,
+				}
+			),
+			SOURCE_FILE,
+			{ END_OF_FILE: true, AUTO_GEN: true }
+		)
+	);
 
 	return tokens;
 }

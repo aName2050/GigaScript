@@ -37,6 +37,10 @@ export function tokenPosition(
 	};
 }
 
+export function formatPosition(position: TokenPos['Start']): string {
+	return `${position.Line}:${position.Column}`;
+}
+
 /**
  *
  * @param str The string to test
@@ -82,7 +86,7 @@ export function isWhitespace(str: string): boolean {
  * @returns If the string indicates a new line
  */
 export function isEOL(str: string): boolean {
-	return /\r?\n/.test(str);
+	return ['\r', '\n'].includes(str);
 }
 
 /**
@@ -91,8 +95,8 @@ export function isEOL(str: string): boolean {
  * @returns If the string contains an allowed escape character
  */
 export function isAllowedEscapeCharacter(str: string): boolean {
-	const validCharecters: string[] = ['b', 't', 'n', 'f', 'r', '"', "'"];
-	return validCharecters.includes(str);
+	const validCharacters: string[] = ['b', 't', 'n', 'f', 'r', '"', "'"];
+	return validCharacters.includes(str);
 }
 
 /**
