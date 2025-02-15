@@ -46,6 +46,8 @@ export enum TokenType {
 	Function,
 	With,
 	Parameters,
+	That,
+	Returns,
 	When,
 	Called,
 	Do,
@@ -73,7 +75,7 @@ export enum TokenType {
 	__String__,
 	__Boolean__,
 	__Object__,
-	__Undefined__,
+	__None__,
 
 	// Special
 	___EOF___,
@@ -180,6 +182,14 @@ const tokens: Array<{ id: TokenType; raw: string }> = [
 		raw: 'parameters',
 	},
 	{
+		id: TokenType.That,
+		raw: 'that',
+	},
+	{
+		id: TokenType.Returns,
+		raw: 'returns',
+	},
+	{
 		id: TokenType.When,
 		raw: 'when',
 	},
@@ -261,8 +271,8 @@ const tokens: Array<{ id: TokenType; raw: string }> = [
 		raw: 'object',
 	},
 	{
-		id: TokenType.__Undefined__,
-		raw: 'Undefined',
+		id: TokenType.__None__,
+		raw: 'none',
 	},
 	// Special
 	{
