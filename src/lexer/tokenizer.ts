@@ -7,7 +7,7 @@ export function tokenize(source: string): Token[] {
 	const tokens: Token[] = new Array<Token>();
 	const src: string[] = source.split('');
 
-	let currentPosition: TokenPos['Start'] = { Line: 1, Column: 0 };
+	let currentPosition: TokenPos['Start'] = { Line: 1, Column: 1 };
 
 	while (src.length > 0) {
 		const currentCharacter: string = src[0];

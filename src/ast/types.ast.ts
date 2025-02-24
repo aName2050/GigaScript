@@ -17,12 +17,12 @@ export type ASTNodeType =
 export interface GSASTNode {
 	kind: ASTNodeType;
 	start: {
-		line: number;
-		column: number;
+		Line: number;
+		Column: number;
 	};
 	end: {
-		line: number;
-		column: number;
+		Line: number;
+		Column: number;
 	};
 }
 

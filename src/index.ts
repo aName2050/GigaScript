@@ -1,22 +1,26 @@
 import path from 'path';
 
-import { GSError, SpecialError, Token } from './types';
+import { GSError, SpecialError } from './types';
 
 import { args } from './cli.conf';
 import { readFileSync } from 'fs';
-import { tokenize } from './lexer/tokenizer';
+import Parser from './parser/parser';
+import { Program } from './ast/core.ast';
 
 const { file } = args;
 
 function run(filename: string, location: string): void {
-	// parser
+	const parser: Parser = new Parser();
 	// environment
 
 	let file = readFileSync(filename, { encoding: 'utf-8' });
 
 	if (filename.endsWith('.g')) {
-		const tokens: Token[] = tokenize(file);
-		console.log(tokens);
+		// const tokens: Token[] = tokenize(file);
+		parser.tokenizeSource(file);
+		// console.log(parser.Tokens);
+		const program: Program = parser.generateAST();
+		console.log(program);
 	}
 }
 

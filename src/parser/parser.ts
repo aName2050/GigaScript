@@ -1,8 +1,14 @@
 import { SOURCE_FILE } from '..';
-import { Program } from '../ast/core.ast';
+import { Expression, Program, Statement } from '../ast/core.ast';
+import {
+	Identifier,
+	NumberLiteral,
+	StringLiteral,
+} from '../ast/literals/literals.ast';
 import { tokenize } from '../lexer/tokenizer';
-import { TokenType } from '../lexer/tokens';
+import { getTokenById, TokenType } from '../lexer/tokens';
 import { GSError, SpecialError, Token } from '../types';
+import ParseDeclaration from './handlers/declarations.parser';
 import { formatErrorLocation, getTokenName } from './util';
 
 export default class Parser {
@@ -40,6 +46,14 @@ export default class Parser {
 		return this.tokens.shift() as Token;
 	}
 
+	public Util = {
+		isEOF: this.isEOF,
+		currentToken: this.currentToken,
+		nextToken: this.nextToken,
+		expect: this.expect,
+		advance: this.advance,
+	};
+
 	private expect(id: Token['id'], errNote = ''): Token {
 		const token = this.advance() as Token;
 		if (!token || token.id != id) {
@@ -68,17 +82,17 @@ export default class Parser {
 			kind: 'Program',
 			body: [],
 			start: {
-				line: 1,
-				column: 1,
+				Line: 1,
+				Column: 1,
 			},
 			end: {
-				line: 1,
-				column: 1,
+				Line: 1,
+				Column: 1,
 			},
 		};
 
 		while (!this.isEOF()) {
-			// TODO:
+			program.body.push(this.parseStatement());
 		}
 
 		const EOFToken = this.currentToken();
@@ -89,11 +103,68 @@ export default class Parser {
 				`${SOURCE_FILE}:${formatErrorLocation(this.currentToken())}`
 			);
 
-		program.end = {
-			line: EOFToken._GSC.Position.End.Line,
-			column: EOFToken._GSC.Position.End.Column,
-		};
+		program.end = EOFToken._GSC.Position.End;
 
 		return program;
+	}
+
+	private parseStatement(): Statement {
+		switch (this.currentToken().id) {
+			case TokenType.Declare:
+				return ParseDeclaration(this);
+
+			default:
+				return this.parseExpression();
+		}
+	}
+
+	private parseExpression(): Expression {
+		return this.parsePrimaryExpression();
+	}
+
+	private parsePrimaryExpression(): Expression {
+		const token = this.currentToken();
+
+		switch (token.id) {
+			case TokenType.__Identifier:
+				return {
+					kind: 'Identifier',
+					symbol: this.advance().raw,
+					start: token._GSC.Position.Start,
+					end: token._GSC.Position.End,
+				} as Identifier;
+
+			case TokenType.__Number:
+				return {
+					kind: 'NumberLiteral',
+					value: parseFloat(this.advance().raw),
+					start: token._GSC.Position.Start,
+					end: token._GSC.Position.End,
+				} as NumberLiteral;
+
+			case TokenType.__String:
+				return {
+					kind: 'StringLiteral',
+					value: this.advance().raw,
+					start: token._GSC.Position.Start,
+					end: token._GSC.Position.End,
+				} as StringLiteral;
+
+			case TokenType.OpenParentheses:
+				this.advance();
+				const value = this.parseExpression();
+				this.expect(TokenType.CloseParentheses);
+
+				return value;
+
+			default:
+				throw new GSError(
+					SpecialError.ParseError,
+					`Uncaught: Unexpected token "${
+						getTokenById(this.currentToken().id)?.raw
+					}`,
+					`${SOURCE_FILE}:${formatErrorLocation(this.currentToken())}`
+				);
+		}
 	}
 }

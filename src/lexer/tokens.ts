@@ -127,6 +127,19 @@ export function getTokenByRawValue(raw: string): Token | undefined {
 	return Tokens[raw];
 }
 
+export function getTokenById(id: TokenType): Token | undefined {
+	let matchedToken: Token | undefined;
+	for (let i = 0; i < Object.entries(Tokens).length; i++) {
+		const token: Token = Object.entries(Tokens)[i][1];
+		if (token.id === id) {
+			matchedToken = token;
+			break;
+		} else continue;
+	}
+
+	return matchedToken;
+}
+
 /**
  * Keyword data list
  */
