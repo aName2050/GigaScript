@@ -108,7 +108,7 @@ export default class Parser {
 		return program;
 	}
 
-	private parseStatement(): Statement {
+	public parseStatement(): Statement {
 		switch (this.currentToken().id) {
 			case TokenType.Declare:
 				return ParseDeclaration(this);
@@ -118,11 +118,11 @@ export default class Parser {
 		}
 	}
 
-	private parseExpression(): Expression {
+	public parseExpression(): Expression {
 		return this.parsePrimaryExpression();
 	}
 
-	private parsePrimaryExpression(): Expression {
+	public parsePrimaryExpression(): Expression {
 		const token = this.currentToken();
 
 		switch (token.id) {
