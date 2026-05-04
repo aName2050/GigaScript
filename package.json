@@ -9,7 +9,7 @@
 	"author": "Bardia Shafaee (aName2050)",
 	"license": "MIT",
 	"devDependencies": {
-		"@types/node": "^20.11.25"
+		"@types/node": "^20.19.39"
 	},
 	"dependencies": {
 		"@types/argparse": "^2.0.15",
