@@ -18,9 +18,6 @@ export enum Symbol {
 	/** Undefined value */
 	_Undefined,
 
-	/** Null value */
-	_Null,
-
 	/** User defined symbol */
 	_Identifier,
 
@@ -43,19 +40,34 @@ export enum Symbol {
 	// /** Else statement */
 	// Else,
 
+	// File Markers
 	/** End Of File (EOF) */
 	__EOF__,
+	/** Start of File (SOF) */
+	__SOF__,
 
 	// { SYMBOLS }
 	// Punctuation
 	/** Semicolon ( ; ) */
-	// Semicolon,
-	// /** Colon ( : ) */
-	// Colon,
-	// /** Dot ( . ) */
-	// Dot,
-	// /** Comma ( , ) */
-	// Comma,
+	Semicolon,
+	/** Colon ( : ) */
+	Colon,
+	/** Dot ( . ) */
+	Dot,
+	/** Comma ( , ) */
+	Comma,
+
+	// Binary Operators
+	/** Plus ( + ) */
+	Plus,
+	/** Minus ( - ) */
+	Minus,
+	/** Multiply ( * )*/
+	Asterisk,
+	/** Divide ( / ) */
+	ForwardSlash,
+	/** Modulo ( % ) */
+	PercentSign,
 
 	// Assignment Operators
 	/** Equals ( = ) */

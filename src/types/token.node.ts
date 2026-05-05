@@ -26,63 +26,66 @@ export enum NodeType {
 	/** Return statement */
 	Return,
 
-	// { CLASSES }
-	/** Class declaration */
-	Class,
-	/** Class constructor */
-	Constructor,
-	/** Private method/property */
-	Private,
-	/** Public method/property */
-	Public,
-	/** Static method/property */
-	Static,
-	/** New Class */
-	New,
+	// // { CLASSES }
+	// /** Class declaration */
+	// Class,
+	// /** Class constructor */
+	// Constructor,
+	// /** Private method/property */
+	// Private,
+	// /** Public method/property */
+	// Public,
+	// /** Static method/property */
+	// Static,
+	// /** New Class */
+	// New,
 
-	// { IF/ELSE STATEMENTS }
-	/** If statement */
-	If,
-	/** Else statement */
-	Else,
+	// // { IF/ELSE STATEMENTS }
+	// /** If statement */
+	// If,
+	// /** Else statement */
+	// Else,
 
-	// { LOOPS }
-	/** While loop statement */
-	While,
-	/** For loop statement */
-	For,
-	/** Continue statement */
-	Continue,
-	/** Break statement */
-	Break,
+	// // { LOOPS }
+	// /** While loop statement */
+	// While,
+	// /** For loop statement */
+	// For,
+	// /** Continue statement */
+	// Continue,
+	// /** Break statement */
+	// Break,
 
-	// { IMPORTS/EXPORTS }
-	/** Import statement */
-	Import,
-	/** Export statement */
-	Export,
-	/** From statement */
-	From,
-	/** As statement */
-	As,
+	// // { IMPORTS/EXPORTS }
+	// /** Import statement */
+	// Import,
+	// /** Export statement */
+	// Export,
+	// /** From statement */
+	// From,
+	// /** As statement */
+	// As,
 
-	// { SPECIAL }
-	/** Throw exception statement */
-	Throw,
+	// // { SPECIAL }
+	// /** Throw exception statement */
+	// Throw,
 
-	/** Try statement */
-	Try,
-	/** Catch statement */
-	Catch,
+	// /** Try statement */
+	// Try,
+	// /** Catch statement */
+	// Catch,
 
-	/** Binary Operation (+ - * / %) */
-	BinOp,
+	// /** Binary Operation (+ - * / %) */
+	// BinOp,
 
-	/** Bitwise Operation ( >> << & | ~ ^ ) */
-	BitOp,
+	// /** Bitwise Operation ( >> << & | ~ ^ ) */
+	// BitOp,
 
+	// File Markers
 	/** End Of File (EOF) */
 	__EOF__,
+	/** Start of File (SOF) */
+	__SOF__,
 
 	// { SYMBOLS }
 	// Punctation
@@ -96,87 +99,78 @@ export enum NodeType {
 	Comma,
 
 	// Binary Operators
-	/** Plus ( + ) */
-	Plus,
-	/** Minus ( - ) */
-	Minus,
-	/** Multiply ( * )*/
-	Multiply,
-	/** Diivde ( / ) */
-	Divide,
-	/** Modulo ( % ) */
-	Modulo,
+	BinaryOperator,
 
-	// Assignment Operators
+	// // Assignment Operators
 	/** Equals ( = ) */
 	Equals,
-	/** Plus Equals ( += ) */
-	AsgAdd,
-	/** Minus Equals ( -= ) */
-	AsgMin,
-	/** Multiply Equals ( *= ) */
-	AsgMult,
-	/** Divide Equals ( /= ) */
-	AsgDiv,
-	/** Modulo Equals ( %= ) */
-	AsgMod,
+	// /** Plus Equals ( += ) */
+	// AsgAdd,
+	// /** Minus Equals ( -= ) */
+	// AsgMin,
+	// /** Multiply Equals ( *= ) */
+	// AsgMult,
+	// /** Divide Equals ( /= ) */
+	// AsgDiv,
+	// /** Modulo Equals ( %= ) */
+	// AsgMod,
 
-	/** Bitwise LShift Equals ( <<= ) */
-	Bitwise_AsgLShift,
-	/** Bitwise Signed RShift Equals Equals ( >>= ) */
-	Bitwise_AsgSRShift,
-	/** Bitwise Zero-Fill RShift Equals ( >>>= ) */
-	Bitwise_AsgZFRShift,
-	/** Bitwise AND Equals ( &= ) */
-	Bitwise_AsgAND,
-	/** Bitwise OR Equals ( |= ) */
-	Bitwise_AsgOR,
-	/** Bitwise XOR Equals ( ^= ) */
-	Bitwise_AsgXOR,
+	// /** Bitwise LShift Equals ( <<= ) */
+	// Bitwise_AsgLShift,
+	// /** Bitwise Signed RShift Equals Equals ( >>= ) */
+	// Bitwise_AsgSRShift,
+	// /** Bitwise Zero-Fill RShift Equals ( >>>= ) */
+	// Bitwise_AsgZFRShift,
+	// /** Bitwise AND Equals ( &= ) */
+	// Bitwise_AsgAND,
+	// /** Bitwise OR Equals ( |= ) */
+	// Bitwise_AsgOR,
+	// /** Bitwise XOR Equals ( ^= ) */
+	// Bitwise_AsgXOR,
 
-	// Increment/Decrement Operators
-	/** Increment ( ++ ) */
-	Increment,
-	/** Decrement ( -- ) */
-	Decrement,
+	// // Increment/Decrement Operators
+	// /** Increment ( ++ ) */
+	// Increment,
+	// /** Decrement ( -- ) */
+	// Decrement,
 
-	// Comparison Operators
-	/** Greater Than ( > ) */
-	GreaterThan,
-	/** Less Than ( < ) */
-	LessThan,
-	/** Greater Than or Equal to ( >= ) */
-	GreaterThanOrEquals,
-	/** Less Than or Equal to ( <= ) */
-	LessThanOrEquals,
-	/** Equal to ( == ) */
-	IsEqual,
-	/** Not Equal to ( != ) */
-	NotEqual,
+	// // Comparison Operators
+	// /** Greater Than ( > ) */
+	// GreaterThan,
+	// /** Less Than ( < ) */
+	// LessThan,
+	// /** Greater Than or Equal to ( >= ) */
+	// GreaterThanOrEquals,
+	// /** Less Than or Equal to ( <= ) */
+	// LessThanOrEquals,
+	// /** Equal to ( == ) */
+	// IsEqual,
+	// /** Not Equal to ( != ) */
+	// NotEqual,
 
-	// Logical Expressions
-	/** Exclamation ( ! ) */
-	Not,
-	/** And ( && ) */
-	And,
-	/** Or ( || ) */
-	Or,
+	// // Logical Expressions
+	// /** Exclamation ( ! ) */
+	// Not,
+	// /** And ( && ) */
+	// And,
+	// /** Or ( || ) */
+	// Or,
 
-	// Bitwise Operators
-	/** Bitwise AND ( & ) */
-	Bitwise_AND,
-	/** Bitwise OR ( | ) */
-	Bitwise_OR,
-	/** Bitwise XOR ( ^ ) */
-	Bitwise_XOR,
-	/** Bitwise NOT ( ~ ) */
-	Bitwise_NOT,
-	/** Bitwise LEFT SHIFT ( << ) */
-	Bitwise_LShift,
-	/** Bitwise SIGNED RIGHT SHIFT ( >> ) */
-	Bitwise_SRShift,
-	/** Bitwise ZERO-FILL RIGHT SHIFT ( >>> ) */
-	Bitwise_ZFRShift,
+	// // Bitwise Operators
+	// /** Bitwise AND ( & ) */
+	// Bitwise_AND,
+	// /** Bitwise OR ( | ) */
+	// Bitwise_OR,
+	// /** Bitwise XOR ( ^ ) */
+	// Bitwise_XOR,
+	// /** Bitwise NOT ( ~ ) */
+	// Bitwise_NOT,
+	// /** Bitwise LEFT SHIFT ( << ) */
+	// Bitwise_LShift,
+	// /** Bitwise SIGNED RIGHT SHIFT ( >> ) */
+	// Bitwise_SRShift,
+	// /** Bitwise ZERO-FILL RIGHT SHIFT ( >>> ) */
+	// Bitwise_ZFRShift,
 
 	// { GROUPING }
 	/** Open Parenthesis ( ( )*/
