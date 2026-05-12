@@ -61,9 +61,13 @@ declareToken(Symbol.Asterisk, NodeType.BinaryOperator, '*');
 declareToken(Symbol.ForwardSlash, NodeType.BinaryOperator, '/');
 declareToken(Symbol.PercentSign, NodeType.BinaryOperator, '%');
 
+// Symbols
+declareToken(Symbol.Semicolon, NodeType.Semicolon, ';');
+
 // Assignment Operators
 declareToken(Symbol.Equals, NodeType.Equals, '=');
 
 // Special
-declareToken(Symbol.__SOF__, NodeType.__SOF__, '<SOF>');
-declareToken(Symbol.__EOF__, NodeType.__EOF__, '<EOF>');
+declareToken(Symbol.__SOF__, NodeType.__SOF__, '<!SOF>');
+declareToken(Symbol.__EOF__, NodeType.__EOF__, '<!EOF>');
+declareToken(Symbol.__EOL__, NodeType.__EOL__, '<!EOL>');

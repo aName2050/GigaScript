@@ -20,21 +20,21 @@ export function tokenize(source: string): Token[] {
 	const determineMultiCharToken = (char: string): [string, number] => {
 		switch (char) {
 			case '=':
-				return src[0] === '=' ? ['==', 1] : ['=', 0];
+				return src.length > 1 && src[1] === '=' ? ['==', 1] : ['=', 0];
 			case '+':
-				if (src[0] === '=') return ['+=', 1];
-				if (src[0] === '+') return ['++', 1];
+				if (src.length > 1 && src[1] === '=') return ['+=', 1];
+				if (src.length > 1 && src[1] === '+') return ['++', 1];
 				return ['+', 0];
 			case '-':
-				if (src[0] === '=') return ['-=', 1];
-				if (src[0] === '-') return ['--', 1];
+				if (src.length > 1 && src[1] === '=') return ['-=', 1];
+				if (src.length > 1 && src[1] === '-') return ['--', 1];
 				return ['-', 0];
 			case '*':
-				return src[0] === '=' ? ['*=', 1] : ['*', 0];
+				return src.length > 1 && src[1] === '=' ? ['*=', 1] : ['*', 0];
 			case '/':
-				return src[0] === '=' ? ['/=', 1] : ['/', 0];
+				return src.length > 1 && src[1] === '=' ? ['/=', 1] : ['/', 0];
 			case '%':
-				return src[0] === '=' ? ['%=', 1] : ['%', 0];
+				return src.length > 1 && src[1] === '=' ? ['%=', 1] : ['%', 0];
 			default:
 				return [char, 0];
 		}
@@ -96,6 +96,13 @@ export function tokenize(source: string): Token[] {
 				src.shift(); // consume the symbol character
 				currentPosition.Column++;
 			}
+
+			if (!getTokenByValue(determinedToken))
+				throw new GigaScriptError(
+					'LexerError',
+					`Unable to tokenize: '${current}' (${current.charCodeAt(0)})`,
+					`${SOURCE_FILE}:${currentPosition.Line}:${currentPosition.Column}`,
+				);
 
 			tokens.push(
 				generateToken(
@@ -166,6 +173,20 @@ export function tokenize(source: string): Token[] {
 						currentPosition.Line++;
 						currentPosition.Column = 1;
 						tokenPosition.Column = 1;
+						tokens.push(
+							generateToken(
+								Symbol.__EOL__,
+								NodeType.__EOL__,
+								'<!EOL>',
+								{
+									start: tokenPosition,
+									end: {
+										Line: currentPosition.Line,
+										Column: currentPosition.Column,
+									},
+								},
+							),
+						);
 					} else if (isWhitespace(current))
 						src.shift() && tokenPosition.Column++;
 					else

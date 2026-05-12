@@ -45,6 +45,8 @@ export enum Symbol {
 	__EOF__,
 	/** Start of File (SOF) */
 	__SOF__,
+	/** End of Line (EOL) */
+	__EOL__,
 
 	// { SYMBOLS }
 	// Punctuation
