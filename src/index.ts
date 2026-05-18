@@ -10,6 +10,7 @@ export function readFile(filePath: string): string {
 }
 
 import { tokenize } from './GigaScript/lexer/tokenizer';
+import Parser from './GigaScript/parser/parser';
 
 const filePath = process.argv[2];
 if (!filePath) {
@@ -21,5 +22,7 @@ const file = path.resolve(filePath);
 export { file as SOURCE_FILE };
 
 const fileContent = readFile(filePath);
-const tokens = tokenize(fileContent);
-console.log(tokens);
+const parser = new Parser();
+parser.tokenizeSource(fileContent);
+console.log(parser.Tokens);
+parser.generateAbstractSyntaxTree();

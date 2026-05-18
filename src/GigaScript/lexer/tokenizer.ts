@@ -43,8 +43,8 @@ export function tokenize(source: string): Token[] {
 	// START OF TOKENIZER
 	tokens.push(
 		generateToken(Symbol.__SOF__, NodeType.__SOF__, '<!SOF>', {
-			start: { Line: null, Column: null },
-			end: { Line: null, Column: null },
+			start: { Line: 0, Column: 0 },
+			end: { Line: 0, Column: 0 },
 		}),
 	);
 
@@ -201,8 +201,11 @@ export function tokenize(source: string): Token[] {
 
 	tokens.push(
 		generateToken(Symbol.__EOF__, NodeType.__EOF__, '<!EOF>', {
-			start: { Line: null, Column: null },
-			end: { Line: null, Column: null },
+			start: {
+				Line: currentPosition.Line,
+				Column: currentPosition.Column,
+			},
+			end: { Line: currentPosition.Line, Column: currentPosition.Column },
 		}),
 	);
 

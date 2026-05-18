@@ -90,7 +90,7 @@ export enum NodeType {
 	__EOL__,
 
 	// { SYMBOLS }
-	// Punctation
+	// Punctuation
 	/** Semicolon ( ; ) */
 	Semicolon,
 	/** Colon ( : ) */
