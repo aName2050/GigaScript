@@ -125,9 +125,10 @@ export default class Parser {
 		}
 
 		program.end = {
-			Line: this.advance().__GSC._POS.end.Line!,
-			Column: this.advance().__GSC._POS.end.Column!,
+			Line: this.peek().__GSC._POS.end.Line!,
+			Column: this.peek().__GSC._POS.end.Column!,
 		};
+		this.expect(NodeType.__EOF__);
 
 		console.log(program);
 
@@ -158,6 +159,7 @@ export default class Parser {
 		const initializer = this.parseExpression();
 
 		this.expect(NodeType.Semicolon);
+		this.expect(NodeType.__EOL__);
 
 		return {
 			kind: 'VariableDeclaration',
@@ -175,7 +177,6 @@ export default class Parser {
 
 	private parsePrimaryExpression(): EXPRESSION {
 		const token = this.peek();
-		console.log(token);
 
 		switch (token.type) {
 			case NodeType.Identifier:
